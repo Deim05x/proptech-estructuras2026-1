@@ -1,0 +1,47 @@
+CREATE TABLE IF NOT EXISTS inmueble (
+    codigo VARCHAR(20) PRIMARY KEY,
+    direccion VARCHAR(150) NOT NULL,
+    ciudad VARCHAR(80) NOT NULL,
+    barrio_zona VARCHAR(80) NOT NULL,
+    tipo_inmueble VARCHAR(50) NOT NULL,
+    finalidad VARCHAR(20) NOT NULL,
+    precio DOUBLE NOT NULL,
+    area DOUBLE NOT NULL,
+    habitaciones INT NOT NULL,
+    banos INT NOT NULL,
+    estado VARCHAR(40) NOT NULL,
+    disponible BOOLEAN NOT NULL,
+    asesor_id_responsable VARCHAR(20)
+);
+
+CREATE TABLE IF NOT EXISTS cliente (
+    id VARCHAR(20) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(100) NOT NULL,
+    telefono VARCHAR(30) NOT NULL,
+    tipo_cliente VARCHAR(30) NOT NULL,
+    presupuesto DOUBLE NOT NULL,
+    zonas_interes VARCHAR(255),
+    tipo_inmueble_deseado VARCHAR(50),
+    habitaciones_minimas INT NOT NULL,
+    estado_busqueda VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS asesor (
+    id VARCHAR(20) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    contacto VARCHAR(100) NOT NULL,
+    especialidad_zona VARCHAR(100) NOT NULL,
+    cantidad_cierres INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS visita (
+    id INT PRIMARY KEY,
+    cliente_id VARCHAR(20) NOT NULL,
+    inmueble_codigo VARCHAR(20) NOT NULL,
+    asesor_id VARCHAR(20) NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    estado VARCHAR(50) NOT NULL,
+    observacion VARCHAR(255)
+);
