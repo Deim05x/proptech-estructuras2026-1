@@ -69,6 +69,34 @@ public class AsesorRepository {
         return filasAfectadas > 0;
     }
 
+    public boolean actualizar(String id, Asesor asesor) {
+        String sql = """
+                UPDATE asesor
+                SET nombre = ?,
+                    contacto = ?,
+                    especialidad_zona = ?,
+                    cantidad_cierres = ?
+                WHERE id = ?
+                """;
+
+        int filasAfectadas = jdbcTemplate.update(
+                sql,
+                asesor.getNombre(),
+                asesor.getContacto(),
+                asesor.getEspecialidadZona(),
+                asesor.getCantidadCierres(),
+                id
+        );
+
+        return filasAfectadas > 0;
+    }
+
+    public boolean eliminar(String id) {
+        String sql = "DELETE FROM asesor WHERE id = ?";
+        int filasAfectadas = jdbcTemplate.update(sql, id);
+        return filasAfectadas > 0;
+    }
+
     private Asesor mapearAsesor(ResultSet rs) throws SQLException {
         return new Asesor(
                 rs.getString("id"),

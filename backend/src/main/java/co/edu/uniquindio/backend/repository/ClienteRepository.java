@@ -77,6 +77,44 @@ public class ClienteRepository {
         return filasAfectadas > 0;
     }
 
+    public boolean actualizar(String id, Cliente cliente) {
+        String sql = """
+                UPDATE cliente
+                SET nombre = ?,
+                    correo = ?,
+                    telefono = ?,
+                    tipo_cliente = ?,
+                    presupuesto = ?,
+                    zonas_interes = ?,
+                    tipo_inmueble_deseado = ?,
+                    habitaciones_minimas = ?,
+                    estado_busqueda = ?
+                WHERE id = ?
+                """;
+
+        int filasAfectadas = jdbcTemplate.update(
+                sql,
+                cliente.getNombre(),
+                cliente.getCorreo(),
+                cliente.getTelefono(),
+                cliente.getTipoCliente(),
+                cliente.getPresupuesto(),
+                cliente.getZonasInteres(),
+                cliente.getTipoInmuebleDeseado(),
+                cliente.getHabitacionesMinimas(),
+                cliente.getEstadoBusqueda(),
+                id
+        );
+
+        return filasAfectadas > 0;
+    }
+
+    public boolean eliminar(String id) {
+        String sql = "DELETE FROM cliente WHERE id = ?";
+        int filasAfectadas = jdbcTemplate.update(sql, id);
+        return filasAfectadas > 0;
+    }
+
     private Cliente mapearCliente(ResultSet rs) throws SQLException {
         return new Cliente(
                 rs.getString("id"),

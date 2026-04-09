@@ -8,19 +8,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class AsesorService {
 
-    private final LinkedSimpleList<Asesor> listaAsesores;
     private final AsesorRepository asesorRepository;
 
     public AsesorService(AsesorRepository asesorRepository) {
         this.asesorRepository = asesorRepository;
-        this.listaAsesores = asesorRepository.obtenerTodos();
     }
 
     public String obtenerMensaje() {
         return "Servicio de asesores funcionando correctamente con lista propia y MariaDB";
     }
 
+    private LinkedSimpleList<Asesor> obtenerListaDesdeBD() {
+        return asesorRepository.obtenerTodos();
+    }
+
     public Asesor[] listarAsesores() {
+        LinkedSimpleList<Asesor> listaAsesores = obtenerListaDesdeBD();
         Asesor[] arreglo = new Asesor[listaAsesores.getSize()];
 
         for (int i = 0; i < listaAsesores.getSize(); i++) {
@@ -31,6 +34,8 @@ public class AsesorService {
     }
 
     public Asesor buscarPorId(String id) {
+        LinkedSimpleList<Asesor> listaAsesores = obtenerListaDesdeBD();
+
         for (Asesor asesor : listaAsesores) {
             if (asesor.getId().equals(id)) {
                 return asesor;
@@ -52,12 +57,38 @@ public class AsesorService {
             return false;
         }
 
-        boolean guardado = asesorRepository.guardar(asesor);
+        return asesorRepository.guardar(asesor);
+    }
 
-        if (guardado) {
-            listaAsesores.addLast(asesor);
+    public boolean actualizarAsesor(String id, Asesor asesorActualizado) {
+        if (id == null || id.trim().isEmpty()) {
+            return false;
         }
 
-        return guardado;
+        if (asesorActualizado == null) {
+            return false;
+        }
+
+        Asesor existente = buscarPorId(id);
+        if (existente == null) {
+            return false;
+        }
+
+        asesorActualizado.setId(id);
+
+        return asesorRepository.actualizar(id, asesorActualizado);
+    }
+
+    public boolean eliminarAsesor(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            return false;
+        }
+
+        Asesor existente = buscarPorId(id);
+        if (existente == null) {
+            return false;
+        }
+
+        return asesorRepository.eliminar(id);
     }
 }

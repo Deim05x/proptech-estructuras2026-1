@@ -8,19 +8,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class VisitaService {
 
-    private final LinkedSimpleList<Visita> listaVisitas;
     private final VisitaRepository visitaRepository;
 
     public VisitaService(VisitaRepository visitaRepository) {
         this.visitaRepository = visitaRepository;
-        this.listaVisitas = visitaRepository.obtenerTodos();
     }
 
     public String obtenerMensaje() {
         return "Servicio de visitas funcionando correctamente con lista propia y MariaDB";
     }
 
+    private LinkedSimpleList<Visita> obtenerListaDesdeBD() {
+        return visitaRepository.obtenerTodos();
+    }
+
     public Visita[] listarVisitas() {
+        LinkedSimpleList<Visita> listaVisitas = obtenerListaDesdeBD();
         Visita[] arreglo = new Visita[listaVisitas.getSize()];
 
         for (int i = 0; i < listaVisitas.getSize(); i++) {
@@ -31,6 +34,8 @@ public class VisitaService {
     }
 
     public Visita buscarPorId(int id) {
+        LinkedSimpleList<Visita> listaVisitas = obtenerListaDesdeBD();
+
         for (Visita visita : listaVisitas) {
             if (visita.getId() == id) {
                 return visita;
@@ -52,12 +57,38 @@ public class VisitaService {
             return false;
         }
 
-        boolean guardado = visitaRepository.guardar(visita);
+        return visitaRepository.guardar(visita);
+    }
 
-        if (guardado) {
-            listaVisitas.addLast(visita);
+    public boolean actualizarVisita(int id, Visita visitaActualizada) {
+        if (id <= 0) {
+            return false;
         }
 
-        return guardado;
+        if (visitaActualizada == null) {
+            return false;
+        }
+
+        Visita existente = buscarPorId(id);
+        if (existente == null) {
+            return false;
+        }
+
+        visitaActualizada.setId(id);
+
+        return visitaRepository.actualizar(id, visitaActualizada);
+    }
+
+    public boolean eliminarVisita(int id) {
+        if (id <= 0) {
+            return false;
+        }
+
+        Visita existente = buscarPorId(id);
+        if (existente == null) {
+            return false;
+        }
+
+        return visitaRepository.eliminar(id);
     }
 }

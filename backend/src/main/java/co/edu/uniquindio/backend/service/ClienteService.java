@@ -8,19 +8,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClienteService {
 
-    private final LinkedSimpleList<Cliente> listaClientes;
     private final ClienteRepository clienteRepository;
 
     public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
-        this.listaClientes = clienteRepository.obtenerTodos();
     }
 
     public String obtenerMensaje() {
         return "Servicio de clientes funcionando correctamente con lista propia y MariaDB";
     }
 
+    private LinkedSimpleList<Cliente> obtenerListaDesdeBD() {
+        return clienteRepository.obtenerTodos();
+    }
+
     public Cliente[] listarClientes() {
+        LinkedSimpleList<Cliente> listaClientes = obtenerListaDesdeBD();
         Cliente[] arreglo = new Cliente[listaClientes.getSize()];
 
         for (int i = 0; i < listaClientes.getSize(); i++) {
@@ -31,6 +34,8 @@ public class ClienteService {
     }
 
     public Cliente buscarPorId(String id) {
+        LinkedSimpleList<Cliente> listaClientes = obtenerListaDesdeBD();
+
         for (Cliente cliente : listaClientes) {
             if (cliente.getId().equals(id)) {
                 return cliente;
@@ -52,12 +57,38 @@ public class ClienteService {
             return false;
         }
 
-        boolean guardado = clienteRepository.guardar(cliente);
+        return clienteRepository.guardar(cliente);
+    }
 
-        if (guardado) {
-            listaClientes.addLast(cliente);
+    public boolean actualizarCliente(String id, Cliente clienteActualizado) {
+        if (id == null || id.trim().isEmpty()) {
+            return false;
         }
 
-        return guardado;
+        if (clienteActualizado == null) {
+            return false;
+        }
+
+        Cliente existente = buscarPorId(id);
+        if (existente == null) {
+            return false;
+        }
+
+        clienteActualizado.setId(id);
+
+        return clienteRepository.actualizar(id, clienteActualizado);
+    }
+
+    public boolean eliminarCliente(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            return false;
+        }
+
+        Cliente existente = buscarPorId(id);
+        if (existente == null) {
+            return false;
+        }
+
+        return clienteRepository.eliminar(id);
     }
 }

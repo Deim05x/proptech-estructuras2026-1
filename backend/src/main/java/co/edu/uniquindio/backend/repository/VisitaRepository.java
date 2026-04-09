@@ -72,6 +72,40 @@ public class VisitaRepository {
         return filasAfectadas > 0;
     }
 
+    public boolean actualizar(int id, Visita visita) {
+        String sql = """
+                UPDATE visita
+                SET cliente_id = ?,
+                    inmueble_codigo = ?,
+                    asesor_id = ?,
+                    fecha = ?,
+                    hora = ?,
+                    estado = ?,
+                    observacion = ?
+                WHERE id = ?
+                """;
+
+        int filasAfectadas = jdbcTemplate.update(
+                sql,
+                visita.getIdCliente(),
+                visita.getCodigoInmueble(),
+                visita.getIdAsesor(),
+                visita.getFecha(),
+                visita.getHora(),
+                visita.getEstado(),
+                visita.getObservacion(),
+                id
+        );
+
+        return filasAfectadas > 0;
+    }
+
+    public boolean eliminar(int id) {
+        String sql = "DELETE FROM visita WHERE id = ?";
+        int filasAfectadas = jdbcTemplate.update(sql, id);
+        return filasAfectadas > 0;
+    }
+
     private Visita mapearVisita(ResultSet rs) throws SQLException {
         return new Visita(
                 rs.getInt("id"),

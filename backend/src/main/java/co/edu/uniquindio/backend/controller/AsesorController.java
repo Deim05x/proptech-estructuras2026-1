@@ -43,4 +43,32 @@ public class AsesorController {
                 .badRequest()
                 .body("No se pudo agregar el asesor. Verifica que el id exista y que no esté repetido.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarAsesor(@PathVariable String id,
+                                              @RequestBody Asesor asesor) {
+        boolean actualizado = asesorService.actualizarAsesor(id, asesor);
+
+        if (actualizado) {
+            Asesor actualizadoObj = asesorService.buscarPorId(id);
+            return ResponseEntity.ok(actualizadoObj);
+        }
+
+        return ResponseEntity
+                .badRequest()
+                .body("No se pudo actualizar el asesor. Verifica que el id exista.");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarAsesor(@PathVariable String id) {
+        boolean eliminado = asesorService.eliminarAsesor(id);
+
+        if (eliminado) {
+            return ResponseEntity.ok("Asesor eliminado correctamente.");
+        }
+
+        return ResponseEntity
+                .badRequest()
+                .body("No se pudo eliminar el asesor. Verifica que el id exista.");
+    }
 }

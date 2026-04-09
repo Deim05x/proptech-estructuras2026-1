@@ -43,4 +43,32 @@ public class ClienteController {
                 .badRequest()
                 .body("No se pudo agregar el cliente. Verifica que el id exista y que no esté repetido.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarCliente(@PathVariable String id,
+                                               @RequestBody Cliente cliente) {
+        boolean actualizado = clienteService.actualizarCliente(id, cliente);
+
+        if (actualizado) {
+            Cliente actualizadoObj = clienteService.buscarPorId(id);
+            return ResponseEntity.ok(actualizadoObj);
+        }
+
+        return ResponseEntity
+                .badRequest()
+                .body("No se pudo actualizar el cliente. Verifica que el id exista.");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarCliente(@PathVariable String id) {
+        boolean eliminado = clienteService.eliminarCliente(id);
+
+        if (eliminado) {
+            return ResponseEntity.ok("Cliente eliminado correctamente.");
+        }
+
+        return ResponseEntity
+                .badRequest()
+                .body("No se pudo eliminar el cliente. Verifica que el id exista.");
+    }
 }

@@ -43,4 +43,32 @@ public class VisitaController {
                 .badRequest()
                 .body("No se pudo agregar la visita. Verifica que el id exista y que no esté repetido.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarVisita(@PathVariable int id,
+                                              @RequestBody Visita visita) {
+        boolean actualizado = visitaService.actualizarVisita(id, visita);
+
+        if (actualizado) {
+            Visita actualizadaObj = visitaService.buscarPorId(id);
+            return ResponseEntity.ok(actualizadaObj);
+        }
+
+        return ResponseEntity
+                .badRequest()
+                .body("No se pudo actualizar la visita. Verifica que el id exista.");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarVisita(@PathVariable int id) {
+        boolean eliminado = visitaService.eliminarVisita(id);
+
+        if (eliminado) {
+            return ResponseEntity.ok("Visita eliminada correctamente.");
+        }
+
+        return ResponseEntity
+                .badRequest()
+                .body("No se pudo eliminar la visita. Verifica que el id exista.");
+    }
 }
