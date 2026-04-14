@@ -45,4 +45,12 @@ INSERT IGNORE INTO visita (
 (
     2, 'CLI-002', 'INM-002', 'ASE-002', '2026-04-01', '15:30:00', 'Programada',
     'Cliente quiere revisar patio y habitaciones'
-);
+); 
+
+INSERT IGNORE INTO favorito (id, cliente_id, inmueble_codigo, fecha_registro) VALUES
+(1, 'CLI-001', 'INM-001', CURRENT_TIMESTAMP),
+(2, 'CLI-002', 'INM-002', CURRENT_TIMESTAMP);
+
+INSERT IGNORE INTO interaccion (id, cliente_id, inmueble_codigo, tipo_interaccion, fecha) VALUES
+(1, 'CLI-001', 'INM-001', 'FAVORITO', CURRENT_TIMESTAMP),
+(2, 'CLI-002', 'INM-002', 'VISITA', CURRENT_TIMESTAMP);

@@ -35,6 +35,25 @@ public class VisitaRepository {
         });
     }
 
+    public LinkedSimpleList<Visita> obtenerPorEstado(String estado) {
+        String sql = """
+                SELECT id, cliente_id, inmueble_codigo, asesor_id, fecha, hora, estado, observacion
+                FROM visita
+                WHERE estado = ?
+                ORDER BY fecha, hora
+                """;
+
+        return jdbcTemplate.query(sql, rs -> {
+            LinkedSimpleList<Visita> lista = new LinkedSimpleList<>();
+
+            while (rs.next()) {
+                lista.addLast(mapearVisita(rs));
+            }
+
+            return lista;
+        }, estado);
+    }
+
     public Visita buscarPorId(int id) {
         String sql = """
                 SELECT id, cliente_id, inmueble_codigo, asesor_id, fecha, hora, estado, observacion
@@ -94,6 +113,46 @@ public class VisitaRepository {
                 visita.getHora(),
                 visita.getEstado(),
                 visita.getObservacion(),
+                id
+        );
+
+        return filasAfectadas > 0;
+    }
+
+    public boolean reprogramar(int id, java.time.LocalDate fecha, java.time.LocalTime hora, String observacion) {
+        String sql = """
+                UPDATE visita
+                SET fecha = ?,
+                    hora = ?,
+                    estado = ?,
+                    observacion = ?
+                WHERE id = ?
+                """;
+
+        int filasAfectadas = jdbcTemplate.update(
+                sql,
+                fecha,
+                hora,
+                "Reprogramada",
+                observacion,
+                id
+        );
+
+        return filasAfectadas > 0;
+    }
+
+    public boolean cancelar(int id, String observacion) {
+        String sql = """
+                UPDATE visita
+                SET estado = ?,
+                    observacion = ?
+                WHERE id = ?
+                """;
+
+        int filasAfectadas = jdbcTemplate.update(
+                sql,
+                "Cancelada",
+                observacion,
                 id
         );
 

@@ -44,4 +44,21 @@ CREATE TABLE IF NOT EXISTS visita (
     hora TIME NOT NULL,
     estado VARCHAR(50) NOT NULL,
     observacion VARCHAR(255)
+); 
+
+CREATE TABLE IF NOT EXISTS favorito (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id VARCHAR(20) NOT NULL,
+    inmueble_codigo VARCHAR(20) NOT NULL,
+    fecha_registro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_favorito_cliente_inmueble (cliente_id, inmueble_codigo)
 );
+
+CREATE TABLE IF NOT EXISTS interaccion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id VARCHAR(20) NOT NULL,
+    inmueble_codigo VARCHAR(20) NOT NULL,
+    tipo_interaccion VARCHAR(40) NOT NULL,
+    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
