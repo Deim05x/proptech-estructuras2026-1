@@ -13,7 +13,7 @@ function Sidebar() {
     return (
         <aside
             style={{
-                width: "220px",
+                width: "190px",
                 backgroundColor: "white",
                 padding: "20px",
                 position: "fixed",

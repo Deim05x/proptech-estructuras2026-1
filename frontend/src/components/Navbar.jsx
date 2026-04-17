@@ -16,7 +16,7 @@ function Navbar() {
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
       }}
     >
-      <h2 style={{ margin: 0 }}>Sistema Inmobiliario - Estructuras de Datos</h2>
+      <h2 style={{ margin: 0 }}>PropTech Manager</h2>
     </header>
   );
 }
