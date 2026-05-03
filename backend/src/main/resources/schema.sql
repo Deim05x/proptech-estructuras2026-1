@@ -80,4 +80,3 @@ CREATE TABLE IF NOT EXISTS auth_token (
     expira_en TIMESTAMP NOT NULL,
     revocado BOOLEAN NOT NULL DEFAULT FALSE
 );
-
