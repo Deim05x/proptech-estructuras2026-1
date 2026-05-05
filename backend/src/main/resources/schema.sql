@@ -80,3 +80,22 @@ CREATE TABLE IF NOT EXISTS auth_token (
     expira_en TIMESTAMP NOT NULL,
     revocado BOOLEAN NOT NULL DEFAULT FALSE
 );
+CREATE TABLE IF NOT EXISTS operaciones (
+    id VARCHAR(30) PRIMARY KEY,
+    codigo_inmueble VARCHAR(30) NOT NULL,
+    id_cliente VARCHAR(30) NOT NULL,
+    id_asesor VARCHAR(30) NOT NULL,
+    fecha DATE NOT NULL,
+    tipo_operacion VARCHAR(40) NOT NULL,
+    valor_acordado DOUBLE NOT NULL,
+    comision DOUBLE NOT NULL,
+    estado_proceso VARCHAR(40) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS alertas (
+    id VARCHAR(40) PRIMARY KEY,
+    tipo VARCHAR(60) NOT NULL,
+    descripcion TEXT NOT NULL,
+    nivel_atencion VARCHAR(30) NOT NULL,
+    fecha_creacion DATETIME NOT NULL,
+    estado VARCHAR(30) NOT NULL
+);
