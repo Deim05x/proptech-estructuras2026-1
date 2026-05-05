@@ -80,6 +80,10 @@ function Sidebar() {
               Historial
             </NavLink>
 
+            <NavLink to="/recomendaciones" style={getLinkStyle}>
+              Recomendaciones
+            </NavLink>
+
             <NavLink to="/carrusel-inmuebles" style={getLinkStyle}>
               Carrusel
             </NavLink>
@@ -116,6 +120,10 @@ function Sidebar() {
               Historial
             </NavLink>
 
+            <NavLink to="/recomendaciones" style={getLinkStyle}>
+              Recomendaciones
+            </NavLink>
+
             <NavLink to="/mis-visitas" style={getLinkStyle}>
               Mis visitas
             </NavLink>
@@ -123,6 +131,8 @@ function Sidebar() {
             <NavLink to="/carrusel-inmuebles" style={getLinkStyle}>
               Carrusel
             </NavLink>
+
+            
           </>
         )}
 

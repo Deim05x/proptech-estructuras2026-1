@@ -15,6 +15,7 @@ import CarruselInmueblesPage from "../pages/CarruselInmueblesPage";
 import RotacionAsesoresPage from "../pages/RotacionAsesoresPage";
 import InicioClientePage from "../pages/InicioClientePage";
 import MisVisitasPage from "../pages/MisVisitasPage";
+import RecomendacionesPage from "../pages/RecomendacionesPage";
 
 function AppRouter() {
   return (
@@ -138,7 +139,16 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/recomendaciones"
+        element={
+          <ProtectedRoute rolesPermitidos={["CLIENTE", "ADMIN"]}>
+            <RecomendacionesPage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
+    
   );
 }
 

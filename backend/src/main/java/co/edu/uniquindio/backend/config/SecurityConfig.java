@@ -44,23 +44,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   TokenAuthenticationFilter tokenAuthenticationFilter) throws Exception {
+            TokenAuthenticationFilter tokenAuthenticationFilter) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login", "/api/auth/register-cliente").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/inmuebles/**", "/api/carrusel-inmuebles/**").authenticated()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/inmuebles/**",
+                                "/api/carrusel-inmuebles/**",
+                                "/api/recomendaciones/**")
+                        .authenticated()
                         .requestMatchers("/api/clientes/**").authenticated()
                         .requestMatchers("/api/visitas/**").authenticated()
-                        .requestMatchers("/api/asesores/**", "/api/rotacion-asesores/**", "/api/operaciones/**", "/api/alertas/**")
+                        .requestMatchers("/api/asesores/**", "/api/rotacion-asesores/**", "/api/operaciones/**",
+                                "/api/alertas/**")
                         .hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                );
+                        .anyRequest().authenticated());
 
         return http.build();
     }
