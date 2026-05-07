@@ -16,7 +16,10 @@ import RotacionAsesoresPage from "../pages/RotacionAsesoresPage";
 import InicioClientePage from "../pages/InicioClientePage";
 import MisVisitasPage from "../pages/MisVisitasPage";
 import RecomendacionesPage from "../pages/RecomendacionesPage";
-
+import ReportesPage from "../pages/ReportesPage";
+import DescubrirInmueblesPage from "../pages/DescubrirInmueblesPage";
+import MiActividadPage from "../pages/MiActividadPage";
+import AsesoresModuloPage from "../pages/AsesoresModuloPage";
 function AppRouter() {
   return (
     <Routes>
@@ -38,17 +41,28 @@ function AppRouter() {
           <ProtectedRoute rolesPermitidos={["ADMIN"]}>
             <ClientesPage />
           </ProtectedRoute>
+          
         }
+        
       />
+      <Route
+  path="/mi-actividad"
+  element={
+    <ProtectedRoute rolesPermitidos={["CLIENTE"]}>
+      <MiActividadPage />
+    </ProtectedRoute>
+  }
+/>
 
       <Route
-        path="/asesores"
-        element={
-          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
-            <AsesoresPage />
-          </ProtectedRoute>
-        }
-      />
+  path="/asesores"
+  element={
+    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+      <AsesoresModuloPage />
+    </ProtectedRoute>
+  }
+/>
+    
 
       <Route
         path="/rotacion-asesores"
@@ -147,8 +161,27 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/reportes"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <ReportesPage />
+          </ProtectedRoute>
+        }
+      />
+<Route
+  path="/descubrir-inmuebles"
+  element={
+    <ProtectedRoute rolesPermitidos={["ADMIN", "CLIENTE"]}>
+      <DescubrirInmueblesPage />
+    </ProtectedRoute>
+  }
+/>
+
     </Routes>
-    
+
+
+
   );
 }
 

@@ -60,6 +60,10 @@ function Sidebar() {
               Inmuebles
             </NavLink>
 
+            <NavLink to="/descubrir-inmuebles" style={getLinkStyle}>
+              Descubrir inmuebles
+            </NavLink>
+
             <NavLink to="/clientes" style={getLinkStyle}>
               Clientes
             </NavLink>
@@ -72,32 +76,16 @@ function Sidebar() {
               Visitas
             </NavLink>
 
-            <NavLink to="/favoritos" style={getLinkStyle}>
-              Favoritos
-            </NavLink>
-
-            <NavLink to="/historial" style={getLinkStyle}>
-              Historial
-            </NavLink>
-
-            <NavLink to="/recomendaciones" style={getLinkStyle}>
-              Recomendaciones
-            </NavLink>
-
-            <NavLink to="/carrusel-inmuebles" style={getLinkStyle}>
-              Carrusel
-            </NavLink>
-
-            <NavLink to="/rotacion-asesores" style={getLinkStyle}>
-              Rotación asesores
-            </NavLink>
-
             <NavLink to="/operaciones" style={getLinkStyle}>
               Operaciones
             </NavLink>
 
             <NavLink to="/alertas" style={getLinkStyle}>
               Alertas
+            </NavLink>
+
+            <NavLink to="/reportes" style={getLinkStyle}>
+              Reportes
             </NavLink>
           </>
         )}
@@ -108,31 +96,17 @@ function Sidebar() {
               Inicio
             </NavLink>
 
-            <NavLink to="/inmuebles" style={getLinkStyle}>
-              Inmuebles
-            </NavLink>
-
-            <NavLink to="/favoritos" style={getLinkStyle}>
-              Favoritos
-            </NavLink>
-
-            <NavLink to="/historial" style={getLinkStyle}>
-              Historial
+            <NavLink to="/descubrir-inmuebles" style={getLinkStyle}>
+              Descubrir inmuebles
             </NavLink>
 
             <NavLink to="/recomendaciones" style={getLinkStyle}>
               Recomendaciones
             </NavLink>
 
-            <NavLink to="/mis-visitas" style={getLinkStyle}>
-              Mis visitas
+            <NavLink to="/mi-actividad" style={getLinkStyle}>
+              Mi actividad
             </NavLink>
-
-            <NavLink to="/carrusel-inmuebles" style={getLinkStyle}>
-              Carrusel
-            </NavLink>
-
-            
           </>
         )}
 

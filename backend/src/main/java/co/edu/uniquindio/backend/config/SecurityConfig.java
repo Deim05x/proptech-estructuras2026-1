@@ -56,12 +56,18 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/inmuebles/**",
                                 "/api/carrusel-inmuebles/**",
-                                "/api/recomendaciones/**")
+                                "/api/recomendaciones/**",
+                                "/api/ordenamientos/**"
+                        )
                         .authenticated()
                         .requestMatchers("/api/clientes/**").authenticated()
                         .requestMatchers("/api/visitas/**").authenticated()
-                        .requestMatchers("/api/asesores/**", "/api/rotacion-asesores/**", "/api/operaciones/**",
-                                "/api/alertas/**")
+                        .requestMatchers(
+                                "/api/asesores/**",
+                                "/api/rotacion-asesores/**",
+                                "/api/operaciones/**",
+                                "/api/alertas/**",
+                                "/api/reportes/**")
                         .hasRole("ADMIN")
                         .anyRequest().authenticated());
 
