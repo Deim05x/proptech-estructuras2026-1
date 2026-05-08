@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
-
 import LoginPage from "../pages/LoginPage";
 import Dashboard from "../pages/Dashboard";
 import InmueblesPage from "../pages/InmueblesPage";
@@ -20,6 +19,8 @@ import ReportesPage from "../pages/ReportesPage";
 import DescubrirInmueblesPage from "../pages/DescubrirInmueblesPage";
 import MiActividadPage from "../pages/MiActividadPage";
 import AsesoresModuloPage from "../pages/AsesoresModuloPage";
+import AnalisisRelacionesPage from "../pages/AnalisisRelacionesPage";
+import EventosInusualesPage from "../pages/EventosInusualesPage";
 function AppRouter() {
   return (
     <Routes>
@@ -176,8 +177,25 @@ function AppRouter() {
       <DescubrirInmueblesPage />
     </ProtectedRoute>
   }
+/> 
+
+<Route
+  path="/analisis-relaciones"
+  element={
+    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+      <AnalisisRelacionesPage />
+    </ProtectedRoute>
+  }
 />
 
+<Route
+  path="/eventos-inusuales"
+  element={
+    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+      <EventosInusualesPage />
+    </ProtectedRoute>
+  }
+/>
     </Routes>
 
 

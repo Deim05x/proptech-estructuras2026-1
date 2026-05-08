@@ -65,7 +65,8 @@ const authService = {
     localStorage.removeItem("rol");
     localStorage.removeItem("username");
     localStorage.removeItem("clienteId");
-  },
+  }, 
+
 
   getToken: () => localStorage.getItem("token"),
   getRol: () => localStorage.getItem("rol"),

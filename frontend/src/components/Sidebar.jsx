@@ -87,6 +87,12 @@ function Sidebar() {
             <NavLink to="/reportes" style={getLinkStyle}>
               Reportes
             </NavLink>
+            <NavLink to="/analisis-relaciones" style={getLinkStyle}>
+              Análisis relaciones
+            </NavLink>
+            <NavLink to="/eventos-inusuales" style={getLinkStyle}>
+              Eventos inusuales
+            </NavLink>
           </>
         )}
 

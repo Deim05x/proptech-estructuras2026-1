@@ -98,4 +98,14 @@ CREATE TABLE IF NOT EXISTS alertas (
     nivel_atencion VARCHAR(30) NOT NULL,
     fecha_creacion DATETIME NOT NULL,
     estado VARCHAR(30) NOT NULL
+); 
+CREATE TABLE IF NOT EXISTS eventos_inusuales (
+    id VARCHAR(60) PRIMARY KEY,
+    tipo VARCHAR(80) NOT NULL,
+    descripcion TEXT NOT NULL,
+    nivel_atencion VARCHAR(30) NOT NULL,
+    fecha_deteccion DATETIME NOT NULL,
+    estado VARCHAR(30) NOT NULL,
+    entidad_referencia VARCHAR(80) NOT NULL
 );
+

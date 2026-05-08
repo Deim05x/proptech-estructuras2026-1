@@ -7,20 +7,21 @@ function RecomendacionesPage() {
   const clienteAutenticado = authService.getClienteId();
 
   const [clienteId, setClienteId] = useState(
-    rol === "CLIENTE" ? clienteAutenticado : ""
+    rol === "CLIENTE" ? clienteAutenticado || "" : ""
   );
 
   const [recomendaciones, setRecomendaciones] = useState([]);
   const [cargando, setCargando] = useState(false);
 
   const cargarRecomendaciones = async () => {
-    if (!clienteId.trim()) {
+    if (!clienteId || !clienteId.trim()) {
       alert("Debes ingresar el ID del cliente");
       return;
     }
 
     try {
       setCargando(true);
+
       const data = await recomendacionService.recomendarPorCliente(clienteId);
       setRecomendaciones(data);
     } catch (error) {
@@ -51,9 +52,7 @@ function RecomendacionesPage() {
       </p>
 
       <div style={panelStyle}>
-        <h2 style={{ color: "#43214d", marginTop: 0 }}>
-          Buscar recomendaciones
-        </h2>
+        <h2 style={titleStyle}>Buscar recomendaciones</h2>
 
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           <input
@@ -65,6 +64,8 @@ function RecomendacionesPage() {
             style={{
               ...inputStyle,
               maxWidth: "280px",
+              opacity: rol === "CLIENTE" ? 0.75 : 1,
+              cursor: rol === "CLIENTE" ? "not-allowed" : "text",
             }}
           />
 
@@ -72,52 +73,26 @@ function RecomendacionesPage() {
             Generar recomendaciones
           </button>
         </div>
+
+        {rol === "CLIENTE" && (
+          <p style={{ color: "#7e747d", fontSize: "0.9rem", marginTop: "12px" }}>
+            Estás consultando recomendaciones asociadas a tu cuenta.
+          </p>
+        )}
       </div>
 
       <div style={panelStyle}>
-        <h2 style={{ color: "#43214d", marginTop: 0 }}>
-          Resultado de recomendaciones
-        </h2>
+        <h2 style={titleStyle}>Resultado de recomendaciones</h2>
 
         {cargando ? (
           <p>Cargando recomendaciones...</p>
         ) : recomendaciones.length === 0 ? (
           <p>No hay recomendaciones para mostrar.</p>
         ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "18px",
-            }}
-          >
+          <div style={cardsGridStyle}>
             {recomendaciones.map((item) => (
-              <div
-                key={item.inmueble.codigo}
-                style={{
-                  background: "#fff7fb",
-                  border: "1px solid #e8e0e5",
-                  borderRadius: "18px",
-                  padding: "18px",
-                  boxShadow: "0 10px 24px rgba(67,33,77,0.08)",
-                }}
-              >
-                <div
-                  style={{
-                    height: "110px",
-                    borderRadius: "16px",
-                    background:
-                      "linear-gradient(135deg, #5b3765, #fdbef4)",
-                    marginBottom: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    fontSize: "2.5rem",
-                  }}
-                >
-                  🏠
-                </div>
+              <div key={item.inmueble.codigo} style={cardStyle}>
+                <div style={imagePlaceholderStyle}>🏠</div>
 
                 <h3 style={{ margin: "0 0 6px", color: "#43214d" }}>
                   {item.inmueble.tipoInmueble} - {item.inmueble.codigo}
@@ -131,31 +106,13 @@ function RecomendacionesPage() {
                   {formatearPrecio(item.inmueble.precio)}
                 </p>
 
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "8px",
-                    flexWrap: "wrap",
-                    marginBottom: "12px",
-                  }}
-                >
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                   <span style={chipStyle}>{item.inmueble.barrioZona}</span>
                   <span style={chipStyle}>{item.inmueble.habitaciones} hab.</span>
                   <span style={chipStyle}>{item.inmueble.area} m²</span>
                 </div>
 
-                <div
-                  style={{
-                    background: "#fbd7ff",
-                    color: "#43214d",
-                    padding: "8px 10px",
-                    borderRadius: "12px",
-                    fontWeight: "800",
-                    marginBottom: "10px",
-                  }}
-                >
-                  Puntaje: {item.puntaje}
-                </div>
+                <div style={scoreStyle}>Puntaje: {item.puntaje}</div>
 
                 <p style={{ color: "#4c444d", fontSize: "0.9rem" }}>
                   {item.motivo}
@@ -178,6 +135,12 @@ const panelStyle = {
   border: "1px solid #e8e0e5",
 };
 
+const titleStyle = {
+  color: "#43214d",
+  marginTop: 0,
+  marginBottom: "14px",
+};
+
 const inputStyle = {
   width: "100%",
   padding: "11px 12px",
@@ -197,6 +160,32 @@ const primaryButton = {
   cursor: "pointer",
 };
 
+const cardsGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+  gap: "18px",
+};
+
+const cardStyle = {
+  background: "#fff7fb",
+  border: "1px solid #e8e0e5",
+  borderRadius: "18px",
+  padding: "18px",
+  boxShadow: "0 10px 24px rgba(67,33,77,0.08)",
+};
+
+const imagePlaceholderStyle = {
+  height: "110px",
+  borderRadius: "16px",
+  background: "linear-gradient(135deg, #5b3765, #fdbef4)",
+  marginBottom: "14px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "white",
+  fontSize: "2.5rem",
+};
+
 const chipStyle = {
   background: "#f4ecf0",
   color: "#43214d",
@@ -204,6 +193,16 @@ const chipStyle = {
   borderRadius: "999px",
   fontSize: "0.8rem",
   fontWeight: "700",
+};
+
+const scoreStyle = {
+  background: "#fbd7ff",
+  color: "#43214d",
+  padding: "8px 10px",
+  borderRadius: "12px",
+  fontWeight: "800",
+  marginTop: "12px",
+  marginBottom: "10px",
 };
 
 export default RecomendacionesPage;

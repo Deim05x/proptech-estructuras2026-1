@@ -57,18 +57,20 @@ public class SecurityConfig {
                                 "/api/inmuebles/**",
                                 "/api/carrusel-inmuebles/**",
                                 "/api/recomendaciones/**",
-                                "/api/ordenamientos/**"
-                        )
+                                "/api/ordenamientos/**")
                         .authenticated()
                         .requestMatchers("/api/clientes/**").authenticated()
                         .requestMatchers("/api/visitas/**").authenticated()
                         .requestMatchers(
-                                "/api/asesores/**",
-                                "/api/rotacion-asesores/**",
-                                "/api/operaciones/**",
-                                "/api/alertas/**",
-                                "/api/reportes/**")
-                        .hasRole("ADMIN")
+        "/api/asesores/**",
+        "/api/rotacion-asesores/**",
+        "/api/operaciones/**",
+        "/api/alertas/**",
+        "/api/reportes/**",
+        "/api/grafos/**",
+        "/api/historial-inmuebles/**",
+        "/api/eventos-inusuales/**"
+).hasRole("ADMIN")
                         .anyRequest().authenticated());
 
         return http.build();
