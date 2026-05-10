@@ -1,6 +1,13 @@
 import axios from "axios";
+import api from "./api";
 
 const AUTH_BASE_URL = "http://localhost:8080/api/auth";
+const RUTAS_INICIO_POR_ROL = {
+  ADMIN: "/dashboard",
+  CLIENTE: "/inicio-cliente",
+};
+
+const normalizarRol = (rol) => (rol || "").replace("ROLE_", "").toUpperCase();
 
 const authService = {
   login: async (credentials) => {
@@ -54,9 +61,9 @@ const authService = {
   },
 
   guardarSesion: (data) => {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("rol", data.rol);
-    localStorage.setItem("username", data.username);
+    localStorage.setItem("token", data.token || "");
+    localStorage.setItem("rol", normalizarRol(data.rol));
+    localStorage.setItem("username", data.username || "");
     localStorage.setItem("clienteId", data.clienteId || "");
   },
 
@@ -67,12 +74,18 @@ const authService = {
     localStorage.removeItem("clienteId");
   }, 
 
+  registrarCliente: async (datos) => {
+    const response = await api.post("/auth/register-cliente", datos);
+    return response.data;
+  },
+
 
   getToken: () => localStorage.getItem("token"),
-  getRol: () => localStorage.getItem("rol"),
+  getRol: () => normalizarRol(localStorage.getItem("rol")),
   getUsername: () => localStorage.getItem("username"),
   getClienteId: () => localStorage.getItem("clienteId"),
   estaAutenticado: () => !!localStorage.getItem("token"),
+  getRutaInicioPorRol: (rol) => RUTAS_INICIO_POR_ROL[normalizarRol(rol)] || "/login",
 };
 
 export default authService;

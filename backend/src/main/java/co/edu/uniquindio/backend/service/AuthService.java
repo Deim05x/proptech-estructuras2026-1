@@ -5,6 +5,7 @@ import co.edu.uniquindio.backend.dto.LoginResponse;
 import co.edu.uniquindio.backend.dto.RegisterClienteRequest;
 import co.edu.uniquindio.backend.model.AuthToken;
 import co.edu.uniquindio.backend.model.AuthUsuario;
+import co.edu.uniquindio.backend.model.Cliente;
 import co.edu.uniquindio.backend.model.Role;
 import co.edu.uniquindio.backend.repository.AuthTokenRepository;
 import co.edu.uniquindio.backend.repository.AuthUsuarioRepository;
@@ -24,9 +25,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public AuthService(AuthUsuarioRepository authUsuarioRepository,
-                       AuthTokenRepository authTokenRepository,
-                       ClienteRepository clienteRepository,
-                       PasswordEncoder passwordEncoder) {
+            AuthTokenRepository authTokenRepository,
+            ClienteRepository clienteRepository,
+            PasswordEncoder passwordEncoder) {
         this.authUsuarioRepository = authUsuarioRepository;
         this.authTokenRepository = authTokenRepository;
         this.clienteRepository = clienteRepository;
@@ -41,45 +42,76 @@ public class AuthService {
                     passwordEncoder.encode("Admin123*"),
                     Role.ADMIN,
                     null,
-                    true
-            );
+                    true);
+
             authUsuarioRepository.guardar(admin);
         }
     }
 
     public boolean registrarCliente(RegisterClienteRequest request) {
-        if (request == null) return false;
-        if (request.getClienteId() == null || request.getClienteId().isBlank()) return false;
-        if (request.getUsername() == null || request.getUsername().isBlank()) return false;
-        if (request.getPassword() == null || request.getPassword().isBlank()) return false;
+        if (request == null)
+            return false;
+        if (request.getUsername() == null || request.getUsername().isBlank())
+            return false;
+        if (request.getPassword() == null || request.getPassword().isBlank())
+            return false;
+        if (request.getNombre() == null || request.getNombre().isBlank())
+            return false;
+        if (request.getCorreo() == null || request.getCorreo().isBlank())
+            return false;
 
-        if (clienteRepository.buscarPorId(request.getClienteId()) == null) return false;
-        if (authUsuarioRepository.existeUsername(request.getUsername())) return false;
+        if (authUsuarioRepository.existeUsername(request.getUsername())) {
+            return false;
+        }
+
+        String nuevoClienteId = clienteRepository.generarNuevoIdCliente();
+
+        Cliente cliente = new Cliente();
+        cliente.setId(nuevoClienteId);
+        cliente.setNombre(request.getNombre());
+        cliente.setCorreo(request.getCorreo());
+        cliente.setTelefono(request.getTelefono());
+        cliente.setTipoCliente("COMPRADOR");
+        cliente.setPresupuesto(0);
+        cliente.setZonasInteres("");
+        cliente.setTipoInmuebleDeseado("");
+        cliente.setHabitacionesMinimas(0);
+        cliente.setEstadoBusqueda("ACTIVO");
+
+        boolean clienteCreado = clienteRepository.guardar(cliente);
+
+        if (!clienteCreado) {
+            return false;
+        }
 
         AuthUsuario usuario = new AuthUsuario(
                 0,
                 request.getUsername(),
                 passwordEncoder.encode(request.getPassword()),
                 Role.CLIENTE,
-                request.getClienteId(),
-                true
-        );
+                nuevoClienteId,
+                true);
 
         return authUsuarioRepository.guardar(usuario);
     }
 
     public LoginResponse login(LoginRequest request) {
-        if (request == null) return null;
+        if (request == null)
+            return null;
 
         AuthUsuario usuario = authUsuarioRepository.buscarPorUsername(request.getUsername());
-        if (usuario == null || !usuario.isActivo()) return null;
+
+        if (usuario == null || !usuario.isActivo()) {
+            return null;
+        }
 
         boolean passwordOk = passwordEncoder.matches(
                 request.getPassword(),
-                usuario.getPasswordHash()
-        );
+                usuario.getPasswordHash());
 
-        if (!passwordOk) return null;
+        if (!passwordOk) {
+            return null;
+        }
 
         String tokenPlano = UUID.randomUUID().toString();
         LocalDateTime ahora = LocalDateTime.now();
@@ -92,35 +124,43 @@ public class AuthService {
                 usuario.getClienteId(),
                 ahora,
                 ahora.plusHours(12),
-                false
-        );
+                false);
 
         boolean guardado = authTokenRepository.guardar(token);
-        if (!guardado) return null;
+
+        if (!guardado) {
+            return null;
+        }
 
         return new LoginResponse(
                 tokenPlano,
                 usuario.getUsername(),
                 usuario.getRol().name(),
-                usuario.getClienteId()
-        );
+                usuario.getClienteId());
     }
 
     public boolean logout(String bearerToken) {
-        if (bearerToken == null || bearerToken.isBlank()) return false;
+        if (bearerToken == null || bearerToken.isBlank())
+            return false;
         return authTokenRepository.revocar(bearerToken);
     }
 
     public AuthToken validarToken(String tokenPlano) {
-        if (tokenPlano == null || tokenPlano.isBlank()) return null;
+        if (tokenPlano == null || tokenPlano.isBlank())
+            return null;
 
         authTokenRepository.revocarExpirados();
+
         AuthToken token = authTokenRepository.buscarTokenValido(tokenPlano);
 
-        if (token == null) return null;
-        if (token.isRevocado()) return null;
-        if (token.getExpiraEn().isBefore(LocalDateTime.now())) return null;
+        if (token == null)
+            return null;
+        if (token.isRevocado())
+            return null;
+        if (token.getExpiraEn().isBefore(LocalDateTime.now()))
+            return null;
 
         return token;
     }
+
 }

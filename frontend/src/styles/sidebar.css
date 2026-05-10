@@ -1,0 +1,101 @@
+@keyframes sidebarFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes sidebarGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(124, 58, 237, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 28px rgba(124, 58, 237, 0.25);
+  }
+}
+
+@keyframes softPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.65;
+    transform: scale(1.2);
+  }
+}
+
+.proptech-sidebar {
+  animation: sidebarFadeIn 0.55s ease both;
+}
+
+.proptech-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.proptech-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.proptech-sidebar::-webkit-scrollbar-thumb {
+  background: #37333e;
+  border-radius: 999px;
+}
+
+.proptech-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
+}
+
+.proptech-sidebar-logo {
+  animation: sidebarGlow 3.4s ease-in-out infinite;
+}
+
+.proptech-sidebar-status-dot {
+  animation: softPulse 1.8s ease-in-out infinite;
+}
+
+.proptech-sidebar-link:hover {
+  background: #221e28 !important;
+  border-color: #6d5f7a !important;
+  transform: translateX(4px);
+}
+
+.proptech-sidebar-link:hover .proptech-sidebar-icon {
+  background: #3f2a57 !important;
+  border-color: #6d5f7a !important;
+  box-shadow: 0 0 18px rgba(124, 58, 237, 0.18);
+}
+
+.proptech-logout-button:hover {
+  background: #4d171e !important;
+  border-color: #7a2c35 !important;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .proptech-sidebar {
+    width: 82px !important;
+    padding: 16px 10px !important;
+  }
+
+  .proptech-sidebar-text,
+  .proptech-sidebar-subtitle,
+  .proptech-sidebar-role-box,
+  .proptech-sidebar-status {
+    display: none !important;
+  }
+
+  .proptech-sidebar-link {
+    justify-content: center !important;
+    padding: 12px !important;
+  }
+}

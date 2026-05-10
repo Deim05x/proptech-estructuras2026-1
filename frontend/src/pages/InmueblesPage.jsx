@@ -182,7 +182,7 @@ function InmueblesPage() {
       const respuesta = await historialInmuebleService.deshacerUltimoCambio();
 
       if (typeof respuesta === "string") {
-        alert(respuesta);
+        alert("No hay cambios pendientes para deshacer.");
       } else {
         alert(
           `Cambio deshecho correctamente. Se restauró el inmueble ${respuesta.codigoInmueble}`
@@ -207,31 +207,92 @@ function InmueblesPage() {
   };
 
   return (
-    <div>
-      <h1 style={{ color: "#43214d", marginBottom: "8px" }}>
-        Gestión de Inmuebles
-      </h1>
+    <div style={pageStyle}>
+      <style>{animations}</style>
 
-      <p style={{ color: "#7e747d", marginBottom: "24px" }}>
-        Administra los inmuebles registrados en la plataforma.
-      </p>
+      <section style={headerStyle}>
+        <div>
+          <p style={eyebrowStyle}>MÓDULO INMOBILIARIO</p>
 
-      <div style={panelStyle}>
-        <h2 style={titleStyle}>Historial de cambios de inmuebles</h2>
+          <h1 style={mainTitleStyle}>
+            Gestión de <span style={titleAccentStyle}>inmuebles</span>
+          </h1>
 
-        <p style={{ color: "#7e747d" }}>
+          <p style={mainDescriptionStyle}>
+            Administra el inventario de propiedades registradas en la
+            plataforma, controla disponibilidad, asesores responsables y cambios
+            reversibles del inventario.
+          </p>
+        </div>
+
+        <div style={headerStatsStyle}>
+          <span style={statusDotStyle}></span>
+          <span>{inmuebles.length} inmuebles registrados</span>
+        </div>
+      </section>
+
+      <section style={summaryGridStyle}>
+        <SummaryCard
+          icono="🏘️"
+          titulo="Inmuebles"
+          valor={inmuebles.length}
+          texto="Registros cargados"
+        />
+
+        <SummaryCard
+          icono="✅"
+          titulo="Disponibles"
+          valor={inmuebles.filter((item) => item.disponible).length}
+          texto="Listos para ofertar"
+        />
+
+        <SummaryCard
+          icono="🧾"
+          titulo="Cambios"
+          valor={cantidadCambios}
+          texto="Disponibles para deshacer"
+        />
+
+        <SummaryCard
+          icono="🧑‍💼"
+          titulo="Asesores"
+          valor={
+            new Set(
+              inmuebles
+                .map((item) => item.idAsesorResponsable)
+                .filter((item) => item)
+            ).size
+          }
+          texto="Relacionados al inventario"
+        />
+      </section>
+
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>CONTROL DE CAMBIOS</p>
+            <h2 style={titleStyle}>Historial de cambios de inmuebles</h2>
+          </div>
+
+          <div style={pillCounterStyle}>
+            <span>{cantidadCambios}</span>
+            <small>cambios</small>
+          </div>
+        </div>
+
+        <p style={softTextStyle}>
           Cambios disponibles para deshacer:{" "}
-          <strong style={{ color: "#43214d" }}>{cantidadCambios}</strong>
+          <strong style={strongLightStyle}>{cantidadCambios}</strong>
         </p>
 
         {ultimaAccion && (
-          <p style={{ color: "#4c444d" }}>
-            Última acción: <strong>{ultimaAccion.descripcion}</strong> sobre el
+          <div style={lastActionStyle}>
+            <strong>Última acción:</strong> {ultimaAccion.descripcion} sobre el
             inmueble <strong>{ultimaAccion.codigoInmueble}</strong>
-          </p>
+          </div>
         )}
 
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        <div style={buttonRowStyle}>
           <button
             type="button"
             onClick={deshacerUltimoCambio}
@@ -245,20 +306,30 @@ function InmueblesPage() {
             onClick={cargarEstadoPila}
             style={secondaryButton}
           >
-            Actualizar estado de pila
+            Actualizar estado
           </button>
         </div>
 
-        <p style={{ color: "#7e747d", fontSize: "0.9rem", marginTop: "14px" }}>
-          Estructura usada: pila genérica propia. Antes de actualizar un
-          inmueble, se guarda su estado anterior para poder restaurarlo.
+        <p style={helperTextStyle}>
+          Antes de actualizar un inmueble, el sistema conserva su estado anterior
+          para que puedas restaurarlo si es necesario.
         </p>
-      </div>
+      </section>
 
-      <div style={panelStyle}>
-        <h2 style={titleStyle}>
-          {editando ? "Editar inmueble" : "Registrar inmueble"}
-        </h2>
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>
+              {editando ? "EDICIÓN DE REGISTRO" : "NUEVO REGISTRO"}
+            </p>
+
+            <h2 style={titleStyle}>
+              {editando ? "Editar inmueble" : "Registrar inmueble"}
+            </h2>
+          </div>
+
+          {editando && <span style={editBadgeStyle}>Modo edición</span>}
+        </div>
 
         <form onSubmit={guardarInmueble}>
           <div style={formGridStyle}>
@@ -270,7 +341,10 @@ function InmueblesPage() {
               onChange={manejarCambio}
               disabled={editando}
               required
-              style={inputStyle}
+              style={{
+                ...inputStyle,
+                ...(editando ? disabledInputStyle : {}),
+              }}
             />
 
             <input
@@ -384,26 +458,18 @@ function InmueblesPage() {
             />
           </div>
 
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginTop: "14px",
-              color: "#4c444d",
-              fontWeight: "700",
-            }}
-          >
+          <label style={checkLabelStyle}>
             <input
               type="checkbox"
               name="disponible"
               checked={formulario.disponible}
               onChange={manejarCambio}
+              style={checkboxStyle}
             />
             Inmueble disponible
           </label>
 
-          <div style={{ display: "flex", gap: "10px", marginTop: "18px" }}>
+          <div style={buttonRowStyle}>
             <button type="submit" style={primaryButton}>
               {editando ? "Actualizar inmueble" : "Registrar inmueble"}
             </button>
@@ -413,35 +479,45 @@ function InmueblesPage() {
             </button>
           </div>
         </form>
-      </div>
+      </section>
 
-      <div style={panelStyle}>
-        <h2 style={titleStyle}>Listado de inmuebles</h2>
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>INVENTARIO</p>
+            <h2 style={titleStyle}>Listado de inmuebles</h2>
+          </div>
+
+          <button type="button" onClick={cargarInmuebles} style={secondaryButton}>
+            Recargar listado
+          </button>
+        </div>
 
         {cargando ? (
-          <p>Cargando inmuebles...</p>
+          <div style={emptyStateStyle}>
+            <div style={loadingOrbStyle}></div>
+            <p>Cargando inmuebles...</p>
+          </div>
         ) : inmuebles.length === 0 ? (
-          <p>No hay inmuebles registrados.</p>
+          <div style={emptyStateStyle}>
+            <span style={{ fontSize: "2rem" }}>🏠</span>
+            <p>No hay inmuebles registrados.</p>
+          </div>
         ) : (
           <div style={cardsGridStyle}>
             {inmuebles.map((inmueble) => (
-              <div key={inmueble.codigo} style={cardStyle}>
-                <div style={imagePlaceholderStyle}>🏠</div>
+              <article key={inmueble.codigo} style={cardStyle}>
+                <div style={imagePlaceholderStyle}>
+                  <span>🏠</span>
+                </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: "10px",
-                    alignItems: "flex-start",
-                  }}
-                >
+                <div style={cardTopStyle}>
                   <div>
-                    <h3 style={{ margin: "0 0 6px", color: "#43214d" }}>
+                    <h3 style={cardTitleStyle}>
                       {inmueble.tipoInmueble} · {inmueble.codigo}
                     </h3>
 
-                    <p style={{ margin: 0, color: "#7e747d" }}>
+                    <p style={cardLocationStyle}>
                       {inmueble.barrioZona}, {inmueble.ciudad}
                     </p>
                   </div>
@@ -449,40 +525,32 @@ function InmueblesPage() {
                   <span
                     style={{
                       ...estadoBadgeStyle,
-                      backgroundColor: inmueble.disponible
-                        ? "#dcfce7"
-                        : "#fee2e2",
-                      color: inmueble.disponible ? "#166534" : "#991b1b",
+                      background: inmueble.disponible ? "#12351f" : "#3a1218",
+                      color: inmueble.disponible ? "#86efac" : "#ffb4ab",
+                      border: inmueble.disponible
+                        ? "1px solid #225c37"
+                        : "1px solid #7a2c35",
                     }}
                   >
                     {inmueble.disponible ? "Disponible" : "No disponible"}
                   </span>
                 </div>
 
-                <p
-                  style={{
-                    margin: "14px 0 8px",
-                    color: "#1e1a1e",
-                    fontWeight: "800",
-                    fontSize: "1.2rem",
-                  }}
-                >
-                  {formatearPrecio(inmueble.precio)}
-                </p>
+                <p style={priceStyle}>{formatearPrecio(inmueble.precio)}</p>
 
-                <p style={{ margin: "0 0 12px", color: "#4c444d" }}>
-                  {inmueble.direccion}
-                </p>
+                <p style={addressStyle}>{inmueble.direccion}</p>
 
-                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                <div style={chipGridStyle}>
                   <span style={chipStyle}>{inmueble.finalidad}</span>
                   <span style={chipStyle}>{inmueble.area} m²</span>
                   <span style={chipStyle}>{inmueble.habitaciones} hab.</span>
                   <span style={chipStyle}>{inmueble.banos} baños</span>
-                  <span style={chipStyle}>Asesor: {inmueble.idAsesorResponsable}</span>
+                  <span style={chipStyle}>
+                    Asesor: {inmueble.idAsesorResponsable}
+                  </span>
                 </div>
 
-                <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+                <div style={cardActionsStyle}>
                   <button
                     type="button"
                     onClick={() => editarInmueble(inmueble)}
@@ -499,28 +567,268 @@ function InmueblesPage() {
                     Eliminar
                   </button>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }
 
-const panelStyle = {
-  backgroundColor: "rgba(255,255,255,0.88)",
+function SummaryCard({ icono, titulo, valor, texto }) {
+  return (
+    <article style={summaryCardStyle}>
+      <div style={summaryIconStyle}>{icono}</div>
+
+      <div>
+        <p style={summaryTitleStyle}>{titulo}</p>
+        <strong style={summaryValueStyle}>{valor}</strong>
+        <small style={summaryTextStyle}>{texto}</small>
+      </div>
+    </article>
+  );
+}
+
+const animations = `
+  @keyframes fadeUpInmuebles {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulseInmueble {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.58;
+      transform: scale(1.18);
+    }
+  }
+
+  @keyframes loadingFloat {
+    0%, 100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+`;
+
+const pageStyle = {
+  animation: "fadeUpInmuebles 0.55s ease both",
+};
+
+const headerStyle = {
+  marginBottom: "18px",
   padding: "22px",
-  borderRadius: "18px",
-  marginBottom: "24px",
-  boxShadow: "0 12px 28px rgba(67,33,77,0.08)",
-  border: "1px solid #e8e0e5",
+  borderRadius: "26px",
+  background: "#221e28",
+  border: "1px solid #37333e",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "18px",
+  alignItems: "flex-end",
+  flexWrap: "wrap",
+};
+
+const eyebrowStyle = {
+  margin: 0,
+  color: "#d2bbff",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  fontSize: "0.72rem",
+  letterSpacing: "0.12em",
+};
+
+const mainTitleStyle = {
+  margin: "8px 0",
+  color: "#ffffff",
+  fontSize: "clamp(1.8rem, 3vw, 2.7rem)",
+  lineHeight: 1.1,
+  letterSpacing: "-0.04em",
+};
+
+const titleAccentStyle = {
+  color: "#d2bbff",
+};
+
+const mainDescriptionStyle = {
+  color: "#ccc3d8",
+  maxWidth: "760px",
+  lineHeight: 1.65,
+  margin: 0,
+};
+
+const headerStatsStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "9px",
+  padding: "10px 13px",
+  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  color: "#ccc3d8",
+  fontSize: "0.78rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+};
+
+const statusDotStyle = {
+  width: "8px",
+  height: "8px",
+  borderRadius: "50%",
+  background: "#22c55e",
+  boxShadow: "0 0 14px rgba(34,197,94,0.8)",
+  animation: "pulseInmueble 1.8s ease-in-out infinite",
+};
+
+const summaryGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+  gap: "14px",
+  marginBottom: "18px",
+};
+
+const summaryCardStyle = {
+  padding: "16px",
+  borderRadius: "22px",
+  background: "#2c2833",
+  border: "1px solid #37333e",
+  boxShadow: "0 18px 38px rgba(0,0,0,0.18)",
+  display: "flex",
+  alignItems: "center",
+  gap: "13px",
+};
+
+const summaryIconStyle = {
+  width: "46px",
+  height: "46px",
+  minWidth: "46px",
+  borderRadius: "16px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "1.35rem",
+};
+
+const summaryTitleStyle = {
+  margin: "0 0 4px",
+  color: "#9f92b2",
+  fontSize: "0.72rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.09em",
+};
+
+const summaryValueStyle = {
+  display: "block",
+  color: "#ffffff",
+  fontSize: "1.35rem",
+  lineHeight: 1.1,
+};
+
+const summaryTextStyle = {
+  display: "block",
+  color: "#8f849e",
+  marginTop: "3px",
+};
+
+const panelStyle = {
+  background: "#221e28",
+  padding: "22px",
+  borderRadius: "26px",
+  marginBottom: "22px",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+  border: "1px solid #37333e",
+};
+
+const panelHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "14px",
+  alignItems: "center",
+  marginBottom: "16px",
+  flexWrap: "wrap",
 };
 
 const titleStyle = {
-  color: "#43214d",
-  marginTop: 0,
-  marginBottom: "14px",
+  color: "#ffffff",
+  margin: "5px 0 0",
+  fontSize: "1.35rem",
+  letterSpacing: "-0.03em",
+};
+
+const softTextStyle = {
+  color: "#ccc3d8",
+  lineHeight: 1.55,
+};
+
+const strongLightStyle = {
+  color: "#ffffff",
+};
+
+const lastActionStyle = {
+  margin: "12px 0",
+  padding: "13px",
+  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  color: "#ccc3d8",
+  lineHeight: 1.5,
+};
+
+const buttonRowStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap",
+  marginTop: "16px",
+};
+
+const helperTextStyle = {
+  color: "#9f92b2",
+  fontSize: "0.88rem",
+  marginTop: "14px",
+  lineHeight: 1.55,
+};
+
+const pillCounterStyle = {
+  minWidth: "78px",
+  padding: "10px 12px",
+  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  color: "#d2bbff",
+};
+
+const editBadgeStyle = {
+  padding: "8px 12px",
+  borderRadius: "999px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
+  color: "#d2bbff",
+  fontWeight: "900",
+  fontSize: "0.76rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
 };
 
 const formGridStyle = {
@@ -531,30 +839,53 @@ const formGridStyle = {
 
 const inputStyle = {
   width: "100%",
-  padding: "11px 12px",
-  borderRadius: "12px",
-  border: "1px solid #cfc3cd",
+  padding: "12px 13px",
+  borderRadius: "14px",
+  border: "1px solid #37333e",
   outline: "none",
-  backgroundColor: "#fff7fb",
+  background: "#15121b",
+  color: "#e8dfee",
+  fontWeight: "650",
+};
+
+const disabledInputStyle = {
+  opacity: 0.65,
+  cursor: "not-allowed",
+};
+
+const checkLabelStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  marginTop: "16px",
+  color: "#ccc3d8",
+  fontWeight: "800",
+};
+
+const checkboxStyle = {
+  width: "16px",
+  height: "16px",
+  accentColor: "#7c3aed",
 };
 
 const primaryButton = {
   padding: "11px 16px",
   border: "none",
-  borderRadius: "12px",
-  background: "linear-gradient(135deg, #5b3765, #43214d)",
+  borderRadius: "14px",
+  background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
   color: "white",
-  fontWeight: "700",
+  fontWeight: "900",
   cursor: "pointer",
+  boxShadow: "0 14px 28px rgba(124,58,237,0.24)",
 };
 
 const secondaryButton = {
   padding: "11px 16px",
-  border: "1px solid #cfc3cd",
-  borderRadius: "12px",
-  backgroundColor: "#fbd7ff",
-  color: "#43214d",
-  fontWeight: "700",
+  border: "1px solid #6d5f7a",
+  borderRadius: "14px",
+  background: "#3f2a57",
+  color: "#d2bbff",
+  fontWeight: "900",
   cursor: "pointer",
 };
 
@@ -565,60 +896,127 @@ const cardsGridStyle = {
 };
 
 const cardStyle = {
-  background: "#fff7fb",
-  border: "1px solid #e8e0e5",
-  borderRadius: "20px",
+  background: "#2c2833",
+  border: "1px solid #37333e",
+  borderRadius: "24px",
   padding: "18px",
-  boxShadow: "0 12px 26px rgba(67,33,77,0.08)",
+  boxShadow: "0 18px 38px rgba(0,0,0,0.20)",
+  transition: "0.28s ease",
 };
 
 const imagePlaceholderStyle = {
   height: "120px",
-  borderRadius: "18px",
-  background: "linear-gradient(135deg, #5b3765, #fdbef4)",
+  borderRadius: "20px",
+  background: "linear-gradient(135deg, #3f2a57, #7c3aed)",
   marginBottom: "16px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   color: "white",
   fontSize: "3rem",
+  border: "1px solid #6d5f7a",
+  boxShadow: "0 0 22px rgba(124,58,237,0.18)",
+};
+
+const cardTopStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "10px",
+  alignItems: "flex-start",
+};
+
+const cardTitleStyle = {
+  margin: "0 0 6px",
+  color: "#ffffff",
+  fontSize: "1rem",
+};
+
+const cardLocationStyle = {
+  margin: 0,
+  color: "#9f92b2",
 };
 
 const estadoBadgeStyle = {
-  padding: "5px 9px",
+  padding: "6px 10px",
   borderRadius: "999px",
-  fontSize: "0.75rem",
-  fontWeight: "800",
+  fontSize: "0.72rem",
+  fontWeight: "900",
   whiteSpace: "nowrap",
 };
 
+const priceStyle = {
+  margin: "14px 0 8px",
+  color: "#ffffff",
+  fontWeight: "900",
+  fontSize: "1.25rem",
+};
+
+const addressStyle = {
+  margin: "0 0 12px",
+  color: "#ccc3d8",
+  lineHeight: 1.45,
+};
+
+const chipGridStyle = {
+  display: "flex",
+  gap: "8px",
+  flexWrap: "wrap",
+};
+
 const chipStyle = {
-  background: "#f4ecf0",
-  color: "#43214d",
-  padding: "5px 9px",
+  background: "#15121b",
+  color: "#d2bbff",
+  border: "1px solid #37333e",
+  padding: "6px 9px",
   borderRadius: "999px",
-  fontSize: "0.8rem",
-  fontWeight: "700",
+  fontSize: "0.78rem",
+  fontWeight: "800",
+};
+
+const cardActionsStyle = {
+  display: "flex",
+  gap: "10px",
+  marginTop: "16px",
+  flexWrap: "wrap",
 };
 
 const smallButton = {
   padding: "8px 12px",
-  border: "none",
-  borderRadius: "10px",
-  backgroundColor: "#dcfce7",
-  color: "#166534",
-  fontWeight: "700",
+  border: "1px solid #225c37",
+  borderRadius: "12px",
+  background: "#12351f",
+  color: "#86efac",
+  fontWeight: "900",
   cursor: "pointer",
 };
 
 const smallDangerButton = {
   padding: "8px 12px",
-  border: "none",
-  borderRadius: "10px",
-  backgroundColor: "#fee2e2",
-  color: "#991b1b",
-  fontWeight: "700",
+  border: "1px solid #7a2c35",
+  borderRadius: "12px",
+  background: "#3a1218",
+  color: "#ffb4ab",
+  fontWeight: "900",
   cursor: "pointer",
+};
+
+const emptyStateStyle = {
+  padding: "28px",
+  borderRadius: "20px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  color: "#9f92b2",
+  textAlign: "center",
+};
+
+const loadingOrbStyle = {
+  width: "48px",
+  height: "48px",
+  borderRadius: "50%",
+  background: "linear-gradient(135deg, #7c3aed, #d2bbff)",
+  boxShadow: "0 0 28px rgba(124,58,237,0.34)",
+  animation: "loadingFloat 1.8s ease-in-out infinite",
+  margin: "0 auto 12px",
 };
 
 export default InmueblesPage;

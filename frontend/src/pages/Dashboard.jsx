@@ -106,254 +106,210 @@ function Dashboard() {
 
   if (cargando) {
     return (
-      <div>
-        <h1 style={{ color: "#43214d" }}>Dashboard</h1>
-        <p>Cargando información general del sistema...</p>
+      <div style={pageStyle}>
+        <style>{animations}</style>
+
+        <div style={loadingCardStyle}>
+          <div style={loadingOrbStyle}></div>
+          <h1 style={loadingTitleStyle}>Cargando panel principal...</h1>
+          <p style={mutedTextStyle}>
+            Sincronizando resumen, alertas, visitas y operaciones.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div style={pageStyle}>
+      <style>{animations}</style>
+
       <section style={heroStyle}>
         <div>
-          <p style={eyebrowStyle}>Panel administrativo</p>
+          <p style={eyebrowStyle}>ADMINISTRATIVE DASHBOARD</p>
 
-          <h1 style={{ margin: "6px 0", color: "#43214d" }}>
-            Bienvenido, {username || "administrador"}
+          <h1 style={heroTitleStyle}>
+            Operaciones en <span style={heroAccentStyle}>tiempo real</span>
           </h1>
 
-          <p style={{ color: "#7e747d", maxWidth: "720px", lineHeight: 1.7 }}>
-            Resumen general de la plataforma PropTech: inmuebles, visitas,
-            operaciones, alertas, eventos inusuales, reportes y análisis
-            comercial.
+          <p style={heroTextStyle}>
+            Bienvenido, {username || "administrador"}. Este centro de mando
+            resume inmuebles, visitas, operaciones, alertas, eventos inusuales,
+            reportes y análisis comercial del sistema PropTech.
           </p>
         </div>
 
-        <button onClick={cargarDashboard} style={primaryButton}>
-          Actualizar dashboard
-        </button>
+        <div style={heroActionsStyle}>
+          <div style={statusPanelStyle}>
+            <span style={statusDotStyle}></span>
+            <span>Monitoreo activo</span>
+          </div>
+
+          <button onClick={cargarDashboard} style={primaryButton}>
+            Actualizar dashboard
+          </button>
+        </div>
       </section>
 
-      <section style={cardsGrid}>
-        <CardResumen
+      <section style={metricsGridStyle}>
+        <MetricCard
           titulo="Total inmuebles"
           valor={resumen?.totalInmuebles || 0}
-          detalle="Inmuebles registrados"
-          icono="🏠"
+          detalle="Activos registrados"
+          icono="🏢"
         />
 
-        <CardResumen
+        <MetricCard
           titulo="Disponibles"
           valor={resumen?.inmueblesDisponibles || 0}
           detalle="Listos para ofertar"
           icono="✅"
         />
 
-        <CardResumen
+        <MetricCard
           titulo="Visitas pendientes"
           valor={contarVisitasPendientes()}
           detalle={`Total visitas: ${resumen?.totalVisitas || 0}`}
           icono="📅"
         />
 
-        <CardResumen
+        <MetricCard
           titulo="Operaciones cerradas"
           valor={resumen?.operacionesCerradas || 0}
-          detalle={`Valor: ${formatearDinero(resumen?.valorTotalCierres || 0)}`}
-          icono="💼"
+          detalle={formatearDinero(resumen?.valorTotalCierres || 0)}
+          icono="🤝"
         />
 
-        <CardResumen
+        <MetricCard
           titulo="Alertas pendientes"
           valor={contarAlertasPendientes()}
           detalle={`${contarAlertasCriticas()} críticas`}
           icono="🚨"
+          danger
         />
 
-        <CardResumen
+        <MetricCard
           titulo="Eventos inusuales"
           valor={contarEventosPendientes()}
           detalle="Pendientes de revisión"
-          icono="📊"
+          icono="🧠"
         />
       </section>
 
-      <section style={panelStyle}>
-        <h2 style={titleStyle}>Accesos rápidos</h2>
+      <section style={mainGridStyle}>
+        <div style={quickColumnStyle}>
+          <div style={sectionHeaderStyle}>
+            <div>
+              <p style={eyebrowStyle}>MÓDULOS DE GESTIÓN</p>
+              <h2 style={sectionTitleStyle}>Accesos rápidos</h2>
+            </div>
+          </div>
 
-        <div style={quickActionsGrid}>
-          <QuickAction
-            titulo="Gestionar inmuebles"
-            descripcion="Crear, editar, eliminar y deshacer cambios."
-            icono="🏘️"
-            onClick={() => navigate("/inmuebles")}
-          />
+          <div style={quickActionsGrid}>
+            <QuickAction
+              titulo="Inmobiliaria"
+              descripcion="Inventario, catalogo y vitrinas de inmuebles."
+              icono="🏘️"
+              onClick={() => navigate("/inmuebles-admin")}
+            />
 
-          <QuickAction
-            titulo="Descubrir inmuebles"
-            descripcion="Catálogo con filtros y ordenamiento por árbol."
-            icono="🔎"
-            onClick={() => navigate("/descubrir-inmuebles")}
-          />
+            <QuickAction
+              titulo="Personas"
+              descripcion="Clientes, asesores y rotación de atención."
+              icono="👥"
+              onClick={() => navigate("/personas")}
+            />
 
-          <QuickAction
-            titulo="Registrar operación"
-            descripcion="Ventas, arriendos, renovaciones y cancelaciones."
-            icono="🧾"
-            onClick={() => navigate("/operaciones")}
-          />
+            <QuickAction
+              titulo="Visitas"
+              descripcion="Agenda, seguimiento y control de visitas."
+              icono="📅"
+              onClick={() => navigate("/visitas")}
+            />
 
-          <QuickAction
-            titulo="Procesar alertas"
-            descripcion="Cola FIFO y cola de prioridad."
-            icono="⚠️"
-            onClick={() => navigate("/alertas")}
-          />
+            <QuickAction
+              titulo="Operaciones"
+              descripcion="Ventas, arriendos, renovaciones y cancelaciones."
+              icono="💼"
+              onClick={() => navigate("/operaciones")}
+            />
 
-          <QuickAction
-            titulo="Ver reportes"
-            descripcion="Zonas, precios, visitas, cierres y asesores."
-            icono="📈"
-            onClick={() => navigate("/reportes")}
-          />
+            <QuickAction
+              titulo="Monitoreo"
+              descripcion="Alertas y eventos inusuales."
+              icono="🚨"
+              onClick={() => navigate("/monitoreo")}
+            />
 
-          <QuickAction
-            titulo="Analizar relaciones"
-            descripcion="Grafo cliente-inmueble-zona-asesor."
-            icono="🕸️"
-            onClick={() => navigate("/analisis-relaciones")}
+            <QuickAction
+              titulo="Analítica"
+              descripcion="Reportes y analisis comercial."
+              icono="📈"
+              onClick={() => navigate("/analitica")}
+              accent
+            />
+          </div>
+        </div>
+
+        <div style={feedColumnStyle}>
+          <FeedPanel
+            alertas={alertasRecientes}
+            eventos={eventosRecientes}
+            navigate={navigate}
           />
         </div>
       </section>
 
-      <section style={dashboardGrid}>
-        <div style={panelStyle}>
-          <h2 style={titleStyle}>Alertas recientes</h2>
-
-          {alertasRecientes.length === 0 ? (
-            <p>No hay alertas registradas.</p>
-          ) : (
-            alertasRecientes.map((alerta) => (
-              <MiniItem
-                key={alerta.id}
-                titulo={`${alerta.id} · ${alerta.tipo}`}
-                descripcion={alerta.descripcion}
-                etiqueta={alerta.nivelAtencion}
-                estado={alerta.estado}
-              />
-            ))
-          )}
-
-          <button onClick={() => navigate("/alertas")} style={secondaryButton}>
-            Ir a alertas
-          </button>
-        </div>
-
-        <div style={panelStyle}>
-          <h2 style={titleStyle}>Eventos inusuales recientes</h2>
-
-          {eventosRecientes.length === 0 ? (
-            <p>No hay eventos inusuales registrados.</p>
-          ) : (
-            eventosRecientes.map((evento) => (
-              <MiniItem
-                key={evento.id}
-                titulo={`${evento.id} · ${evento.tipo}`}
-                descripcion={evento.descripcion}
-                etiqueta={evento.nivelAtencion}
-                estado={evento.estado}
-              />
-            ))
-          )}
-
-          <button
-            onClick={() => navigate("/eventos-inusuales")}
-            style={secondaryButton}
-          >
-            Ir a eventos
-          </button>
-        </div>
-      </section>
-
-      <section style={dashboardGrid}>
-        <div style={panelStyle}>
-          <h2 style={titleStyle}>Visitas recientes</h2>
-
+      <section style={twoColumnsStyle}>
+        <GlassPanel
+          titulo="Visitas recientes"
+          action="Ir a visitas"
+          onClick={() => navigate("/visitas")}
+        >
           {visitasRecientes.length === 0 ? (
-            <p>No hay visitas registradas.</p>
+            <EmptyState texto="No hay visitas registradas." />
           ) : (
-            <table style={tableStyle}>
-              <thead>
-                <tr style={theadRowStyle}>
-                  <th>ID</th>
-                  <th>Cliente</th>
-                  <th>Inmueble</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {visitasRecientes.map((visita) => (
-                  <tr key={visita.id}>
-                    <td style={tdStyle}>{visita.id}</td>
-                    <td style={tdStyle}>{visita.idCliente}</td>
-                    <td style={tdStyle}>{visita.codigoInmueble}</td>
-                    <td style={tdStyle}>{visita.estado}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Table
+              headers={["ID", "Cliente", "Inmueble", "Estado"]}
+              rows={visitasRecientes.map((visita) => [
+                visita.id,
+                visita.idCliente,
+                visita.codigoInmueble,
+                visita.estado,
+              ])}
+            />
           )}
+        </GlassPanel>
 
-          <button onClick={() => navigate("/visitas")} style={secondaryButton}>
-            Ir a visitas
-          </button>
-        </div>
-
-        <div style={panelStyle}>
-          <h2 style={titleStyle}>Operaciones recientes</h2>
-
+        <GlassPanel
+          titulo="Operaciones recientes"
+          action="Ir a operaciones"
+          onClick={() => navigate("/operaciones")}
+        >
           {operacionesRecientes.length === 0 ? (
-            <p>No hay operaciones registradas.</p>
+            <EmptyState texto="No hay operaciones registradas." />
           ) : (
-            <table style={tableStyle}>
-              <thead>
-                <tr style={theadRowStyle}>
-                  <th>ID</th>
-                  <th>Tipo</th>
-                  <th>Valor</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {operacionesRecientes.map((operacion) => (
-                  <tr key={operacion.id}>
-                    <td style={tdStyle}>{operacion.id}</td>
-                    <td style={tdStyle}>{operacion.tipoOperacion}</td>
-                    <td style={tdStyle}>
-                      {formatearDinero(operacion.valorAcordado)}
-                    </td>
-                    <td style={tdStyle}>{operacion.estadoProceso}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Table
+              headers={["ID", "Tipo", "Valor", "Estado"]}
+              rows={operacionesRecientes.map((operacion) => [
+                operacion.id,
+                operacion.tipoOperacion,
+                formatearDinero(operacion.valorAcordado),
+                operacion.estadoProceso,
+              ])}
+            />
           )}
-
-          <button onClick={() => navigate("/operaciones")} style={secondaryButton}>
-            Ir a operaciones
-          </button>
-        </div>
+        </GlassPanel>
       </section>
 
-      <section style={dashboardGrid}>
-        <div style={panelStyle}>
-          <h2 style={titleStyle}>Zonas con más inmuebles</h2>
-
+      <section style={twoColumnsStyle}>
+        <GlassPanel
+          titulo="Zonas con más inmuebles"
+          action="Ir a analítica"
+          onClick={() => navigate("/analitica")}
+        >
           {zonasTop.length === 0 ? (
-            <p>No hay datos de zonas.</p>
+            <EmptyState texto="No hay datos de zonas." />
           ) : (
             zonasTop.map((zona) => (
               <RankingItem
@@ -364,13 +320,15 @@ function Dashboard() {
               />
             ))
           )}
-        </div>
+        </GlassPanel>
 
-        <div style={panelStyle}>
-          <h2 style={titleStyle}>Cierres por asesor</h2>
-
+        <GlassPanel
+          titulo="Cierres por asesor"
+          action="Ir a analítica"
+          onClick={() => navigate("/analitica")}
+        >
           {asesoresTop.length === 0 ? (
-            <p>No hay cierres registrados.</p>
+            <EmptyState texto="No hay cierres registrados." />
           ) : (
             asesoresTop.map((asesor) => (
               <RankingItem
@@ -381,70 +339,170 @@ function Dashboard() {
               />
             ))
           )}
-        </div>
+        </GlassPanel>
       </section>
 
-      <section style={panelStyle}>
-        <h2 style={titleStyle}>Estructuras implementadas</h2>
+      <section style={glassPanelStyle}>
+        <div style={sectionHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>OPERACION</p>
+            <h2 style={sectionTitleStyle}>Capacidades del sistema</h2>
+          </div>
+        </div>
 
         <div style={estructuraGrid}>
-          <BadgeEstructura nombre="Lista" uso="Favoritos, historial y recorridos" />
-          <BadgeEstructura nombre="Pila" uso="Deshacer cambios en inmuebles" />
-          <BadgeEstructura nombre="Cola" uso="Alertas pendientes FIFO" />
-          <BadgeEstructura nombre="Cola prioridad" uso="Alertas críticas primero" />
-          <BadgeEstructura nombre="Tabla hash" uso="Reportes y agrupaciones" />
-          <BadgeEstructura nombre="Árbol" uso="Ordenamiento de inmuebles" />
-          <BadgeEstructura nombre="Grafo" uso="Relaciones cliente-inmueble" />
+          <BadgeEstructura nombre="Inventario" uso="Catalogo y disponibilidad" />
+          <BadgeEstructura nombre="Cambios" uso="Deshacer ajustes recientes" />
+          <BadgeEstructura nombre="Alertas" uso="Seguimiento de pendientes" />
+          <BadgeEstructura nombre="Priorizacion" uso="Atencion de casos urgentes" />
+          <BadgeEstructura nombre="Reportes" uso="Indicadores comerciales" />
+          <BadgeEstructura nombre="Catalogo" uso="Orden por precio, area y demanda" />
+          <BadgeEstructura nombre="Relaciones" uso="Conexiones cliente-inmueble" />
         </div>
       </section>
     </div>
   );
 }
 
-function CardResumen({ titulo, valor, detalle, icono }) {
+function MetricCard({ titulo, valor, detalle, icono, danger }) {
   return (
-    <div style={cardStyle}>
-      <div style={cardIconStyle}>{icono}</div>
+    <div
+      style={{
+        ...metricCardStyle,
+        borderColor: danger ? "#5f232a" : "#37333e",
+      }}
+    >
+      <div style={metricGlowStyle}></div>
 
-      <h3 style={{ margin: "12px 0 6px", color: "#43214d" }}>{titulo}</h3>
+      <div style={metricIconStyle}>{icono}</div>
 
-      <p style={cardValueStyle}>{valor}</p>
+      <span style={metricLabelStyle}>{titulo}</span>
 
-      <small style={{ color: "#7e747d" }}>{detalle}</small>
+      <div style={metricValueRowStyle}>
+        <strong style={metricValueStyle}>{valor}</strong>
+      </div>
+
+      <small style={danger ? dangerTextStyle : mutedTextStyle}>{detalle}</small>
     </div>
   );
 }
 
-function QuickAction({ titulo, descripcion, icono, onClick }) {
+function QuickAction({ titulo, descripcion, icono, onClick, accent }) {
   return (
     <button onClick={onClick} style={quickActionStyle}>
-      <div style={quickIconStyle}>{icono}</div>
+      <div style={accent ? quickIconAccentStyle : quickIconStyle}>{icono}</div>
 
-      <div style={{ textAlign: "left" }}>
-        <strong style={{ color: "#43214d" }}>{titulo}</strong>
-        <p style={{ margin: "6px 0 0", color: "#7e747d", lineHeight: 1.4 }}>
-          {descripcion}
-        </p>
-      </div>
+      <strong style={quickTitleStyle}>{titulo}</strong>
+
+      <p style={quickTextStyle}>{descripcion}</p>
     </button>
   );
 }
 
-function MiniItem({ titulo, descripcion, etiqueta, estado }) {
+function FeedPanel({ alertas, eventos, navigate }) {
+  const alertasFeed = alertas.slice(0, 2);
+  const eventosFeed = eventos.slice(0, 2);
+
   return (
-    <div style={miniItemStyle}>
-      <div>
-        <strong style={{ color: "#43214d" }}>{titulo}</strong>
+    <div style={feedPanelStyle}>
+      <div style={feedHeaderStyle}>
+        <span style={feedIconStyle}>📡</span>
 
-        <p style={{ margin: "6px 0 0", color: "#4c444d", lineHeight: 1.5 }}>
-          {descripcion}
-        </p>
+        <div>
+          <p style={eyebrowStyle}>FEED DE INTELIGENCIA</p>
+          <h3 style={feedTitleStyle}>Monitoreo reciente</h3>
+        </div>
       </div>
 
-      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-        <span style={pillStyle}>{etiqueta}</span>
-        <span style={pillLightStyle}>{estado}</span>
+      {alertasFeed.length === 0 && eventosFeed.length === 0 ? (
+        <EmptyState texto="No hay alertas ni eventos recientes." />
+      ) : (
+        <>
+          {alertasFeed.map((alerta) => (
+            <FeedItem
+              key={`alerta-${alerta.id}`}
+              tipo="Alerta"
+              titulo={`${alerta.id} · ${alerta.tipo}`}
+              descripcion={alerta.descripcion}
+              color="#ffb4ab"
+            />
+          ))}
+
+          {eventosFeed.map((evento) => (
+            <FeedItem
+              key={`evento-${evento.id}`}
+              tipo="Evento"
+              titulo={`${evento.id} · ${evento.tipo}`}
+              descripcion={evento.descripcion}
+              color="#d2bbff"
+            />
+          ))}
+        </>
+      )}
+
+      <button onClick={() => navigate("/monitoreo")} style={ghostButtonStyle}>
+        Ver monitoreo completo
+      </button>
+    </div>
+  );
+}
+
+function FeedItem({ tipo, titulo, descripcion, color }) {
+  return (
+    <div style={{ ...feedItemStyle, borderLeft: `2px solid ${color}` }}>
+      <span style={{ ...feedTypeStyle, color }}>{tipo}</span>
+
+      <strong style={feedItemTitleStyle}>{titulo}</strong>
+
+      <p style={feedItemTextStyle}>{descripcion || "Sin descripción registrada."}</p>
+    </div>
+  );
+}
+
+function GlassPanel({ titulo, action, onClick, children }) {
+  return (
+    <div style={glassPanelStyle}>
+      <div style={panelHeaderStyle}>
+        <h2 style={panelTitleStyle}>{titulo}</h2>
+
+        {action && (
+          <button onClick={onClick} style={smallButtonStyle}>
+            {action}
+          </button>
+        )}
       </div>
+
+      {children}
+    </div>
+  );
+}
+
+function Table({ headers, rows }) {
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            {headers.map((header) => (
+              <th key={header} style={thStyle}>
+                {header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {rows.map((row, index) => (
+            <tr key={index}>
+              {row.map((cell, cellIndex) => (
+                <td key={cellIndex} style={tdStyle}>
+                  {cell || "—"}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -453,8 +511,8 @@ function RankingItem({ titulo, cantidad, detalle }) {
   return (
     <div style={rankingItemStyle}>
       <div>
-        <strong style={{ color: "#43214d" }}>{titulo}</strong>
-        <p style={{ margin: "4px 0 0", color: "#7e747d" }}>{detalle}</p>
+        <strong style={rankingTitleStyle}>{titulo}</strong>
+        <p style={rankingDetailStyle}>{detalle}</p>
       </div>
 
       <span style={rankingNumberStyle}>{cantidad}</span>
@@ -471,179 +529,461 @@ function BadgeEstructura({ nombre, uso }) {
   );
 }
 
+function EmptyState({ texto }) {
+  return <p style={emptyTextStyle}>{texto}</p>;
+}
+
+const animations = `
+  @keyframes fadeUpDashboard {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulseDashboard {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: .55;
+      transform: scale(1.18);
+    }
+  }
+
+  @keyframes orbDashboard {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-10px) scale(1.05);
+    }
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const pageStyle = {
+  minHeight: "100vh",
+  color: "#e8dfee",
+  background:
+    "radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.14), transparent 34%), radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.10), transparent 34%), #15121b",
+  animation: "fadeUpDashboard 0.65s ease both",
+};
+
 const heroStyle = {
-  backgroundColor: "rgba(255,255,255,0.88)",
-  padding: "26px",
-  borderRadius: "22px",
-  marginBottom: "24px",
-  boxShadow: "0 14px 34px rgba(67,33,77,0.09)",
-  border: "1px solid #e8e0e5",
+  marginBottom: "28px",
+  padding: "28px",
+  borderRadius: "30px",
+  background: "#221e28",
+  border: "1px solid #37333e",
+  boxShadow: "0 24px 60px rgba(0,0,0,0.28)",
   display: "flex",
   justifyContent: "space-between",
-  gap: "18px",
-  alignItems: "center",
+  gap: "24px",
+  alignItems: "flex-end",
   flexWrap: "wrap",
 };
 
 const eyebrowStyle = {
   margin: 0,
-  color: "#7f4d7c",
-  fontWeight: "800",
+  color: "#d2bbff",
+  fontWeight: "900",
   textTransform: "uppercase",
+  fontSize: "0.72rem",
+  letterSpacing: "0.12em",
+};
+
+const heroTitleStyle = {
+  margin: "8px 0",
+  color: "#ffffff",
+  fontSize: "clamp(2rem, 4vw, 3.7rem)",
+  lineHeight: 1.08,
+  letterSpacing: "-0.05em",
+};
+
+const heroAccentStyle = {
+  color: "#d2bbff",
+};
+
+const heroTextStyle = {
+  color: "#ccc3d8",
+  maxWidth: "760px",
+  lineHeight: 1.7,
+  margin: 0,
+};
+
+const heroActionsStyle = {
+  display: "flex",
+  gap: "12px",
+  alignItems: "center",
+  flexWrap: "wrap",
+};
+
+const statusPanelStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "9px",
+  padding: "11px 14px",
+  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  color: "#ccc3d8",
   fontSize: "0.78rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
   letterSpacing: "0.08em",
 };
 
-const cardsGrid = {
+const statusDotStyle = {
+  width: "8px",
+  height: "8px",
+  borderRadius: "50%",
+  background: "#22c55e",
+  boxShadow: "0 0 16px rgba(34,197,94,0.8)",
+  animation: "pulseDashboard 1.8s ease-in-out infinite",
+};
+
+const primaryButton = {
+  padding: "12px 16px",
+  border: "none",
+  borderRadius: "16px",
+  background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
+  color: "white",
+  fontWeight: "900",
+  cursor: "pointer",
+  transition: "0.25s ease",
+  boxShadow: "0 16px 32px rgba(124,58,237,0.28)",
+};
+
+const metricsGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
   gap: "16px",
-  marginBottom: "24px",
+  marginBottom: "28px",
 };
 
-const cardStyle = {
-  background: "rgba(255,255,255,0.86)",
-  borderRadius: "20px",
+const metricCardStyle = {
+  position: "relative",
+  overflow: "hidden",
   padding: "20px",
-  boxShadow: "0 12px 28px rgba(67,33,77,0.08)",
-  border: "1px solid #e8e0e5",
+  borderRadius: "26px",
+  background: "#2c2833",
+  border: "1px solid #37333e",
+  boxShadow: "0 18px 40px rgba(0,0,0,0.22)",
+  transition: "0.3s ease",
 };
 
-const cardIconStyle = {
+const metricGlowStyle = {
+  position: "absolute",
+  top: "-40px",
+  right: "-40px",
+  width: "110px",
+  height: "110px",
+  background: "rgba(124,58,237,0.16)",
+  filter: "blur(28px)",
+};
+
+const metricIconStyle = {
   width: "46px",
   height: "46px",
   borderRadius: "16px",
-  background: "#fbd7ff",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: "1.4rem",
-};
-
-const cardValueStyle = {
-  margin: 0,
-  fontSize: "2rem",
-  fontWeight: "900",
-  color: "#1e1a1e",
-};
-
-const panelStyle = {
-  backgroundColor: "rgba(255,255,255,0.88)",
-  padding: "22px",
-  borderRadius: "20px",
-  marginBottom: "24px",
-  boxShadow: "0 12px 28px rgba(67,33,77,0.08)",
-  border: "1px solid #e8e0e5",
-};
-
-const titleStyle = {
-  color: "#43214d",
-  marginTop: 0,
+  fontSize: "1.35rem",
   marginBottom: "16px",
+};
+
+const metricLabelStyle = {
+  display: "block",
+  color: "#9f92b2",
+  fontSize: "0.72rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.09em",
+};
+
+const metricValueRowStyle = {
+  display: "flex",
+  alignItems: "baseline",
+  gap: "8px",
+  marginTop: "10px",
+};
+
+const metricValueStyle = {
+  color: "#ffffff",
+  fontSize: "2.2rem",
+  lineHeight: 1,
+};
+
+const mutedTextStyle = {
+  color: "#9f92b2",
+};
+
+const dangerTextStyle = {
+  color: "#ffb4ab",
+};
+
+const mainGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(12, 1fr)",
+  gap: "22px",
+  marginBottom: "28px",
+};
+
+const quickColumnStyle = {
+  gridColumn: "span 8",
+};
+
+const feedColumnStyle = {
+  gridColumn: "span 4",
+};
+
+const sectionHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-end",
+  gap: "16px",
+  marginBottom: "16px",
+};
+
+const sectionTitleStyle = {
+  color: "#ffffff",
+  margin: "6px 0 0",
+  fontSize: "1.35rem",
+  letterSpacing: "-0.03em",
 };
 
 const quickActionsGrid = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-  gap: "14px",
+  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+  gap: "16px",
 };
 
 const quickActionStyle = {
-  border: "1px solid #e8e0e5",
-  backgroundColor: "#fff7fb",
-  padding: "16px",
-  borderRadius: "18px",
-  display: "flex",
-  gap: "14px",
+  minHeight: "170px",
+  border: "1px solid #37333e",
+  background: "#2c2833",
+  color: "#ffffff",
+  padding: "22px",
+  borderRadius: "28px",
   cursor: "pointer",
-  boxShadow: "0 8px 20px rgba(67,33,77,0.05)",
+  boxShadow: "0 18px 38px rgba(0,0,0,0.20)",
+  transition: "0.28s ease",
+  textAlign: "center",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "12px",
 };
 
 const quickIconStyle = {
-  width: "44px",
-  height: "44px",
-  minWidth: "44px",
-  borderRadius: "14px",
-  background: "linear-gradient(135deg, #5b3765, #fdbef4)",
+  width: "60px",
+  height: "60px",
+  borderRadius: "20px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  color: "white",
-  fontSize: "1.3rem",
+  fontSize: "1.9rem",
 };
 
-const dashboardGrid = {
+const quickIconAccentStyle = {
+  ...quickIconStyle,
+  background: "#283318",
+  color: "#bcff00",
+  border: "1px solid #557022",
+};
+
+const quickTitleStyle = {
+  color: "#ffffff",
+  fontSize: "1.05rem",
+};
+
+const quickTextStyle = {
+  margin: 0,
+  color: "#9f92b2",
+  fontSize: "0.78rem",
+  lineHeight: 1.45,
+};
+
+const feedPanelStyle = {
+  height: "100%",
+  minHeight: "420px",
+  padding: "24px",
+  borderRadius: "32px",
+  background: "#221e28",
+  border: "1px solid #37333e",
+  boxShadow: "0 20px 50px rgba(0,0,0,0.24)",
+};
+
+const feedHeaderStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "12px",
+  marginBottom: "22px",
+};
+
+const feedIconStyle = {
+  width: "44px",
+  height: "44px",
+  borderRadius: "16px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const feedTitleStyle = {
+  margin: "4px 0 0",
+  color: "#ffffff",
+};
+
+const feedItemStyle = {
+  padding: "0 0 0 16px",
+  marginBottom: "22px",
+};
+
+const feedTypeStyle = {
+  display: "block",
+  fontSize: "0.68rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.1em",
+  marginBottom: "6px",
+};
+
+const feedItemTitleStyle = {
+  display: "block",
+  color: "#ffffff",
+  fontSize: "0.92rem",
+};
+
+const feedItemTextStyle = {
+  margin: "6px 0 0",
+  color: "#9f92b2",
+  fontSize: "0.8rem",
+  lineHeight: 1.5,
+};
+
+const ghostButtonStyle = {
+  width: "100%",
+  padding: "12px",
+  borderRadius: "16px",
+  border: "1px solid #6d5f7a",
+  background: "#3f2a57",
+  color: "#d2bbff",
+  fontWeight: "900",
+  cursor: "pointer",
+};
+
+const twoColumnsStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
-  gap: "18px",
+  gap: "22px",
+  marginBottom: "28px",
 };
 
-const miniItemStyle = {
-  backgroundColor: "#fff7fb",
-  border: "1px solid #e8e0e5",
-  borderRadius: "16px",
-  padding: "14px",
-  marginBottom: "10px",
+const glassPanelStyle = {
+  padding: "22px",
+  borderRadius: "28px",
+  background: "#221e28",
+  border: "1px solid #37333e",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+  marginBottom: "28px",
 };
 
-const pillStyle = {
-  backgroundColor: "#fbd7ff",
-  color: "#43214d",
-  padding: "5px 9px",
-  borderRadius: "999px",
-  fontSize: "0.75rem",
-  fontWeight: "800",
+const panelHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "12px",
+  alignItems: "center",
+  marginBottom: "16px",
 };
 
-const pillLightStyle = {
-  backgroundColor: "#f4ecf0",
-  color: "#4c444d",
-  padding: "5px 9px",
-  borderRadius: "999px",
-  fontSize: "0.75rem",
-  fontWeight: "800",
+const panelTitleStyle = {
+  color: "#ffffff",
+  margin: 0,
+  fontSize: "1.2rem",
+};
+
+const smallButtonStyle = {
+  padding: "9px 12px",
+  border: "1px solid #6d5f7a",
+  borderRadius: "14px",
+  background: "#3f2a57",
+  color: "#d2bbff",
+  fontWeight: "900",
+  cursor: "pointer",
 };
 
 const tableStyle = {
   width: "100%",
   borderCollapse: "collapse",
-  backgroundColor: "white",
-  borderRadius: "14px",
   overflow: "hidden",
-  marginBottom: "14px",
 };
 
-const theadRowStyle = {
-  backgroundColor: "#f4ecf0",
-  color: "#43214d",
+const thStyle = {
+  padding: "12px",
+  color: "#d2bbff",
+  fontSize: "0.72rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  textAlign: "left",
+  borderBottom: "1px solid #37333e",
 };
 
 const tdStyle = {
-  padding: "10px",
-  border: "1px solid #e8e0e5",
+  padding: "12px",
+  color: "#ccc3d8",
+  borderBottom: "1px solid #2c2833",
+  fontSize: "0.86rem",
 };
 
 const rankingItemStyle = {
-  backgroundColor: "#fff7fb",
-  border: "1px solid #e8e0e5",
-  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  borderRadius: "18px",
   padding: "14px",
   marginBottom: "10px",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+};
+
+const rankingTitleStyle = {
+  color: "#ffffff",
+};
+
+const rankingDetailStyle = {
+  margin: "4px 0 0",
+  color: "#8f849e",
 };
 
 const rankingNumberStyle = {
   width: "42px",
   height: "42px",
   borderRadius: "50%",
-  background: "linear-gradient(135deg, #5b3765, #43214d)",
+  background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
   color: "white",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   fontWeight: "900",
+  boxShadow: "0 0 18px rgba(124,58,237,0.28)",
 };
 
 const estructuraGrid = {
@@ -653,35 +993,47 @@ const estructuraGrid = {
 };
 
 const estructuraBadgeStyle = {
-  backgroundColor: "#fff7fb",
-  border: "1px solid #e8e0e5",
-  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  borderRadius: "18px",
   padding: "14px",
-  color: "#43214d",
+  color: "#ffffff",
   display: "flex",
   flexDirection: "column",
   gap: "6px",
 };
 
-const primaryButton = {
-  padding: "11px 16px",
-  border: "none",
-  borderRadius: "12px",
-  background: "linear-gradient(135deg, #5b3765, #43214d)",
-  color: "white",
-  fontWeight: "800",
-  cursor: "pointer",
+const emptyTextStyle = {
+  color: "#9f92b2",
+  margin: 0,
+  lineHeight: 1.6,
 };
 
-const secondaryButton = {
-  padding: "9px 13px",
-  border: "1px solid #cfc3cd",
-  borderRadius: "12px",
-  backgroundColor: "#fbd7ff",
-  color: "#43214d",
-  fontWeight: "800",
-  cursor: "pointer",
-  marginTop: "10px",
+const loadingCardStyle = {
+  minHeight: "340px",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  borderRadius: "30px",
+  background: "#221e28",
+  border: "1px solid #37333e",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+};
+
+const loadingOrbStyle = {
+  width: "76px",
+  height: "76px",
+  borderRadius: "50%",
+  background: "linear-gradient(135deg, #7c3aed, #d2bbff)",
+  boxShadow: "0 0 36px rgba(124,58,237,0.42)",
+  animation: "orbDashboard 2s ease-in-out infinite",
+  marginBottom: "18px",
+};
+
+const loadingTitleStyle = {
+  color: "#ffffff",
+  margin: "0 0 8px",
 };
 
 export default Dashboard;

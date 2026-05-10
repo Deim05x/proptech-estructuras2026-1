@@ -115,8 +115,8 @@ function AnalisisRelacionesPage() {
       </h1>
 
       <p style={{ color: "#7e747d", marginBottom: "24px" }}>
-        Consulta relaciones entre clientes, inmuebles, zonas y asesores usando
-        un grafo no dirigido genérico.
+        Consulta conexiones comerciales entre clientes, inmuebles, zonas y
+        asesores para identificar oportunidades de seguimiento.
       </p>
 
       {cargando ? (
@@ -132,7 +132,7 @@ function AnalisisRelacionesPage() {
             }}
           >
             <CardResumen
-              titulo="Total nodos"
+              titulo="Total registros"
               valor={resumen?.totalNodos || 0}
             />
 
@@ -142,18 +142,18 @@ function AnalisisRelacionesPage() {
             />
 
             <CardResumen
-              titulo="Nodo más conectado"
+              titulo="Registro con mas conexiones"
               valor={resumen?.nodoMayorConexion || "Sin datos"}
             />
 
             <CardResumen
-              titulo="Grado mayor"
+              titulo="Conexiones maximas"
               valor={resumen?.gradoMayorConexion || 0}
             />
           </div>
 
           <div style={panelStyle}>
-            <h2 style={titleStyle}>Consultas estructurales</h2>
+            <h2 style={titleStyle}>Consultas de relaciones</h2>
 
             <div
               style={{
@@ -228,10 +228,10 @@ function AnalisisRelacionesPage() {
           </div>
 
           <div style={panelStyle}>
-            <h2 style={titleStyle}>Nodos del grafo</h2>
+            <h2 style={titleStyle}>Elementos relacionados</h2>
 
             {nodos.length === 0 ? (
-              <p>No hay nodos para mostrar.</p>
+              <p>No hay elementos para mostrar.</p>
             ) : (
               <table style={tableStyle}>
                 <thead>
@@ -239,7 +239,7 @@ function AnalisisRelacionesPage() {
                     <th>ID</th>
                     <th>Tipo</th>
                     <th>Etiqueta</th>
-                    <th>Grado</th>
+                    <th>Conexiones</th>
                   </tr>
                 </thead>
 
@@ -271,7 +271,7 @@ function AnalisisRelacionesPage() {
           </div>
 
           <div style={panelStyle}>
-            <h2 style={titleStyle}>Relaciones del grafo</h2>
+            <h2 style={titleStyle}>Relaciones detectadas</h2>
 
             {relaciones.length === 0 ? (
               <p>No hay relaciones para mostrar.</p>
@@ -282,7 +282,7 @@ function AnalisisRelacionesPage() {
                     <th>Origen</th>
                     <th>Destino</th>
                     <th>Tipo relación</th>
-                    <th>Peso</th>
+                    <th>Relevancia</th>
                   </tr>
                 </thead>
 
@@ -298,17 +298,6 @@ function AnalisisRelacionesPage() {
                 </tbody>
               </table>
             )}
-          </div>
-
-          <div style={panelStyle}>
-            <h2 style={titleStyle}>Justificación de estructura</h2>
-
-            <p style={{ color: "#4c444d", lineHeight: 1.7 }}>
-              Esta vista usa un grafo no dirigido genérico en backend para
-              representar relaciones entre clientes, inmuebles, zonas y asesores.
-              Las aristas permiten analizar interacciones comerciales, conexiones
-              por visitas, operaciones y similitud entre inmuebles.
-            </p>
           </div>
         </>
       )}

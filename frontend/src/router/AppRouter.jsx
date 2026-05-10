@@ -21,6 +21,11 @@ import MiActividadPage from "../pages/MiActividadPage";
 import AsesoresModuloPage from "../pages/AsesoresModuloPage";
 import AnalisisRelacionesPage from "../pages/AnalisisRelacionesPage";
 import EventosInusualesPage from "../pages/EventosInusualesPage";
+import RegistroClientePage from "../pages/RegistroClientePage";
+import GestionInmobiliariaPage from "../pages/GestionInmobiliariaPage.jsx";
+import PersonasPage from "../pages/PersonasPage";
+import MonitoreoPage from "../pages/MonitoreoPage";
+import AnaliticaPage from "../pages/AnaliticaPage";
 function AppRouter() {
   return (
     <Routes>
@@ -186,7 +191,45 @@ function AppRouter() {
       <AnalisisRelacionesPage />
     </ProtectedRoute>
   }
+/> 
+
+<Route
+  path="/inmuebles-admin"
+  element={
+    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+      <GestionInmobiliariaPage />
+    </ProtectedRoute>
+  }
 />
+
+<Route
+  path="/personas"
+  element={
+    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+      <PersonasPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/monitoreo"
+  element={
+    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+      <MonitoreoPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/analitica"
+  element={
+    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+      <AnaliticaPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route path="/registro-cliente" element={<RegistroClientePage />} />
 
 <Route
   path="/eventos-inusuales"

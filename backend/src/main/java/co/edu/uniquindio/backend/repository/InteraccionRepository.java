@@ -33,6 +33,18 @@ public class InteraccionRepository {
         return filas > 0;
     }
 
+    public boolean guardar(Interaccion interaccion) {
+        if (interaccion == null) {
+            return false;
+        }
+
+        return guardarInteraccion(
+                interaccion.getIdCliente(),
+                interaccion.getCodigoInmueble(),
+                interaccion.getTipoInteraccion()
+        );
+    }
+
     public LinkedDoubleList<Interaccion> obtenerHistorialPorCliente(String clienteId) {
         String sql = """
                 SELECT id, cliente_id, inmueble_codigo, tipo_interaccion, fecha

@@ -96,12 +96,12 @@ function AlertasPage() {
 
   const recargarCola = async () => {
     try {
-      const respuesta = await alertaService.recargarCola();
-      alert(respuesta);
+      await alertaService.recargarCola();
+      alert("Alertas pendientes actualizadas.");
       cargarAlertas();
     } catch (error) {
       console.error("Error al recargar cola:", error);
-      alert("No se pudo recargar la cola de alertas");
+      alert("No se pudieron recargar las alertas pendientes");
     }
   };
 
@@ -110,9 +110,9 @@ function AlertasPage() {
       const respuesta = await alertaService.procesarSiguiente();
 
       if (typeof respuesta === "string") {
-        alert(respuesta);
+        alert("No hay alertas pendientes para procesar.");
       } else {
-        alert(`Alerta procesada por cola normal: ${respuesta.id}`);
+        alert(`Alerta procesada: ${respuesta.id}`);
       }
 
       cargarAlertas();
@@ -124,12 +124,12 @@ function AlertasPage() {
 
   const recargarColaPrioridad = async () => {
     try {
-      const respuesta = await alertaService.recargarColaPrioridad();
-      alert(respuesta);
+      await alertaService.recargarColaPrioridad();
+      alert("Alertas prioritarias actualizadas.");
       cargarAlertas();
     } catch (error) {
       console.error("Error al recargar cola de prioridad:", error);
-      alert("No se pudo recargar la cola de prioridad");
+      alert("No se pudieron recargar las alertas prioritarias");
     }
   };
 
@@ -138,7 +138,7 @@ function AlertasPage() {
       const respuesta = await alertaService.procesarSiguientePrioritaria();
 
       if (typeof respuesta === "string") {
-        alert(respuesta);
+        alert("No hay alertas prioritarias para procesar.");
       } else {
         alert(
           `Alerta prioritaria procesada: ${respuesta.id} - Nivel: ${respuesta.nivelAtencion}`
@@ -188,8 +188,8 @@ function AlertasPage() {
       </h1>
 
       <p style={{ color: "#7e747d", marginBottom: "24px" }}>
-        Genera, revisa y procesa alertas usando cola normal FIFO y cola de
-        prioridad.
+        Genera, revisa y atiende alertas operativas segun su nivel de
+        urgencia.
       </p>
 
       <div
@@ -206,12 +206,12 @@ function AlertasPage() {
         </div>
 
         <div style={cardStyle}>
-          <h3 style={cardTitle}>Pendientes FIFO</h3>
+          <h3 style={cardTitle}>Pendientes generales</h3>
           <p style={cardNumber}>{cantidadCola}</p>
         </div>
 
         <div style={cardStyle}>
-          <h3 style={cardTitle}>Pendientes prioridad</h3>
+          <h3 style={cardTitle}>Alta prioridad</h3>
           <p style={cardNumber}>{cantidadColaPrioridad}</p>
         </div>
 
@@ -224,9 +224,9 @@ function AlertasPage() {
             boxShadow: "0 12px 28px rgba(67,33,77,0.18)",
           }}
         >
-          <h3 style={{ margin: 0 }}>Estructuras usadas</h3>
+          <h3 style={{ margin: 0 }}>Flujo de atencion</h3>
           <p style={{ margin: "10px 0 0" }}>
-            Cola FIFO y cola de prioridad para alertas críticas.
+            Casos organizados para responder primero a lo mas urgente.
           </p>
         </div>
       </div>
@@ -322,19 +322,19 @@ function AlertasPage() {
           </button>
 
           <button onClick={recargarCola} style={secondaryButton}>
-            Recargar cola FIFO
+            Recargar pendientes
           </button>
 
           <button onClick={procesarSiguiente} style={secondaryButton}>
-            Procesar FIFO
+            Procesar siguiente
           </button>
 
           <button onClick={recargarColaPrioridad} style={priorityButton}>
-            Recargar cola prioridad
+            Recargar alta prioridad
           </button>
 
           <button onClick={procesarSiguientePrioritaria} style={priorityButton}>
-            Procesar prioridad
+            Procesar alta prioridad
           </button>
 
           <select

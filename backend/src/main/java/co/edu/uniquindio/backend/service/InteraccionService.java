@@ -27,11 +27,29 @@ public class InteraccionService {
             return false;
         }
 
-        return interaccionRepository.guardarInteraccion(clienteId, codigoInmueble, tipoInteraccion);
+        return interaccionRepository.guardarInteraccion(
+                clienteId,
+                codigoInmueble,
+                tipoInteraccion
+        );
+    }
+
+    public boolean registrarInteraccion(Interaccion interaccion) {
+        if (interaccion == null) {
+            return false;
+        }
+
+        return registrarInteraccion(
+                interaccion.getIdCliente(),
+                interaccion.getCodigoInmueble(),
+                interaccion.getTipoInteraccion()
+        );
     }
 
     public Interaccion[] obtenerHistorialCliente(String clienteId) {
-        LinkedDoubleList<Interaccion> lista = interaccionRepository.obtenerHistorialPorCliente(clienteId);
+        LinkedDoubleList<Interaccion> lista =
+                interaccionRepository.obtenerHistorialPorCliente(clienteId);
+
         Interaccion[] arreglo = new Interaccion[lista.getSize()];
 
         for (int i = 0; i < lista.getSize(); i++) {
@@ -42,10 +60,13 @@ public class InteraccionService {
     }
 
     public Interaccion[] obtenerHistorialClienteReverso(String clienteId) {
-        LinkedDoubleList<Interaccion> lista = interaccionRepository.obtenerHistorialPorCliente(clienteId);
+        LinkedDoubleList<Interaccion> lista =
+                interaccionRepository.obtenerHistorialPorCliente(clienteId);
+
         Interaccion[] arreglo = new Interaccion[lista.getSize()];
 
         int posicion = 0;
+
         for (int i = lista.getSize() - 1; i >= 0; i--) {
             arreglo[posicion] = lista.getNodeValue(i);
             posicion++;

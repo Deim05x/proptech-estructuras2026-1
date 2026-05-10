@@ -1,0 +1,71 @@
+@keyframes navbarFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseStatus {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.55;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes avatarGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(124, 58, 237, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 22px rgba(124, 58, 237, 0.45);
+  }
+}
+
+.proptech-navbar {
+  animation: navbarFadeDown 0.55s ease both;
+}
+
+.proptech-navbar-user-card {
+  transition: 0.25s ease;
+}
+
+.proptech-navbar-user-card:hover {
+  border-color: #6d5f7a !important;
+  box-shadow: 0 0 24px rgba(124, 58, 237, 0.16);
+  transform: translateY(-1px);
+}
+
+.proptech-navbar-status-dot {
+  animation: pulseStatus 1.8s ease-in-out infinite;
+}
+
+.proptech-navbar-avatar {
+  animation: avatarGlow 3.2s ease-in-out infinite;
+}
+
+@media (max-width: 760px) {
+  .proptech-navbar-subtitle {
+    display: none;
+  }
+
+  .proptech-navbar-status {
+    display: none !important;
+  }
+
+  .proptech-navbar-title {
+    font-size: 1.25rem !important;
+  }
+}

@@ -366,18 +366,6 @@ function EventosInusualesPage() {
           </table>
         )}
       </div>
-
-      <div style={panelStyle}>
-        <h2 style={titleStyle}>Justificación del módulo</h2>
-
-        <p style={{ color: "#4c444d", lineHeight: 1.7 }}>
-          Este módulo analiza información de visitas, inmuebles, asesores y
-          operaciones para detectar patrones comerciales que requieren
-          seguimiento. Cuando se genera un evento inusual automático, también se
-          crea una alerta administrativa para que pueda ser procesada en el
-          módulo de alertas.
-        </p>
-      </div>
     </div>
   );
 }

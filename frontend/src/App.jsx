@@ -7,32 +7,31 @@ import authService from "./services/authService";
 function App() {
   const location = useLocation();
 
-  const esLogin = location.pathname === "/login";
+  const esPaginaAutenticacion = ["/login", "/registro-cliente"].includes(
+    location.pathname
+  );
+
   const autenticado = authService.estaAutenticado();
 
-  if (esLogin) {
+  if (esPaginaAutenticacion) {
     return <AppRouter />;
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, #fff7fb 0%, #f4ecf0 45%, #e8e0e5 100%)",
-      }}
-    >
+    <div style={appContainerStyle}>
       {autenticado && <Navbar />}
 
-      <div style={{ display: "flex" }}>
+      <div style={layoutStyle}>
         {autenticado && <Sidebar />}
 
         <main
           style={{
-            flex: 1,
-            padding: "24px",
-            marginLeft: autenticado ? "220px" : "0",
-            marginTop: autenticado ? "70px" : "0",
+            ...mainContentStyle,
+            marginLeft: autenticado ? "250px" : "0",
+            paddingTop: autenticado ? "102px" : "24px",
+            paddingLeft: autenticado ? "28px" : "24px",
+            paddingRight: "28px",
+            paddingBottom: "28px",
           }}
         >
           <AppRouter />
@@ -41,5 +40,31 @@ function App() {
     </div>
   );
 }
+
+const appContainerStyle = {
+  minHeight: "100vh",
+  width: "100%",
+  background:
+    "radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.14), transparent 34%), radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.10), transparent 34%), #15121b",
+  color: "#e8dfee",
+};
+
+const layoutStyle = {
+  minHeight: "100vh",
+  width: "100%",
+  display: "flex",
+  background:
+    "radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.14), transparent 34%), radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.10), transparent 34%), #15121b",
+};
+
+const mainContentStyle = {
+  flex: 1,
+  minHeight: "100vh",
+  width: "100%",
+  background:
+    "radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.10), transparent 32%), radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.08), transparent 32%), #15121b",
+  color: "#e8dfee",
+  transition: "0.25s ease",
+};
 
 export default App;

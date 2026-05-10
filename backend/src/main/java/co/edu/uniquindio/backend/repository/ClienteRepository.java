@@ -48,33 +48,38 @@ public class ClienteRepository {
             if (rs.next()) {
                 return mapearCliente(rs);
             }
+
             return null;
         }, id);
     }
 
-    public boolean guardar(Cliente cliente) {
-        String sql = """
-                INSERT INTO cliente (
-                    id, nombre, correo, telefono, tipo_cliente, presupuesto,
-                    zonas_interes, tipo_inmueble_deseado, habitaciones_minimas, estado_busqueda
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+ public boolean guardar(Cliente cliente) {
+    String sql = """
+            INSERT INTO cliente (
+                id, nombre, correo, telefono, tipo_cliente, presupuesto,
+                zonas_interes, tipo_inmueble_deseado, habitaciones_minimas, estado_busqueda
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
 
-        int filasAfectadas = jdbcTemplate.update(
-                sql,
-                cliente.getId(),
-                cliente.getNombre(),
-                cliente.getCorreo(),
-                cliente.getTelefono(),
-                cliente.getTipoCliente(),
-                cliente.getPresupuesto(),
-                cliente.getZonasInteres(),
-                cliente.getTipoInmuebleDeseado(),
-                cliente.getHabitacionesMinimas(),
-                cliente.getEstadoBusqueda()
-        );
+    int filasAfectadas = jdbcTemplate.update(
+            sql,
+            cliente.getId(),
+            cliente.getNombre(),
+            cliente.getCorreo(),
+            cliente.getTelefono(),
+            cliente.getTipoCliente(),
+            cliente.getPresupuesto(),
+            cliente.getZonasInteres(),
+            cliente.getTipoInmuebleDeseado(),
+            cliente.getHabitacionesMinimas(),
+            cliente.getEstadoBusqueda()
+    );
 
-        return filasAfectadas > 0;
+    return filasAfectadas > 0;
+}
+
+    public boolean agregarCliente(Cliente cliente) {
+        return guardar(cliente);
     }
 
     public boolean actualizar(String id, Cliente cliente) {
@@ -113,6 +118,43 @@ public class ClienteRepository {
         String sql = "DELETE FROM cliente WHERE id = ?";
         int filasAfectadas = jdbcTemplate.update(sql, id);
         return filasAfectadas > 0;
+    }
+
+    public String generarNuevoIdCliente() {
+        String sql = """
+                SELECT id
+                FROM cliente
+                WHERE id LIKE 'CLI-%'
+                """;
+
+        Integer mayorNumero = jdbcTemplate.query(sql, rs -> {
+            int mayor = 0;
+
+            while (rs.next()) {
+                String idActual = rs.getString("id");
+
+                if (idActual == null) {
+                    continue;
+                }
+
+                try {
+                    String numeroTexto = idActual.replace("CLI-", "");
+                    int numero = Integer.parseInt(numeroTexto);
+
+                    if (numero > mayor) {
+                        mayor = numero;
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignora IDs que no tengan formato CLI-001
+                }
+            }
+
+            return mayor;
+        });
+
+        int siguiente = mayorNumero + 1;
+
+        return String.format("CLI-%03d", siguiente);
     }
 
     private Cliente mapearCliente(ResultSet rs) throws SQLException {

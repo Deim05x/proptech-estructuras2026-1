@@ -3,6 +3,7 @@ package co.edu.uniquindio.backend.controller;
 import co.edu.uniquindio.backend.dto.CancelarVisitaRequest;
 import co.edu.uniquindio.backend.dto.ReprogramarVisitaRequest;
 import co.edu.uniquindio.backend.model.Visita;
+import co.edu.uniquindio.backend.service.SesionUsuarioService;
 import co.edu.uniquindio.backend.service.VisitaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class VisitaController {
 
     private final VisitaService visitaService;
+    private final SesionUsuarioService sesionUsuarioService;
 
-    public VisitaController(VisitaService visitaService) {
+    public VisitaController(VisitaService visitaService,
+                            SesionUsuarioService sesionUsuarioService) {
         this.visitaService = visitaService;
+        this.sesionUsuarioService = sesionUsuarioService;
     }
 
     @GetMapping("/test")
@@ -25,22 +29,60 @@ public class VisitaController {
     }
 
     @GetMapping
-    public Visita[] listarVisitas() {
-        return visitaService.listarVisitas();
+    public ResponseEntity<?> listarVisitas() {
+        Visita[] visitas = visitaService.listarVisitas();
+
+        if (sesionUsuarioService.esAdmin()) {
+            return ResponseEntity.ok(visitas);
+        }
+
+        if (sesionUsuarioService.esCliente()) {
+            String clienteId = sesionUsuarioService.obtenerClienteIdAutenticado();
+            return ResponseEntity.ok(filtrarVisitasPorCliente(visitas, clienteId));
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("No tienes permiso para consultar visitas.");
     }
 
     @GetMapping("/estado/{estado}")
-    public Visita[] listarVisitasPorEstado(@PathVariable String estado) {
-        return visitaService.listarVisitasPorEstado(estado);
+    public ResponseEntity<?> listarVisitasPorEstado(@PathVariable String estado) {
+        Visita[] visitas = visitaService.listarVisitasPorEstado(estado);
+
+        if (sesionUsuarioService.esAdmin()) {
+            return ResponseEntity.ok(visitas);
+        }
+
+        if (sesionUsuarioService.esCliente()) {
+            String clienteId = sesionUsuarioService.obtenerClienteIdAutenticado();
+            return ResponseEntity.ok(filtrarVisitasPorCliente(visitas, clienteId));
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("No tienes permiso para consultar visitas.");
     }
 
     @GetMapping("/{id}")
-    public Visita obtenerVisitaPorId(@PathVariable int id) {
-        return visitaService.buscarPorId(id);
+    public ResponseEntity<?> obtenerVisitaPorId(@PathVariable int id) {
+        Visita visita = visitaService.buscarPorId(id);
+
+        if (visita == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró la visita.");
+        }
+
+        if (!puedeAccederAVisita(visita)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("No tienes permiso para consultar esta visita.");
+        }
+
+        return ResponseEntity.ok(visita);
     }
 
     @PostMapping
     public ResponseEntity<?> agregarVisita(@RequestBody Visita visita) {
+        prepararVisitaSegunRol(visita);
+
         boolean agregado = visitaService.agregarVisita(visita);
 
         if (agregado) {
@@ -54,6 +96,8 @@ public class VisitaController {
 
     @PostMapping("/agendar")
     public ResponseEntity<?> agendarVisita(@RequestBody Visita visita) {
+        prepararVisitaSegunRol(visita);
+
         boolean agendada = visitaService.agregarVisita(visita);
 
         if (agendada) {
@@ -67,6 +111,22 @@ public class VisitaController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarVisita(@PathVariable int id,
                                               @RequestBody Visita visita) {
+        Visita visitaActual = visitaService.buscarPorId(id);
+
+        if (visitaActual == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró la visita.");
+        }
+
+        if (!puedeAccederAVisita(visitaActual)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("No tienes permiso para actualizar esta visita.");
+        }
+
+        if (sesionUsuarioService.esCliente()) {
+            visita.setIdCliente(sesionUsuarioService.obtenerClienteIdAutenticado());
+        }
+
         boolean actualizado = visitaService.actualizarVisita(id, visita);
 
         if (actualizado) {
@@ -82,6 +142,18 @@ public class VisitaController {
     @PutMapping("/{id}/reprogramar")
     public ResponseEntity<?> reprogramarVisita(@PathVariable int id,
                                                @RequestBody ReprogramarVisitaRequest request) {
+        Visita visitaActual = visitaService.buscarPorId(id);
+
+        if (visitaActual == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró la visita.");
+        }
+
+        if (!puedeAccederAVisita(visitaActual)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("No tienes permiso para reprogramar esta visita.");
+        }
+
         boolean reprogramada = visitaService.reprogramarVisita(id, request);
 
         if (reprogramada) {
@@ -95,6 +167,18 @@ public class VisitaController {
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<?> cancelarVisita(@PathVariable int id,
                                             @RequestBody CancelarVisitaRequest request) {
+        Visita visitaActual = visitaService.buscarPorId(id);
+
+        if (visitaActual == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró la visita.");
+        }
+
+        if (!puedeAccederAVisita(visitaActual)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("No tienes permiso para cancelar esta visita.");
+        }
+
         boolean cancelada = visitaService.cancelarVisita(id, request);
 
         if (cancelada) {
@@ -107,6 +191,18 @@ public class VisitaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarVisita(@PathVariable int id) {
+        Visita visitaActual = visitaService.buscarPorId(id);
+
+        if (visitaActual == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró la visita.");
+        }
+
+        if (!puedeAccederAVisita(visitaActual)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("No tienes permiso para eliminar esta visita.");
+        }
+
         boolean eliminado = visitaService.eliminarVisita(id);
 
         if (eliminado) {
@@ -116,5 +212,63 @@ public class VisitaController {
         return ResponseEntity
                 .badRequest()
                 .body("No se pudo eliminar la visita. Verifica que el id exista.");
+    }
+
+    private void prepararVisitaSegunRol(Visita visita) {
+        if (visita == null) {
+            return;
+        }
+
+        if (sesionUsuarioService.esCliente()) {
+            visita.setIdCliente(sesionUsuarioService.obtenerClienteIdAutenticado());
+        }
+    }
+
+    private boolean puedeAccederAVisita(Visita visita) {
+        if (visita == null) {
+            return false;
+        }
+
+        if (sesionUsuarioService.esAdmin()) {
+            return true;
+        }
+
+        if (!sesionUsuarioService.esCliente()) {
+            return false;
+        }
+
+        String clienteAutenticado = sesionUsuarioService.obtenerClienteIdAutenticado();
+
+        return clienteAutenticado != null
+                && visita.getIdCliente() != null
+                && clienteAutenticado.equalsIgnoreCase(visita.getIdCliente());
+    }
+
+    private Visita[] filtrarVisitasPorCliente(Visita[] visitas, String clienteId) {
+        if (visitas == null || clienteId == null) {
+            return new Visita[0];
+        }
+
+        Visita[] temporal = new Visita[visitas.length];
+        int contador = 0;
+
+        for (Visita visita : visitas) {
+            if (visita == null || visita.getIdCliente() == null) {
+                continue;
+            }
+
+            if (visita.getIdCliente().equalsIgnoreCase(clienteId)) {
+                temporal[contador] = visita;
+                contador++;
+            }
+        }
+
+        Visita[] resultado = new Visita[contador];
+
+        for (int i = 0; i < contador; i++) {
+            resultado[i] = temporal[i];
+        }
+
+        return resultado;
     }
 }

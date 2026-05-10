@@ -74,12 +74,11 @@ function HistorialPage() {
     }
 
     try {
-      await historialService.crear({
-        idCliente: clienteId,
-        codigoInmueble: formulario.codigoInmueble,
-        tipoInteraccion: formulario.tipoInteraccion,
-        descripcion: formulario.descripcion,
-      });
+     await historialService.crear({
+  idCliente: clienteId,
+  codigoInmueble: formulario.codigoInmueble,
+  tipoInteraccion: formulario.tipoInteraccion,
+});
 
       alert("Interacción registrada correctamente");
       limpiarFormulario();
@@ -131,7 +130,7 @@ function HistorialPage() {
           </button>
 
           <button onClick={cambiarModo} style={secondaryButton}>
-            {modoReverso ? "Ver normal" : "Ver reverso"}
+            {modoReverso ? "Ver actividad reciente" : "Ver actividad anterior"}
           </button>
         </div>
       </div>
@@ -184,7 +183,7 @@ function HistorialPage() {
 
       <div style={panelStyle}>
         <h3 style={titleStyle}>
-          Listado de historial {modoReverso ? "(reverso)" : "(normal)"}
+          Historial de actividad
         </h3>
 
         {cargando ? (

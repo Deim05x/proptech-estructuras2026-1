@@ -10,7 +10,7 @@ function ProtectedRoute({ children, rolesPermitidos = [] }) {
   }
 
   if (rolesPermitidos.length > 0 && !rolesPermitidos.includes(rol)) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={authService.getRutaInicioPorRol(rol)} replace />;
   }
 
   return children;

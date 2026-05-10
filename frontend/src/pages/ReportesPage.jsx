@@ -81,8 +81,8 @@ function ReportesPage() {
       </h1>
 
       <p style={{ color: "#7e747d", marginBottom: "24px" }}>
-        Consulta reportes por zona, precio, visitas y cierres usando una tabla
-        hash propia para conteos y agrupaciones.
+        Consulta reportes por zona, precio, visitas y cierres para evaluar el
+        desempeno comercial del negocio.
       </p>
 
       {resumen && (
@@ -167,19 +167,6 @@ function ReportesPage() {
             </tbody>
           </table>
         )}
-      </div>
-
-      <div style={panelStyle}>
-        <h2 style={{ color: "#43214d", marginTop: 0 }}>
-          Justificación de estructura
-        </h2>
-
-        <p style={{ color: "#4c444d", lineHeight: 1.7 }}>
-          En este módulo se utiliza una tabla hash propia para agrupar datos por
-          criterio, como zona, rango de precio, inmueble, asesor o tipo de
-          operación. Esto permite acumular conteos y valores sin usar colecciones
-          nativas de Java.
-        </p>
       </div>
     </div>
   );

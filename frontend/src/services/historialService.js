@@ -1,28 +1,18 @@
 import api from "./api";
 
 const historialService = {
-  listar: async () => {
-    const response = await api.get("/historial");
-    return response.data;
-  },
-
   listarPorCliente: async (clienteId) => {
-    const response = await api.get(`/historial/cliente/${clienteId}`);
+    const response = await api.get(`/clientes/${clienteId}/historial`);
     return response.data;
   },
 
   listarReversoPorCliente: async (clienteId) => {
-    const response = await api.get(`/historial/cliente/${clienteId}/reverso`);
+    const response = await api.get(`/clientes/${clienteId}/historial/reverso`);
     return response.data;
   },
 
   crear: async (historial) => {
-    const response = await api.post("/historial", historial);
-    return response.data;
-  },
-
-  eliminar: async (id) => {
-    const response = await api.delete(`/historial/${id}`);
+    const response = await api.post("/interacciones", historial);
     return response.data;
   },
 };
