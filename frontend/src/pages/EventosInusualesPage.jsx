@@ -31,7 +31,7 @@ function EventosInusualesPage() {
         data = await eventoInusualService.listarPorEstado(estadoFiltro);
       }
 
-      setEventos(data);
+      setEventos(data || []);
     } catch (error) {
       console.error("Error al cargar eventos inusuales:", error);
       alert("No se pudieron cargar los eventos inusuales");
@@ -113,71 +113,155 @@ function EventosInusualesPage() {
     }).length;
   };
 
-  const obtenerColorNivel = (nivel) => {
+  const obtenerEstiloNivel = (nivel) => {
     const valor = (nivel || "").toUpperCase();
 
-    if (valor === "CRITICO" || valor === "CRÍTICO") return "#991b1b";
-    if (valor === "ALTO") return "#b45309";
-    if (valor === "MEDIO") return "#7c3aed";
-    return "#166534";
+    if (valor === "CRITICO" || valor === "CRÍTICO") {
+      return {
+        background: "#3a1218",
+        color: "#ffb4ab",
+        border: "1px solid #7a2c35",
+      };
+    }
+
+    if (valor === "ALTO") {
+      return {
+        background: "#3a2d00",
+        color: "#ffd76a",
+        border: "1px solid #826300",
+      };
+    }
+
+    if (valor === "MEDIO") {
+      return {
+        background: "#3f2a57",
+        color: "#d2bbff",
+        border: "1px solid #6d5f7a",
+      };
+    }
+
+    return {
+      background: "#12351f",
+      color: "#86efac",
+      border: "1px solid #225c37",
+    };
   };
 
-  const obtenerColorEstado = (estado) => {
+  const obtenerEstiloEstado = (estado) => {
     const valor = (estado || "").toUpperCase();
 
-    if (valor === "PENDIENTE") return "#b45309";
-    if (valor === "REVISADO" || valor === "REVISADA") return "#166534";
-    if (valor === "DESCARTADO" || valor === "DESCARTADA") return "#991b1b";
-    return "#4b5563";
+    if (valor === "PENDIENTE") {
+      return {
+        background: "#3a2d00",
+        color: "#ffd76a",
+        border: "1px solid #826300",
+      };
+    }
+
+    if (valor === "REVISADO" || valor === "REVISADA") {
+      return {
+        background: "#12351f",
+        color: "#86efac",
+        border: "1px solid #225c37",
+      };
+    }
+
+    if (valor === "DESCARTADO" || valor === "DESCARTADA") {
+      return {
+        background: "#3a1218",
+        color: "#ffb4ab",
+        border: "1px solid #7a2c35",
+      };
+    }
+
+    return {
+      background: "#15121b",
+      color: "#ccc3d8",
+      border: "1px solid #37333e",
+    };
   };
 
   return (
-    <div>
-      <h1 style={{ color: "#43214d", marginBottom: "8px" }}>
-        Eventos inusuales
-      </h1>
+    <div style={pageStyle}>
+      <style>{animations}</style>
 
-      <p style={{ color: "#7e747d", marginBottom: "24px" }}>
-        Detecta patrones comerciales inusuales como inmuebles con muchas visitas
-        sin cierre, clientes sin continuidad, asesores sobrecargados y zonas con
-        alta concentración de interés.
-      </p>
+      <section style={headerStyle}>
+        <div>
+          <p style={eyebrowStyle}>ANÁLISIS DE COMPORTAMIENTO</p>
 
-      <div style={cardsResumenGrid}>
-        <CardResumen titulo="Total eventos" valor={eventos.length} />
+          <h1 style={mainTitleStyle}>
+            Eventos <span style={titleAccentStyle}>inusuales</span>
+          </h1>
 
-        <CardResumen
-          titulo="Pendientes"
-          valor={contarPorEstado("PENDIENTE")}
-        />
-
-        <CardResumen titulo="Críticos" valor={contarCriticos()} />
-
-        <div
-          style={{
-            background: "linear-gradient(135deg, #5b3765, #43214d)",
-            borderRadius: "18px",
-            padding: "20px",
-            color: "white",
-            boxShadow: "0 12px 28px rgba(67,33,77,0.18)",
-          }}
-        >
-          <h3 style={{ margin: 0 }}>Análisis automático</h3>
-          <p style={{ margin: "10px 0 0" }}>
-            El sistema genera eventos y también crea alertas administrativas.
+          <p style={descriptionStyle}>
+            Detecta patrones comerciales inusuales como inmuebles con muchas
+            visitas sin cierre, clientes sin continuidad, asesores sobrecargados
+            y zonas con alta concentración de interés.
           </p>
         </div>
-      </div>
 
-      <div style={panelStyle}>
-        <h2 style={titleStyle}>Detección automática</h2>
+        <div style={headerBadgeStyle}>
+          <span style={statusDotStyle}></span>
+          <span>{eventos.length} eventos</span>
+        </div>
+      </section>
 
-        <p style={{ color: "#4c444d", lineHeight: 1.7 }}>
-          Este proceso revisa visitas, inmuebles, asesores y operaciones para
-          detectar comportamientos que requieren atención comercial.
-        </p>
+      <section style={summaryGridStyle}>
+        <SummaryCard
+          icono="📊"
+          titulo="Total eventos"
+          valor={eventos.length}
+          texto="Registros cargados"
+        />
 
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        <SummaryCard
+          icono="⏳"
+          titulo="Pendientes"
+          valor={contarPorEstado("PENDIENTE")}
+          texto="Sin revisar"
+        />
+
+        <SummaryCard
+          icono="🔥"
+          titulo="Críticos"
+          valor={contarCriticos()}
+          texto="Requieren atención"
+          danger
+        />
+
+        <div style={analysisCardStyle}>
+          <div style={analysisIconStyle}>🧠</div>
+
+          <div>
+            <p style={summaryTitleLightStyle}>Análisis automático</p>
+
+            <strong style={analysisTitleStyle}>Detección activa</strong>
+
+            <small style={analysisTextStyle}>
+              El sistema genera eventos y alertas administrativas.
+            </small>
+          </div>
+        </div>
+      </section>
+
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>DETECCIÓN AUTOMÁTICA</p>
+            <h2 style={titleStyle}>Motor de análisis</h2>
+
+            <p style={mutedTextStyle}>
+              Este proceso revisa visitas, inmuebles, asesores y operaciones
+              para detectar comportamientos que requieren atención comercial.
+            </p>
+          </div>
+
+          <span style={filterBadgeStyle}>
+            {estadoFiltro === "TODOS" ? "Todos" : estadoFiltro}
+          </span>
+        </div>
+
+        <div style={actionsGridStyle}>
           <button onClick={detectarEventos} style={primaryButton}>
             Detectar eventos inusuales
           </button>
@@ -197,10 +281,17 @@ function EventosInusualesPage() {
             Recargar
           </button>
         </div>
-      </div>
+      </section>
 
-      <div style={panelStyle}>
-        <h2 style={titleStyle}>Registrar evento manual</h2>
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>REGISTRO MANUAL</p>
+            <h2 style={titleStyle}>Registrar evento inusual</h2>
+          </div>
+
+          <span style={modeBadgeStyle}>Evento manual</span>
+        </div>
 
         <form onSubmit={crearEventoManual}>
           <div style={formGridStyle}>
@@ -233,7 +324,7 @@ function EventosInusualesPage() {
               <option value="BAJO">BAJO</option>
               <option value="MEDIO">MEDIO</option>
               <option value="ALTO">ALTO</option>
-              <option value="CRITICO">CRITICO</option>
+              <option value="CRITICO">CRÍTICO</option>
             </select>
 
             <select
@@ -263,17 +354,11 @@ function EventosInusualesPage() {
               value={formulario.descripcion}
               onChange={manejarCambio}
               required
-              style={{
-                ...inputStyle,
-                gridColumn: "1 / -1",
-                height: "90px",
-                resize: "vertical",
-                paddingTop: "12px",
-              }}
+              style={textareaStyle}
             />
           </div>
 
-          <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+          <div style={buttonRowStyle}>
             <button type="submit" style={primaryButton}>
               Guardar evento
             </button>
@@ -283,214 +368,530 @@ function EventosInusualesPage() {
             </button>
           </div>
         </form>
-      </div>
+      </section>
 
-      <div style={panelStyle}>
-        <h2 style={titleStyle}>Listado de eventos inusuales</h2>
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>REGISTROS</p>
+            <h2 style={titleStyle}>Listado de eventos inusuales</h2>
+          </div>
+
+          <button type="button" onClick={cargarEventos} style={secondaryButton}>
+            Recargar
+          </button>
+        </div>
 
         {cargando ? (
-          <p>Cargando eventos...</p>
+          <EmptyState texto="Cargando eventos..." />
         ) : eventos.length === 0 ? (
-          <p>No hay eventos inusuales registrados.</p>
+          <EmptyState texto="No hay eventos inusuales registrados." />
         ) : (
-          <table style={tableStyle}>
-            <thead>
-              <tr style={theadRowStyle}>
-                <th>ID</th>
-                <th>Tipo</th>
-                <th>Descripción</th>
-                <th>Nivel</th>
-                <th>Estado</th>
-                <th>Referencia</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {eventos.map((evento) => (
-                <tr key={evento.id}>
-                  <td style={tdStyle}>{evento.id}</td>
-                  <td style={tdStyle}>{evento.tipo}</td>
-                  <td style={tdStyle}>{evento.descripcion}</td>
-                  <td style={tdStyle}>
-                    <span
-                      style={{
-                        backgroundColor: obtenerColorNivel(evento.nivelAtencion),
-                        color: "white",
-                        padding: "5px 10px",
-                        borderRadius: "999px",
-                        fontSize: "0.78rem",
-                        fontWeight: "800",
-                      }}
-                    >
-                      {evento.nivelAtencion}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>
-                    <span
-                      style={{
-                        backgroundColor: obtenerColorEstado(evento.estado),
-                        color: "white",
-                        padding: "5px 10px",
-                        borderRadius: "999px",
-                        fontSize: "0.78rem",
-                        fontWeight: "800",
-                      }}
-                    >
-                      {evento.estado}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>{evento.entidadReferencia}</td>
-                  <td style={tdStyle}>{evento.fechaDeteccion}</td>
-                  <td style={tdStyle}>
-                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                      <button
-                        onClick={() => cambiarEstado(evento.id, "REVISADO")}
-                        style={miniButton}
-                      >
-                        Revisar
-                      </button>
-
-                      <button
-                        onClick={() => cambiarEstado(evento.id, "DESCARTADO")}
-                        style={miniButtonDanger}
-                      >
-                        Descartar
-                      </button>
-                    </div>
-                  </td>
+          <div style={tableWrapperStyle}>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>ID</th>
+                  <th style={thStyle}>Tipo</th>
+                  <th style={thStyle}>Descripción</th>
+                  <th style={thStyle}>Nivel</th>
+                  <th style={thStyle}>Estado</th>
+                  <th style={thStyle}>Referencia</th>
+                  <th style={thStyle}>Fecha</th>
+                  <th style={thStyle}>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {eventos.map((evento) => (
+                  <tr key={evento.id}>
+                    <td style={tdStrongStyle}>{evento.id}</td>
+                    <td style={tdStyle}>{evento.tipo}</td>
+                    <td style={tdDescriptionStyle}>{evento.descripcion}</td>
+
+                    <td style={tdStyle}>
+                      <span
+                        style={{
+                          ...pillStyle,
+                          ...obtenerEstiloNivel(evento.nivelAtencion),
+                        }}
+                      >
+                        {evento.nivelAtencion}
+                      </span>
+                    </td>
+
+                    <td style={tdStyle}>
+                      <span
+                        style={{
+                          ...pillStyle,
+                          ...obtenerEstiloEstado(evento.estado),
+                        }}
+                      >
+                        {evento.estado}
+                      </span>
+                    </td>
+
+                    <td style={tdStyle}>{evento.entidadReferencia || "—"}</td>
+                    <td style={tdStyle}>{evento.fechaDeteccion || "—"}</td>
+
+                    <td style={tdStyle}>
+                      <div style={actionRowStyle}>
+                        <button
+                          onClick={() => cambiarEstado(evento.id, "REVISADO")}
+                          style={miniSuccessButton}
+                        >
+                          Revisar
+                        </button>
+
+                        <button
+                          onClick={() => cambiarEstado(evento.id, "DESCARTADO")}
+                          style={miniDangerButton}
+                        >
+                          Descartar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }
 
-function CardResumen({ titulo, valor }) {
+function SummaryCard({ icono, titulo, valor, texto, danger }) {
   return (
-    <div style={cardStyle}>
-      <h3 style={{ margin: 0, color: "#43214d" }}>{titulo}</h3>
-
-      <p
+    <article
+      style={{
+        ...summaryCardStyle,
+        border: danger ? "1px solid #7a2c35" : "1px solid #37333e",
+      }}
+    >
+      <div
         style={{
-          fontSize: "2rem",
-          fontWeight: "800",
-          margin: "10px 0 0",
-          color: "#1e1a1e",
+          ...summaryIconStyle,
+          background: danger ? "#3a1218" : "#3f2a57",
+          border: danger ? "1px solid #7a2c35" : "1px solid #6d5f7a",
         }}
       >
-        {valor}
-      </p>
+        {icono}
+      </div>
+
+      <div>
+        <p style={summaryTitleStyle}>{titulo}</p>
+        <strong style={summaryValueStyle}>{valor}</strong>
+        <small style={danger ? dangerTextStyle : summaryTextStyle}>{texto}</small>
+      </div>
+    </article>
+  );
+}
+
+function EmptyState({ texto }) {
+  return (
+    <div style={emptyStateStyle}>
+      <span style={{ fontSize: "2rem" }}>📊</span>
+      <p>{texto}</p>
     </div>
   );
 }
 
-const cardsResumenGrid = {
+const animations = `
+  @keyframes fadeUpEventos {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulseEventos {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.58;
+      transform: scale(1.18);
+    }
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const pageStyle = {
+  animation: "fadeUpEventos 0.55s ease both",
+};
+
+const headerStyle = {
+  marginBottom: "18px",
+  padding: "22px",
+  borderRadius: "26px",
+  background: "#221e28",
+  border: "1px solid #37333e",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "18px",
+  alignItems: "flex-end",
+  flexWrap: "wrap",
+};
+
+const eyebrowStyle = {
+  margin: 0,
+  color: "#d2bbff",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  fontSize: "0.72rem",
+  letterSpacing: "0.12em",
+};
+
+const mainTitleStyle = {
+  margin: "8px 0",
+  color: "#ffffff",
+  fontSize: "clamp(1.8rem, 3vw, 2.7rem)",
+  lineHeight: 1.1,
+  letterSpacing: "-0.04em",
+};
+
+const titleAccentStyle = {
+  color: "#d2bbff",
+};
+
+const descriptionStyle = {
+  color: "#ccc3d8",
+  maxWidth: "760px",
+  lineHeight: 1.65,
+  margin: 0,
+};
+
+const headerBadgeStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "9px",
+  padding: "10px 13px",
+  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  color: "#ccc3d8",
+  fontSize: "0.78rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+};
+
+const statusDotStyle = {
+  width: "8px",
+  height: "8px",
+  borderRadius: "50%",
+  background: "#22c55e",
+  boxShadow: "0 0 14px rgba(34,197,94,0.8)",
+  animation: "pulseEventos 1.8s ease-in-out infinite",
+};
+
+const summaryGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-  gap: "16px",
-  marginBottom: "24px",
+  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+  gap: "14px",
+  marginBottom: "18px",
+};
+
+const summaryCardStyle = {
+  padding: "16px",
+  borderRadius: "22px",
+  background: "#2c2833",
+  boxShadow: "0 18px 38px rgba(0,0,0,0.18)",
+  display: "flex",
+  alignItems: "center",
+  gap: "13px",
+};
+
+const summaryIconStyle = {
+  width: "46px",
+  height: "46px",
+  minWidth: "46px",
+  borderRadius: "16px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "1.35rem",
+};
+
+const summaryTitleStyle = {
+  margin: "0 0 4px",
+  color: "#9f92b2",
+  fontSize: "0.72rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.09em",
+};
+
+const summaryTitleLightStyle = {
+  margin: "0 0 4px",
+  color: "#ddd6fe",
+  fontSize: "0.72rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.09em",
+};
+
+const summaryValueStyle = {
+  display: "block",
+  color: "#ffffff",
+  fontSize: "1.35rem",
+  lineHeight: 1.1,
+};
+
+const summaryTextStyle = {
+  display: "block",
+  color: "#8f849e",
+  marginTop: "3px",
+};
+
+const dangerTextStyle = {
+  display: "block",
+  color: "#ffb4ab",
+  marginTop: "3px",
+};
+
+const analysisCardStyle = {
+  padding: "16px",
+  borderRadius: "22px",
+  background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
+  border: "1px solid #6d5f7a",
+  boxShadow: "0 18px 38px rgba(124,58,237,0.24)",
+  display: "flex",
+  alignItems: "center",
+  gap: "13px",
+  color: "#ffffff",
+};
+
+const analysisIconStyle = {
+  width: "46px",
+  height: "46px",
+  minWidth: "46px",
+  borderRadius: "16px",
+  background: "rgba(255,255,255,0.12)",
+  border: "1px solid rgba(255,255,255,0.24)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "1.35rem",
+};
+
+const analysisTitleStyle = {
+  display: "block",
+  color: "#ffffff",
+  fontSize: "1.05rem",
+  lineHeight: 1.1,
+};
+
+const analysisTextStyle = {
+  display: "block",
+  color: "#ddd6fe",
+  marginTop: "5px",
 };
 
 const panelStyle = {
-  backgroundColor: "rgba(255,255,255,0.88)",
+  background: "#221e28",
   padding: "22px",
-  borderRadius: "18px",
-  marginBottom: "24px",
-  boxShadow: "0 12px 28px rgba(67,33,77,0.08)",
-  border: "1px solid #e8e0e5",
+  borderRadius: "26px",
+  marginBottom: "22px",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+  border: "1px solid #37333e",
 };
 
-const cardStyle = {
-  background: "rgba(255,255,255,0.86)",
-  borderRadius: "18px",
-  padding: "20px",
-  boxShadow: "0 12px 28px rgba(67,33,77,0.08)",
-  border: "1px solid #e8e0e5",
+const panelHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "14px",
+  alignItems: "center",
+  marginBottom: "16px",
+  flexWrap: "wrap",
 };
 
 const titleStyle = {
-  color: "#43214d",
-  marginTop: 0,
-  marginBottom: "14px",
+  color: "#ffffff",
+  margin: "5px 0 0",
+  fontSize: "1.35rem",
+  letterSpacing: "-0.03em",
+};
+
+const mutedTextStyle = {
+  color: "#9f92b2",
+  margin: "6px 0 0",
+  lineHeight: 1.55,
 };
 
 const formGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: "12px",
+};
+
+const actionsGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+  gap: "10px",
 };
 
 const inputStyle = {
   width: "100%",
-  padding: "11px 12px",
-  borderRadius: "12px",
-  border: "1px solid #cfc3cd",
+  padding: "12px 13px",
+  borderRadius: "14px",
+  border: "1px solid #37333e",
   outline: "none",
-  backgroundColor: "#fff7fb",
+  background: "#15121b",
+  color: "#e8dfee",
+  fontWeight: "650",
+};
+
+const textareaStyle = {
+  ...inputStyle,
+  gridColumn: "1 / -1",
+  minHeight: "90px",
+  resize: "vertical",
+  paddingTop: "12px",
+};
+
+const buttonRowStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap",
+  marginTop: "16px",
 };
 
 const primaryButton = {
   padding: "11px 16px",
   border: "none",
-  borderRadius: "12px",
-  background: "linear-gradient(135deg, #5b3765, #43214d)",
+  borderRadius: "14px",
+  background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
   color: "white",
-  fontWeight: "700",
+  fontWeight: "900",
   cursor: "pointer",
+  boxShadow: "0 14px 28px rgba(124,58,237,0.24)",
 };
 
 const secondaryButton = {
   padding: "11px 16px",
-  border: "1px solid #cfc3cd",
-  borderRadius: "12px",
-  backgroundColor: "#fbd7ff",
-  color: "#43214d",
-  fontWeight: "700",
+  border: "1px solid #6d5f7a",
+  borderRadius: "14px",
+  background: "#3f2a57",
+  color: "#d2bbff",
+  fontWeight: "900",
   cursor: "pointer",
+};
+
+const modeBadgeStyle = {
+  padding: "8px 12px",
+  borderRadius: "999px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
+  color: "#d2bbff",
+  fontWeight: "900",
+  fontSize: "0.76rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+};
+
+const filterBadgeStyle = {
+  ...modeBadgeStyle,
+  background: "#15121b",
+  border: "1px solid #37333e",
+};
+
+const tableWrapperStyle = {
+  overflowX: "auto",
+  borderRadius: "18px",
+  border: "1px solid #37333e",
 };
 
 const tableStyle = {
   width: "100%",
   borderCollapse: "collapse",
-  backgroundColor: "white",
-  borderRadius: "14px",
-  overflow: "hidden",
+  background: "#15121b",
 };
 
-const theadRowStyle = {
-  backgroundColor: "#f4ecf0",
-  color: "#43214d",
+const thStyle = {
+  padding: "12px",
+  color: "#d2bbff",
+  fontSize: "0.72rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  textAlign: "left",
+  borderBottom: "1px solid #37333e",
 };
 
 const tdStyle = {
-  padding: "10px",
-  border: "1px solid #e8e0e5",
+  padding: "12px",
+  color: "#ccc3d8",
+  borderBottom: "1px solid #2c2833",
+  fontSize: "0.86rem",
   verticalAlign: "top",
 };
 
-const miniButton = {
-  padding: "7px 10px",
-  border: "none",
-  borderRadius: "10px",
-  backgroundColor: "#dcfce7",
-  color: "#166534",
-  fontWeight: "700",
+const tdStrongStyle = {
+  ...tdStyle,
+  color: "#ffffff",
+  fontWeight: "900",
+};
+
+const tdDescriptionStyle = {
+  ...tdStyle,
+  minWidth: "260px",
+  lineHeight: 1.45,
+};
+
+const pillStyle = {
+  padding: "6px 9px",
+  borderRadius: "999px",
+  fontSize: "0.75rem",
+  fontWeight: "900",
+  whiteSpace: "nowrap",
+};
+
+const actionRowStyle = {
+  display: "flex",
+  gap: "8px",
+  flexWrap: "wrap",
+};
+
+const miniSuccessButton = {
+  padding: "8px 12px",
+  border: "1px solid #225c37",
+  borderRadius: "12px",
+  background: "#12351f",
+  color: "#86efac",
+  fontWeight: "900",
   cursor: "pointer",
 };
 
-const miniButtonDanger = {
-  padding: "7px 10px",
-  border: "none",
-  borderRadius: "10px",
-  backgroundColor: "#fee2e2",
-  color: "#991b1b",
-  fontWeight: "700",
+const miniDangerButton = {
+  padding: "8px 12px",
+  border: "1px solid #7a2c35",
+  borderRadius: "12px",
+  background: "#3a1218",
+  color: "#ffb4ab",
+  fontWeight: "900",
   cursor: "pointer",
+};
+
+const emptyStateStyle = {
+  padding: "28px",
+  borderRadius: "20px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  color: "#9f92b2",
+  textAlign: "center",
 };
 
 export default EventosInusualesPage;

@@ -166,8 +166,9 @@ function OperacionesPage() {
       valor.includes("COMPLETADA")
     ) {
       return {
-        backgroundColor: "#dcfce7",
-        color: "#166534",
+        background: "#12351f",
+        color: "#86efac",
+        border: "1px solid #225c37",
       };
     }
 
@@ -177,8 +178,9 @@ function OperacionesPage() {
       valor.includes("DESCARTADA")
     ) {
       return {
-        backgroundColor: "#fee2e2",
-        color: "#991b1b",
+        background: "#3a1218",
+        color: "#ffb4ab",
+        border: "1px solid #7a2c35",
       };
     }
 
@@ -189,14 +191,16 @@ function OperacionesPage() {
       valor.includes("NEGOCIACIÓN")
     ) {
       return {
-        backgroundColor: "#fef3c7",
-        color: "#92400e",
+        background: "#3a2d00",
+        color: "#ffd76a",
+        border: "1px solid #826300",
       };
     }
 
     return {
-      backgroundColor: "#f4ecf0",
-      color: "#43214d",
+      background: "#3f2a57",
+      color: "#d2bbff",
+      border: "1px solid #6d5f7a",
     };
   };
 
@@ -205,35 +209,40 @@ function OperacionesPage() {
 
     if (valor.includes("VENTA")) {
       return {
-        backgroundColor: "#dbeafe",
-        color: "#1d4ed8",
+        background: "#10294f",
+        color: "#93c5fd",
+        border: "1px solid #1d4ed8",
       };
     }
 
     if (valor.includes("ARRIENDO")) {
       return {
-        backgroundColor: "#fbd7ff",
-        color: "#43214d",
+        background: "#3f2a57",
+        color: "#d2bbff",
+        border: "1px solid #6d5f7a",
       };
     }
 
     if (valor.includes("RENOVACION") || valor.includes("RENOVACIÓN")) {
       return {
-        backgroundColor: "#dcfce7",
-        color: "#166534",
+        background: "#12351f",
+        color: "#86efac",
+        border: "1px solid #225c37",
       };
     }
 
     if (valor.includes("CANCELACION") || valor.includes("CANCELACIÓN")) {
       return {
-        backgroundColor: "#fee2e2",
-        color: "#991b1b",
+        background: "#3a1218",
+        color: "#ffb4ab",
+        border: "1px solid #7a2c35",
       };
     }
 
     return {
-      backgroundColor: "#f4ecf0",
-      color: "#4c444d",
+      background: "#15121b",
+      color: "#ccc3d8",
+      border: "1px solid #37333e",
     };
   };
 
@@ -278,49 +287,81 @@ function OperacionesPage() {
   }, 0);
 
   return (
-    <div>
-      <h1 style={{ color: "#43214d", marginBottom: "8px" }}>
-        Gestión de Operaciones
-      </h1>
+    <div style={pageStyle}>
+      <style>{animations}</style>
 
-      <p style={{ color: "#7e747d", marginBottom: "24px" }}>
-        Registra y administra operaciones comerciales como ventas, arriendos,
-        renovaciones y cancelaciones.
-      </p>
+      <section style={headerStyle}>
+        <div>
+          <p style={eyebrowStyle}>GESTIÓN COMERCIAL</p>
 
-      <div style={cardsResumenGrid}>
-        <CardResumen titulo="Total operaciones" valor={totalOperaciones} />
+          <h1 style={mainTitleStyle}>
+            Gestión de <span style={titleAccentStyle}>operaciones</span>
+          </h1>
 
-        <CardResumen titulo="Cerradas" valor={operacionesCerradas} />
-
-        <CardResumen titulo="En proceso" valor={operacionesEnProceso} />
-
-        <div
-          style={{
-            background: "linear-gradient(135deg, #5b3765, #43214d)",
-            borderRadius: "18px",
-            padding: "20px",
-            color: "white",
-            boxShadow: "0 12px 28px rgba(67,33,77,0.18)",
-          }}
-        >
-          <h3 style={{ margin: 0 }}>Valor cerrado</h3>
-          <p
-            style={{
-              margin: "10px 0 0",
-              fontSize: "1.35rem",
-              fontWeight: "900",
-            }}
-          >
-            {formatearDinero(valorTotalCerrado)}
+          <p style={descriptionStyle}>
+            Registra y administra operaciones comerciales como ventas,
+            arriendos, renovaciones y cancelaciones. Controla estados, valores,
+            comisiones y responsables del proceso.
           </p>
         </div>
-      </div>
 
-      <div style={panelStyle}>
-        <h2 style={titleStyle}>
-          {editando ? "Editar operación" : "Registrar operación"}
-        </h2>
+        <div style={headerBadgeStyle}>
+          <span style={statusDotStyle}></span>
+          <span>{operaciones.length} operaciones</span>
+        </div>
+      </section>
+
+      <section style={cardsResumenGrid}>
+        <CardResumen
+          icono="💼"
+          titulo="Total operaciones"
+          valor={totalOperaciones}
+          texto="Registros comerciales"
+        />
+
+        <CardResumen
+          icono="✅"
+          titulo="Cerradas"
+          valor={operacionesCerradas}
+          texto="Procesos finalizados"
+        />
+
+        <CardResumen
+          icono="⏳"
+          titulo="En proceso"
+          valor={operacionesEnProceso}
+          texto="Pendientes o negociación"
+        />
+
+        <div style={valorCardStyle}>
+          <div style={valorIconStyle}>💰</div>
+
+          <div>
+            <p style={summaryTitleStyle}>Valor cerrado</p>
+
+            <strong style={valorTotalStyle}>
+              {formatearDinero(valorTotalCerrado)}
+            </strong>
+
+            <small style={summaryTextStyle}>Total de operaciones cerradas</small>
+          </div>
+        </div>
+      </section>
+
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>
+              {editando ? "EDICIÓN DE OPERACIÓN" : "NUEVA OPERACIÓN"}
+            </p>
+
+            <h2 style={titleStyle}>
+              {editando ? "Editar operación" : "Registrar operación"}
+            </h2>
+          </div>
+
+          {editando && <span style={modeBadgeStyle}>Modo edición</span>}
+        </div>
 
         <form onSubmit={guardarOperacion}>
           <div style={formGridStyle}>
@@ -334,8 +375,7 @@ function OperacionesPage() {
               required
               style={{
                 ...inputStyle,
-                opacity: editando ? 0.75 : 1,
-                cursor: editando ? "not-allowed" : "text",
+                ...(editando ? disabledInputStyle : {}),
               }}
             />
 
@@ -425,38 +465,27 @@ function OperacionesPage() {
             </select>
           </div>
 
-          <div style={{ display: "flex", gap: "10px", marginTop: "18px" }}>
+          <div style={buttonRowStyle}>
             <button type="submit" style={primaryButton}>
               {editando ? "Actualizar operación" : "Registrar operación"}
             </button>
 
-            <button
-              type="button"
-              onClick={limpiarFormulario}
-              style={secondaryButton}
-            >
+            <button type="button" onClick={limpiarFormulario} style={secondaryButton}>
               Limpiar
             </button>
           </div>
         </form>
-      </div>
+      </section>
 
-      <div style={panelStyle}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: "12px",
-            alignItems: "center",
-            flexWrap: "wrap",
-            marginBottom: "16px",
-          }}
-        >
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
           <div>
+            <p style={eyebrowStyle}>REGISTROS</p>
             <h2 style={titleStyle}>Listado de operaciones</h2>
 
-            <p style={{ color: "#7e747d", margin: 0 }}>
-              Consulta las operaciones comerciales registradas.
+            <p style={mutedTextStyle}>
+              Consulta las operaciones comerciales registradas y cambia su estado
+              rápidamente.
             </p>
           </div>
 
@@ -466,51 +495,42 @@ function OperacionesPage() {
         </div>
 
         {cargando ? (
-          <p>Cargando operaciones...</p>
+          <EmptyState texto="Cargando operaciones..." />
         ) : operaciones.length === 0 ? (
-          <p>No hay operaciones registradas.</p>
+          <EmptyState texto="No hay operaciones registradas." />
         ) : (
-          <div style={{ overflowX: "auto" }}>
+          <div style={tableWrapperStyle}>
             <table style={tableStyle}>
               <thead>
-                <tr style={theadRowStyle}>
-                  <th>ID</th>
-                  <th>Inmueble</th>
-                  <th>Cliente</th>
-                  <th>Asesor</th>
-                  <th>Fecha</th>
-                  <th>Tipo</th>
-                  <th>Valor</th>
-                  <th>Comisión</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
+                <tr>
+                  <th style={thStyle}>ID</th>
+                  <th style={thStyle}>Inmueble</th>
+                  <th style={thStyle}>Cliente</th>
+                  <th style={thStyle}>Asesor</th>
+                  <th style={thStyle}>Fecha</th>
+                  <th style={thStyle}>Tipo</th>
+                  <th style={thStyle}>Valor</th>
+                  <th style={thStyle}>Comisión</th>
+                  <th style={thStyle}>Estado</th>
+                  <th style={thStyle}>Acciones</th>
                 </tr>
               </thead>
 
               <tbody>
                 {operaciones.map((operacion) => {
-                  const estadoStyle = obtenerColorEstado(
-                    operacion.estadoProceso
-                  );
-
+                  const estadoStyle = obtenerColorEstado(operacion.estadoProceso);
                   const tipoStyle = obtenerColorTipo(operacion.tipoOperacion);
 
                   return (
                     <tr key={operacion.id}>
-                      <td style={tdStyle}>{operacion.id}</td>
+                      <td style={tdStrongStyle}>{operacion.id}</td>
                       <td style={tdStyle}>{operacion.codigoInmueble}</td>
                       <td style={tdStyle}>{operacion.idCliente}</td>
                       <td style={tdStyle}>{operacion.idAsesor}</td>
                       <td style={tdStyle}>{operacion.fecha}</td>
 
                       <td style={tdStyle}>
-                        <span
-                          style={{
-                            ...pillStyle,
-                            backgroundColor: tipoStyle.backgroundColor,
-                            color: tipoStyle.color,
-                          }}
-                        >
+                        <span style={{ ...pillStyle, ...tipoStyle }}>
                           {operacion.tipoOperacion}
                         </span>
                       </td>
@@ -524,25 +544,13 @@ function OperacionesPage() {
                       </td>
 
                       <td style={tdStyle}>
-                        <span
-                          style={{
-                            ...pillStyle,
-                            backgroundColor: estadoStyle.backgroundColor,
-                            color: estadoStyle.color,
-                          }}
-                        >
+                        <span style={{ ...pillStyle, ...estadoStyle }}>
                           {operacion.estadoProceso}
                         </span>
                       </td>
 
                       <td style={tdStyle}>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "6px",
-                            flexWrap: "wrap",
-                          }}
-                        >
+                        <div style={actionRowStyle}>
                           <button
                             type="button"
                             onClick={() => editarOperacion(operacion)}
@@ -587,29 +595,133 @@ function OperacionesPage() {
             </table>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }
 
-function CardResumen({ titulo, valor }) {
+function CardResumen({ icono, titulo, valor, texto }) {
   return (
-    <div style={cardStyle}>
-      <h3 style={{ margin: 0, color: "#43214d" }}>{titulo}</h3>
+    <article style={cardStyle}>
+      <div style={summaryIconStyle}>{icono}</div>
 
-      <p
-        style={{
-          fontSize: "2rem",
-          fontWeight: "900",
-          margin: "10px 0 0",
-          color: "#1e1a1e",
-        }}
-      >
-        {valor}
-      </p>
+      <div>
+        <p style={summaryTitleStyle}>{titulo}</p>
+        <strong style={summaryValueStyle}>{valor}</strong>
+        <small style={summaryTextStyle}>{texto}</small>
+      </div>
+    </article>
+  );
+}
+
+function EmptyState({ texto }) {
+  return (
+    <div style={emptyStateStyle}>
+      <span style={{ fontSize: "2rem" }}>💼</span>
+      <p>{texto}</p>
     </div>
   );
 }
+
+const animations = `
+  @keyframes fadeUpOperaciones {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulseOperaciones {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.58;
+      transform: scale(1.18);
+    }
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const pageStyle = {
+  animation: "fadeUpOperaciones 0.55s ease both",
+};
+
+const headerStyle = {
+  marginBottom: "18px",
+  padding: "22px",
+  borderRadius: "26px",
+  background: "#221e28",
+  border: "1px solid #37333e",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "18px",
+  alignItems: "flex-end",
+  flexWrap: "wrap",
+};
+
+const eyebrowStyle = {
+  margin: 0,
+  color: "#d2bbff",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  fontSize: "0.72rem",
+  letterSpacing: "0.12em",
+};
+
+const mainTitleStyle = {
+  margin: "8px 0",
+  color: "#ffffff",
+  fontSize: "clamp(1.8rem, 3vw, 2.7rem)",
+  lineHeight: 1.1,
+  letterSpacing: "-0.04em",
+};
+
+const titleAccentStyle = {
+  color: "#d2bbff",
+};
+
+const descriptionStyle = {
+  color: "#ccc3d8",
+  maxWidth: "760px",
+  lineHeight: 1.65,
+  margin: 0,
+};
+
+const headerBadgeStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "9px",
+  padding: "10px 13px",
+  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  color: "#ccc3d8",
+  fontSize: "0.78rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+};
+
+const statusDotStyle = {
+  width: "8px",
+  height: "8px",
+  borderRadius: "50%",
+  background: "#22c55e",
+  boxShadow: "0 0 14px rgba(34,197,94,0.8)",
+  animation: "pulseOperaciones 1.8s ease-in-out infinite",
+};
 
 const cardsResumenGrid = {
   display: "grid",
@@ -618,27 +730,124 @@ const cardsResumenGrid = {
   marginBottom: "24px",
 };
 
-const panelStyle = {
-  backgroundColor: "rgba(255,255,255,0.88)",
-  padding: "22px",
-  borderRadius: "18px",
-  marginBottom: "24px",
-  boxShadow: "0 12px 28px rgba(67,33,77,0.08)",
-  border: "1px solid #e8e0e5",
+const cardStyle = {
+  padding: "16px",
+  borderRadius: "22px",
+  background: "#2c2833",
+  border: "1px solid #37333e",
+  boxShadow: "0 18px 38px rgba(0,0,0,0.18)",
+  display: "flex",
+  alignItems: "center",
+  gap: "13px",
 };
 
-const cardStyle = {
-  background: "rgba(255,255,255,0.86)",
-  borderRadius: "18px",
-  padding: "20px",
-  boxShadow: "0 12px 28px rgba(67,33,77,0.08)",
-  border: "1px solid #e8e0e5",
+const summaryIconStyle = {
+  width: "46px",
+  height: "46px",
+  minWidth: "46px",
+  borderRadius: "16px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "1.35rem",
+};
+
+const summaryTitleStyle = {
+  margin: "0 0 4px",
+  color: "#9f92b2",
+  fontSize: "0.72rem",
+  fontWeight: "900",
+  textTransform: "uppercase",
+  letterSpacing: "0.09em",
+};
+
+const summaryValueStyle = {
+  display: "block",
+  color: "#ffffff",
+  fontSize: "1.35rem",
+  lineHeight: 1.1,
+};
+
+const summaryTextStyle = {
+  display: "block",
+  color: "#8f849e",
+  marginTop: "3px",
+};
+
+const valorCardStyle = {
+  padding: "16px",
+  borderRadius: "22px",
+  background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
+  border: "1px solid #6d5f7a",
+  boxShadow: "0 18px 38px rgba(124,58,237,0.24)",
+  display: "flex",
+  alignItems: "center",
+  gap: "13px",
+  color: "#ffffff",
+};
+
+const valorIconStyle = {
+  width: "46px",
+  height: "46px",
+  minWidth: "46px",
+  borderRadius: "16px",
+  background: "rgba(255,255,255,0.12)",
+  border: "1px solid rgba(255,255,255,0.24)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "1.35rem",
+};
+
+const valorTotalStyle = {
+  display: "block",
+  color: "#ffffff",
+  fontSize: "1.15rem",
+  lineHeight: 1.1,
+};
+
+const panelStyle = {
+  background: "#221e28",
+  padding: "22px",
+  borderRadius: "26px",
+  marginBottom: "22px",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+  border: "1px solid #37333e",
+};
+
+const panelHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "14px",
+  alignItems: "center",
+  marginBottom: "16px",
+  flexWrap: "wrap",
 };
 
 const titleStyle = {
-  color: "#43214d",
-  marginTop: 0,
-  marginBottom: "14px",
+  color: "#ffffff",
+  margin: "5px 0 0",
+  fontSize: "1.35rem",
+  letterSpacing: "-0.03em",
+};
+
+const mutedTextStyle = {
+  color: "#9f92b2",
+  margin: "6px 0 0",
+};
+
+const modeBadgeStyle = {
+  padding: "8px 12px",
+  borderRadius: "999px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
+  color: "#d2bbff",
+  fontWeight: "900",
+  fontSize: "0.76rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
 };
 
 const formGridStyle = {
@@ -649,98 +858,145 @@ const formGridStyle = {
 
 const inputStyle = {
   width: "100%",
-  padding: "11px 12px",
-  borderRadius: "12px",
-  border: "1px solid #cfc3cd",
+  padding: "12px 13px",
+  borderRadius: "14px",
+  border: "1px solid #37333e",
   outline: "none",
-  backgroundColor: "#fff7fb",
+  background: "#15121b",
+  color: "#e8dfee",
+  fontWeight: "650",
+};
+
+const disabledInputStyle = {
+  opacity: 0.65,
+  cursor: "not-allowed",
+};
+
+const buttonRowStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap",
+  marginTop: "18px",
 };
 
 const primaryButton = {
   padding: "11px 16px",
   border: "none",
-  borderRadius: "12px",
-  background: "linear-gradient(135deg, #5b3765, #43214d)",
+  borderRadius: "14px",
+  background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
   color: "white",
-  fontWeight: "700",
+  fontWeight: "900",
   cursor: "pointer",
+  boxShadow: "0 14px 28px rgba(124,58,237,0.24)",
 };
 
 const secondaryButton = {
   padding: "11px 16px",
-  border: "1px solid #cfc3cd",
-  borderRadius: "12px",
-  backgroundColor: "#fbd7ff",
-  color: "#43214d",
-  fontWeight: "700",
+  border: "1px solid #6d5f7a",
+  borderRadius: "14px",
+  background: "#3f2a57",
+  color: "#d2bbff",
+  fontWeight: "900",
   cursor: "pointer",
+};
+
+const tableWrapperStyle = {
+  overflowX: "auto",
+  borderRadius: "18px",
+  border: "1px solid #37333e",
 };
 
 const tableStyle = {
   width: "100%",
   borderCollapse: "collapse",
-  backgroundColor: "white",
-  borderRadius: "14px",
-  overflow: "hidden",
+  background: "#15121b",
 };
 
-const theadRowStyle = {
-  backgroundColor: "#f4ecf0",
-  color: "#43214d",
+const thStyle = {
+  padding: "12px",
+  color: "#d2bbff",
+  fontSize: "0.72rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  textAlign: "left",
+  borderBottom: "1px solid #37333e",
 };
 
 const tdStyle = {
-  padding: "10px",
-  border: "1px solid #e8e0e5",
+  padding: "12px",
+  color: "#ccc3d8",
+  borderBottom: "1px solid #2c2833",
+  fontSize: "0.86rem",
   verticalAlign: "top",
 };
 
+const tdStrongStyle = {
+  ...tdStyle,
+  color: "#ffffff",
+  fontWeight: "900",
+};
+
 const pillStyle = {
-  padding: "5px 10px",
+  padding: "6px 9px",
   borderRadius: "999px",
-  fontSize: "0.78rem",
-  fontWeight: "800",
+  fontSize: "0.75rem",
+  fontWeight: "900",
   whiteSpace: "nowrap",
 };
 
+const actionRowStyle = {
+  display: "flex",
+  gap: "8px",
+  flexWrap: "wrap",
+};
+
 const miniButton = {
-  padding: "7px 10px",
-  border: "none",
-  borderRadius: "10px",
-  backgroundColor: "#fbd7ff",
-  color: "#43214d",
-  fontWeight: "700",
+  padding: "8px 12px",
+  border: "1px solid #6d5f7a",
+  borderRadius: "12px",
+  background: "#3f2a57",
+  color: "#d2bbff",
+  fontWeight: "900",
   cursor: "pointer",
 };
 
 const miniSuccessButton = {
-  padding: "7px 10px",
-  border: "none",
-  borderRadius: "10px",
-  backgroundColor: "#dcfce7",
-  color: "#166534",
-  fontWeight: "700",
+  padding: "8px 12px",
+  border: "1px solid #225c37",
+  borderRadius: "12px",
+  background: "#12351f",
+  color: "#86efac",
+  fontWeight: "900",
   cursor: "pointer",
 };
 
 const miniWarningButton = {
-  padding: "7px 10px",
-  border: "none",
-  borderRadius: "10px",
-  backgroundColor: "#fef3c7",
-  color: "#92400e",
-  fontWeight: "700",
+  padding: "8px 12px",
+  border: "1px solid #826300",
+  borderRadius: "12px",
+  background: "#3a2d00",
+  color: "#ffd76a",
+  fontWeight: "900",
   cursor: "pointer",
 };
 
 const miniDangerButton = {
-  padding: "7px 10px",
-  border: "none",
-  borderRadius: "10px",
-  backgroundColor: "#fee2e2",
-  color: "#991b1b",
-  fontWeight: "700",
+  padding: "8px 12px",
+  border: "1px solid #7a2c35",
+  borderRadius: "12px",
+  background: "#3a1218",
+  color: "#ffb4ab",
+  fontWeight: "900",
   cursor: "pointer",
+};
+
+const emptyStateStyle = {
+  padding: "28px",
+  borderRadius: "20px",
+  background: "#15121b",
+  border: "1px solid #37333e",
+  color: "#9f92b2",
+  textAlign: "center",
 };
 
 export default OperacionesPage;
