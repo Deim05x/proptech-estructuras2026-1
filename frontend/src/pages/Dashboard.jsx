@@ -350,14 +350,14 @@ function Dashboard() {
           </div>
         </div>
 
-        <div style={estructuraGrid}>
-          <BadgeEstructura nombre="Inventario" uso="Catalogo y disponibilidad" />
-          <BadgeEstructura nombre="Cambios" uso="Deshacer ajustes recientes" />
-          <BadgeEstructura nombre="Alertas" uso="Seguimiento de pendientes" />
-          <BadgeEstructura nombre="Priorizacion" uso="Atencion de casos urgentes" />
-          <BadgeEstructura nombre="Reportes" uso="Indicadores comerciales" />
-          <BadgeEstructura nombre="Catalogo" uso="Orden por precio, area y demanda" />
-          <BadgeEstructura nombre="Relaciones" uso="Conexiones cliente-inmueble" />
+        <div style={capabilitiesGrid}>
+          <CapabilityBadge nombre="Inventario" uso="Catalogo y disponibilidad" />
+          <CapabilityBadge nombre="Cambios" uso="Deshacer ajustes recientes" />
+          <CapabilityBadge nombre="Alertas" uso="Seguimiento de pendientes" />
+          <CapabilityBadge nombre="Priorizacion" uso="Atencion de casos urgentes" />
+          <CapabilityBadge nombre="Reportes" uso="Indicadores comerciales" />
+          <CapabilityBadge nombre="Catalogo" uso="Orden por precio, area y demanda" />
+          <CapabilityBadge nombre="Relaciones" uso="Conexiones cliente-inmueble" />
         </div>
       </section>
     </div>
@@ -520,9 +520,9 @@ function RankingItem({ titulo, cantidad, detalle }) {
   );
 }
 
-function BadgeEstructura({ nombre, uso }) {
+function CapabilityBadge({ nombre, uso }) {
   return (
-    <div style={estructuraBadgeStyle}>
+    <div style={capabilityBadgeStyle}>
       <strong>{nombre}</strong>
       <small>{uso}</small>
     </div>
@@ -986,13 +986,13 @@ const rankingNumberStyle = {
   boxShadow: "0 0 18px rgba(124,58,237,0.28)",
 };
 
-const estructuraGrid = {
+const capabilitiesGrid = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
   gap: "12px",
 };
 
-const estructuraBadgeStyle = {
+const capabilityBadgeStyle = {
   background: "#15121b",
   border: "1px solid #37333e",
   borderRadius: "18px",

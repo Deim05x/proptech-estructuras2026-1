@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import ordenamientoService from "../services/ordenamientoService";
+import solicitudRapidaHelper from "../utils/solicitudRapidaHelper";
+import authService from "../services/authService";
 
 function DescubrirInmueblesPage() {
   const [inmueblesOrdenados, setInmueblesOrdenados] = useState([]);
   const [cargando, setCargando] = useState(false);
-
   const [criterio, setCriterio] = useState("precio");
   const [direccion, setDireccion] = useState("desc");
 
@@ -16,13 +17,37 @@ function DescubrirInmueblesPage() {
     disponibilidad: "TODOS",
   });
 
+  const rol = authService.getRol();
+  const esCliente = rol === "CLIENTE";
+
+  const crearSolicitudRapida = async (tipoSolicitud, inmueble) => {
+    try {
+      await solicitudRapidaHelper.crearSolicitudRapida(tipoSolicitud, inmueble);
+
+      if (tipoSolicitud === "COMPRA") {
+        alert("Intención de compra enviada correctamente.");
+      } else if (tipoSolicitud === "ARRIENDO") {
+        alert("Intención de arriendo enviada correctamente.");
+      } else if (tipoSolicitud === "VISITA") {
+        alert("Solicitud de visita enviada correctamente.");
+      } else {
+        alert("Solicitud de información enviada correctamente.");
+      }
+    } catch (error) {
+      console.error("Error al crear solicitud rápida:", error);
+      alert(error.message || "No se pudo enviar la solicitud.");
+    }
+  };
+
   const cargarInmuebles = async () => {
     try {
       setCargando(true);
+
       const data = await ordenamientoService.ordenarInmuebles(
         criterio,
         direccion
       );
+
       setInmueblesOrdenados(data);
     } catch (error) {
       console.error("Error al cargar inmuebles:", error);
@@ -117,7 +142,7 @@ function DescubrirInmueblesPage() {
 
       <section style={headerStyle}>
         <div>
-          <p style={eyebrowStyle}>EXPLORACION COMERCIAL</p>
+          <p style={eyebrowStyle}>EXPLORACIÓN COMERCIAL</p>
 
           <h1 style={mainTitleStyle}>
             Descubrir <span style={titleAccentStyle}>inmuebles</span>
@@ -125,7 +150,8 @@ function DescubrirInmueblesPage() {
 
           <p style={descriptionStyle}>
             Explora inmuebles con filtros combinados y organiza los resultados
-            por precio, area o demanda.
+            por precio, área o demanda. Desde cada inmueble puedes registrar una
+            solicitud de visita, compra, arriendo o información.
           </p>
         </div>
 
@@ -158,17 +184,17 @@ function DescubrirInmueblesPage() {
         />
 
         <SummaryCard
-          icono="🔎"
-          titulo="Filtrados"
-          valor={inmueblesFiltrados.length}
-          texto="Coincidencias actuales"
+          icono="📩"
+          titulo="Solicitudes"
+          valor={esCliente ? "Activas" : "Solo cliente"}
+          texto="Acciones rápidas"
         />
       </section>
 
       <section style={panelStyle}>
         <div style={panelHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>ORGANIZAR CATALOGO</p>
+            <p style={eyebrowStyle}>ORGANIZAR CATÁLOGO</p>
             <h2 style={titleStyle}>Ordenar resultados</h2>
           </div>
 
@@ -337,6 +363,46 @@ function DescubrirInmueblesPage() {
                   <div style={orderValueStyle}>
                     Valor de referencia: <strong>{item.valorOrden}</strong>
                   </div>
+
+                  {esCliente && (
+                    <div style={quickActionsStyle}>
+                      <button
+                        type="button"
+                        onClick={() => crearSolicitudRapida("VISITA", inmueble)}
+                        style={quickActionButton}
+                      >
+                        Solicitar visita
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => crearSolicitudRapida("COMPRA", inmueble)}
+                        style={quickBuyButton}
+                      >
+                        Me interesa comprar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          crearSolicitudRapida("ARRIENDO", inmueble)
+                        }
+                        style={quickRentButton}
+                      >
+                        Me interesa arrendar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          crearSolicitudRapida("INFORMACION", inmueble)
+                        }
+                        style={quickInfoButton}
+                      >
+                        Más información
+                      </button>
+                    </div>
+                  )}
                 </article>
               );
             })}
@@ -699,6 +765,55 @@ const orderValueStyle = {
   border: "1px solid #37333e",
   color: "#d2bbff",
   fontWeight: "800",
+};
+
+const quickActionsStyle = {
+  display: "flex",
+  gap: "8px",
+  flexWrap: "wrap",
+  marginTop: "16px",
+  paddingTop: "14px",
+  borderTop: "1px solid #37333e",
+};
+
+const quickActionButton = {
+  padding: "9px 12px",
+  border: "1px solid #6d5f7a",
+  borderRadius: "12px",
+  background: "#3f2a57",
+  color: "#d2bbff",
+  fontWeight: "900",
+  cursor: "pointer",
+};
+
+const quickBuyButton = {
+  padding: "9px 12px",
+  border: "1px solid #225c37",
+  borderRadius: "12px",
+  background: "#12351f",
+  color: "#86efac",
+  fontWeight: "900",
+  cursor: "pointer",
+};
+
+const quickRentButton = {
+  padding: "9px 12px",
+  border: "1px solid #1d4ed8",
+  borderRadius: "12px",
+  background: "#10294f",
+  color: "#93c5fd",
+  fontWeight: "900",
+  cursor: "pointer",
+};
+
+const quickInfoButton = {
+  padding: "9px 12px",
+  border: "1px solid #826300",
+  borderRadius: "12px",
+  background: "#3a2d00",
+  color: "#ffd76a",
+  fontWeight: "900",
+  cursor: "pointer",
 };
 
 const emptyStateStyle = {

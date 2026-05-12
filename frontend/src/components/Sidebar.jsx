@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 
-const adminLinks = [
+const groupedAdminLinks = [
   {
     label: "Panel principal",
     path: "/dashboard",
@@ -12,7 +12,7 @@ const adminLinks = [
     label: "Inmuebles",
     path: "/inmuebles-admin",
     icon: "🏘️",
-    descripcion: "Catálogo y activos",
+    descripcion: "Inventario y precios",
   },
   {
     label: "Personas",
@@ -21,32 +21,26 @@ const adminLinks = [
     descripcion: "Clientes y asesores",
   },
   {
-    label: "Visitas",
-    path: "/visitas",
-    icon: "📅",
-    descripcion: "Agenda comercial",
-  },
-  {
-    label: "Operaciones",
-    path: "/operaciones",
+    label: "Comercial",
+    path: "/comercial",
     icon: "💼",
-    descripcion: "Ventas y arriendos",
+    descripcion: "Visitas y contratos",
   },
   {
     label: "Monitoreo",
     path: "/monitoreo",
     icon: "🚨",
-    descripcion: "Alertas y eventos",
+    descripcion: "Alertas y controles",
   },
   {
     label: "Analítica",
     path: "/analitica",
     icon: "📈",
-    descripcion: "Reportes y relaciones",
+    descripcion: "Reportes y búsqueda",
   },
 ];
 
-const clienteLinks = [
+const groupedClienteLinks = [
   {
     label: "Inicio",
     path: "/inicio-cliente",
@@ -54,22 +48,22 @@ const clienteLinks = [
     descripcion: "Portal cliente",
   },
   {
-    label: "Descubrir",
-    path: "/descubrir-inmuebles",
+    label: "Catálogo",
+    path: "/catalogo-cliente",
     icon: "🔎",
-    descripcion: "Explorar inmuebles",
-  },
-  {
-    label: "Recomendaciones",
-    path: "/recomendaciones",
-    icon: "✨",
-    descripcion: "Sugerencias",
+    descripcion: "Explorar y comparar",
   },
   {
     label: "Mi actividad",
     path: "/mi-actividad",
     icon: "📌",
     descripcion: "Favoritos y visitas",
+  },
+  {
+    label: "Mis solicitudes",
+    path: "/mis-solicitudes",
+    icon: "📩",
+    descripcion: "Seguimiento",
   },
 ];
 
@@ -88,7 +82,7 @@ function Sidebar() {
     }
   };
 
-  const links = rol === "ADMIN" ? adminLinks : clienteLinks;
+  const links = rol === "ADMIN" ? groupedAdminLinks : groupedClienteLinks;
 
   return (
     <aside style={sidebarStyle}>

@@ -1,33 +1,33 @@
 import { useState } from "react";
 
-import ClientesPage from "./ClientesPage";
-import AsesoresPage from "./AsesoresPage";
-import RotacionAsesoresPage from "./RotacionAsesoresPage";
+import DescubrirInmueblesPage from "./DescubrirInmueblesPage";
+import RangoPrecioPage from "./RangoPrecioPage";
+import RecomendacionesPage from "./RecomendacionesPage";
 
-function PersonasPage() {
-  const [activeTab, setActiveTab] = useState("clientes");
+function CatalogoClientePage() {
+  const [activeTab, setActiveTab] = useState("descubrir");
 
   const tabs = [
     {
-      id: "clientes",
-      label: "Clientes",
-      shortLabel: "Clientes",
-      icon: "👥",
-      descripcion: "Gestión de clientes, preferencias y datos de búsqueda.",
+      id: "descubrir",
+      label: "Descubrir inmuebles",
+      shortLabel: "Descubrir",
+      icon: "🔎",
+      descripcion: "Explora inmuebles disponibles.",
     },
     {
-      id: "asesores",
-      label: "Asesores",
-      shortLabel: "Asesores",
-      icon: "🧑‍💼",
-      descripcion: "Administración de asesores comerciales y cierres.",
+      id: "recomendaciones",
+      label: "Recomendaciones",
+      shortLabel: "Sugerencias",
+      icon: "✨",
+      descripcion: "Opciones destacadas segun tu actividad.",
     },
     {
-      id: "rotacion",
-      label: "Rotación de asesores",
-      shortLabel: "Rotación",
-      icon: "🔁",
-      descripcion: "Asignación equilibrada de atención comercial.",
+      id: "rangos",
+      label: "Rangos de precio",
+      shortLabel: "Rangos",
+      icon: "💰",
+      descripcion: "Compara inmuebles por valor de referencia.",
     },
   ];
 
@@ -39,41 +39,41 @@ function PersonasPage() {
 
       <section style={heroStyle}>
         <div>
-          <p style={eyebrowStyle}>MÓDULO ADMINISTRATIVO</p>
+          <p style={eyebrowStyle}>PORTAL CLIENTE</p>
 
           <h1 style={titleStyle}>
-            Gestión de <span style={titleAccentStyle}>personas</span>
+            Catalogo de <span style={titleAccentStyle}>inmuebles</span>
           </h1>
 
           <p style={descriptionStyle}>
-            Administra clientes, asesores y la rotación de atención comercial
-            desde un solo centro de control del sistema PropTech.
+            Explora propiedades, revisa recomendaciones y compara rangos de
+            precio desde una sola vista.
           </p>
         </div>
 
         <div style={heroBadgeStyle}>
           <span style={heroBadgeDotStyle}></span>
-          <span>Personas activo</span>
+          <span>Catalogo activo</span>
         </div>
       </section>
 
       <section style={summaryGridStyle}>
         <InfoCard
-          icono="👥"
-          titulo="Clientes"
-          texto="Registro, edición y seguimiento de clientes."
+          icono="🔎"
+          titulo="Explorar"
+          texto="Consulta inmuebles disponibles."
         />
 
         <InfoCard
-          icono="🧑‍💼"
-          titulo="Asesores"
-          texto="Control de asesores y especialidades."
+          icono="✨"
+          titulo="Sugerencias"
+          texto="Recomendaciones segun tu interes."
         />
 
         <InfoCard
-          icono="🔁"
-          titulo="Rotación"
-          texto="Asignación equilibrada de atención comercial."
+          icono="💰"
+          titulo="Rangos"
+          texto="Busqueda por valor de referencia."
         />
       </section>
 
@@ -128,7 +128,7 @@ function PersonasPage() {
         <div style={activeIconStyle}>{tabActiva?.icon}</div>
 
         <div>
-          <p style={eyebrowStyle}>SECCIÓN ACTIVA</p>
+          <p style={eyebrowStyle}>SECCION ACTIVA</p>
 
           <h2 style={moduleTitleStyle}>{tabActiva?.label}</h2>
 
@@ -137,9 +137,9 @@ function PersonasPage() {
       </section>
 
       <section style={contentPanelStyle}>
-        {activeTab === "clientes" && <ClientesPage />}
-        {activeTab === "asesores" && <AsesoresPage />}
-        {activeTab === "rotacion" && <RotacionAsesoresPage />}
+        {activeTab === "descubrir" && <DescubrirInmueblesPage />}
+        {activeTab === "recomendaciones" && <RecomendacionesPage />}
+        {activeTab === "rangos" && <RangoPrecioPage />}
       </section>
     </div>
   );
@@ -159,7 +159,7 @@ function InfoCard({ icono, titulo, texto }) {
 }
 
 const animations = `
-  @keyframes fadeUpPersonas {
+  @keyframes fadeUpCatalogoCliente {
     from {
       opacity: 0;
       transform: translateY(18px);
@@ -171,7 +171,7 @@ const animations = `
     }
   }
 
-  @keyframes pulsePersonas {
+  @keyframes pulseCatalogoCliente {
     0%, 100% {
       opacity: 1;
       transform: scale(1);
@@ -183,7 +183,7 @@ const animations = `
     }
   }
 
-  @keyframes glowPersonas {
+  @keyframes glowCatalogoCliente {
     0%, 100% {
       box-shadow: 0 0 0 rgba(124, 58, 237, 0);
     }
@@ -203,7 +203,7 @@ const pageStyle = {
   width: "100%",
   color: "#e8dfee",
   background: "transparent",
-  animation: "fadeUpPersonas 0.55s ease both",
+  animation: "fadeUpCatalogoCliente 0.55s ease both",
 };
 
 const heroStyle = {
@@ -234,7 +234,7 @@ const titleStyle = {
   color: "#ffffff",
   fontSize: "clamp(2rem, 4vw, 3.4rem)",
   lineHeight: 1.08,
-  letterSpacing: "-0.05em",
+  letterSpacing: 0,
 };
 
 const titleAccentStyle = {
@@ -269,7 +269,7 @@ const heroBadgeDotStyle = {
   borderRadius: "50%",
   background: "#22c55e",
   boxShadow: "0 0 16px rgba(34,197,94,0.8)",
-  animation: "pulsePersonas 1.8s ease-in-out infinite",
+  animation: "pulseCatalogoCliente 1.8s ease-in-out infinite",
 };
 
 const summaryGridStyle = {
@@ -303,7 +303,7 @@ const infoIconStyle = {
   alignItems: "center",
   justifyContent: "center",
   fontSize: "1.45rem",
-  animation: "glowPersonas 3.3s ease-in-out infinite",
+  animation: "glowCatalogoCliente 3.3s ease-in-out infinite",
 };
 
 const infoTitleStyle = {
@@ -414,7 +414,7 @@ const moduleTitleStyle = {
   margin: "5px 0",
   color: "#ffffff",
   fontSize: "1.4rem",
-  letterSpacing: "-0.03em",
+  letterSpacing: 0,
 };
 
 const moduleDescriptionStyle = {
@@ -432,4 +432,4 @@ const contentPanelStyle = {
   overflow: "hidden",
 };
 
-export default PersonasPage;
+export default CatalogoClientePage;

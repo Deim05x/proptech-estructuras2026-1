@@ -1,259 +1,208 @@
 # PropTech Estructuras 2026-1
 
-Proyecto con arquitectura separada en `backend` y `frontend` para la gestión básica de una inmobiliaria. El backend expone una API REST construida con Spring Boot y persiste la información en MariaDB usando `JdbcTemplate`. El frontend está creado con React + Vite, pero en el estado actual del repositorio todavía conserva principalmente la plantilla base y no consume la API.
+PropTech es una plataforma de gestion inmobiliaria con backend en Spring Boot y frontend en React. El proyecto combina persistencia relacional con MariaDB y estructuras de datos propias implementadas en Java para resolver procesos de catalogo, atencion comercial, monitoreo, analitica y seguimiento de clientes.
 
-## Estructura del repositorio
+## Vision General
+
+El sistema esta organizado como una aplicacion web administrativa y de cliente:
+
+- El backend expone una API REST bajo `/api`.
+- El frontend consume esa API desde servicios centralizados en `frontend/src/services`.
+- La autenticacion usa tokens persistidos en base de datos.
+- Las reglas de negocio se implementan en servicios Java.
+- Las colecciones criticas del dominio usan estructuras propias antes de devolver arreglos JSON al frontend.
 
 ```text
 proptech-estructuras2026-1/
-|-- backend/   API REST, acceso a datos y estructuras de listas propias
-`-- frontend/  aplicación React inicial basada en Vite
+|-- backend/   API REST, persistencia, seguridad y estructuras propias
+`-- frontend/  interfaz React con rutas protegidas por rol
 ```
 
-## Estado actual del proyecto
+## Stack
 
-- `backend`: implementado y con endpoints REST para inmuebles, clientes, asesores, visitas, favoritos e historial de interacciones.
-- `frontend`: inicializado, pero todavía sin páginas funcionales conectadas al backend.
-- Base de datos: el proyecto está configurado para trabajar con MariaDB en `localhost:3306/inmobiliaria_db`.
-- Datos semilla: el backend carga esquema y registros iniciales desde `schema.sql` y `data.sql`.
-
-## Tecnologías usadas
-
-### Backend
+Backend:
 
 - Java 21
-- Spring Boot 4.0.5
+- Spring Boot 4
 - Spring Web MVC
+- Spring Security
 - Spring JDBC
-- MariaDB Java Client 3.5.7
+- MariaDB
 - Gradle Wrapper
 
-### Frontend
+Frontend:
 
 - React 19
+- React Router
 - Vite 8
-- ESLint 9
+- Axios
 
-## Cómo ejecutar el proyecto
+## Diseno Backend
 
-## 1. Backend
+El backend sigue una arquitectura por capas:
 
-Requisitos:
+- `controller`: define rutas HTTP y traduce solicitudes/respuestas.
+- `service`: contiene reglas de negocio, validaciones y uso de estructuras.
+- `repository`: accede a MariaDB con `JdbcTemplate`.
+- `model`: representa entidades del dominio.
+- `dto`: objetos de respuesta o entrada para flujos especificos.
+- `estructuras`: implementaciones propias de listas, colas, arboles, tablas hash, pilas y grafos.
+- `config` y `security`: CORS, autorizacion por rol y validacion de token.
 
-- Java 21
-- MariaDB en ejecución
-- Base de datos `inmobiliaria_db` creada
-
-Configuración actual en [backend/src/main/resources/application.properties](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/resources/application.properties):
-
-```properties
-server.port=8080
-spring.datasource.url=jdbc:mariadb://localhost:3306/inmobiliaria_db
-spring.datasource.username=root
-spring.datasource.password=110426
-```
-
-Ejecución:
-
-```powershell
-cd backend
-.\gradlew.bat bootRun
-```
-
-La API quedará disponible en:
+Flujo base:
 
 ```text
-http://localhost:8080
+React page -> frontend service -> API REST -> controller -> service -> repository -> MariaDB
+                                              |
+                                              `-> estructura propia segun caso de uso
 ```
 
-## 2. Frontend
-
-Requisitos:
-
-- Node.js
-- npm
-
-Ejecución:
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-La app de desarrollo normalmente quedará disponible en:
-
-```text
-http://localhost:5173
-```
-
-## Backend
-
-## Arquitectura
-
-El backend sigue una organización por capas:
-
-- `controller`: expone endpoints HTTP.
-- `service`: contiene validaciones y reglas básicas de negocio.
-- `repository`: ejecuta consultas SQL con `JdbcTemplate`.
-- `model`: representa las entidades del dominio.
-- `dto`: requests específicos para acciones como reprogramar o cancelar visitas.
-- `estructuras`: implementaciones propias de listas enlazadas usadas por los repositorios y servicios.
-
-## Estructuras de datos propias
-
-Una de las ideas centrales del proyecto es usar estructuras implementadas manualmente en lugar de depender solo de colecciones estándar:
-
-- `LinkedSimpleList`: usada para listar inmuebles, clientes, asesores y visitas.
-- `LinkedDoubleList`: usada para el historial de interacciones.
-- `LinkedCircularSimpleList`: usada en la rotación de asesores.
-- También existen implementaciones circulares dobles e iteradores asociados.
-
-Estas estructuras están ubicadas en [backend/src/main/java/co/edu/uniquindio/backend/estructuras](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/java/co/edu/uniquindio/backend/estructuras).
-
-## Módulos principales del backend
+## Modulos Funcionales
 
 ### Inmuebles
 
-Archivo principal: [backend/src/main/java/co/edu/uniquindio/backend/controller/InmuebleController.java](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/java/co/edu/uniquindio/backend/controller/InmuebleController.java)
-
-Responsabilidades:
-
-- listar inmuebles
-- consultar un inmueble por código
-- crear, actualizar y eliminar inmuebles
-
-Ruta base:
-
-```text
-/api/inmuebles
-```
-
-### Clientes
-
-Archivo principal: [backend/src/main/java/co/edu/uniquindio/backend/controller/ClienteController.java](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/java/co/edu/uniquindio/backend/controller/ClienteController.java)
-
-Responsabilidades:
-
-- listar clientes
-- consultar un cliente por id
-- crear, actualizar y eliminar clientes
-
-Ruta base:
-
-```text
-/api/clientes
-```
-
-### Asesores
-
-Archivo principal: [backend/src/main/java/co/edu/uniquindio/backend/controller/AsesorController.java](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/java/co/edu/uniquindio/backend/controller/AsesorController.java)
-
-Responsabilidades:
-
-- listar asesores
-- consultar un asesor por id
-- crear, actualizar y eliminar asesores
-
-Ruta base:
-
-```text
-/api/asesores
-```
-
-### Visitas
-
-Archivo principal: [backend/src/main/java/co/edu/uniquindio/backend/controller/VisitaController.java](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/java/co/edu/uniquindio/backend/controller/VisitaController.java)
-
-Responsabilidades:
-
-- listar visitas
-- filtrar visitas por estado
-- agendar visitas
-- reprogramar visitas
-- cancelar visitas
-- actualizar y eliminar visitas
-
-Ruta base:
-
-```text
-/api/visitas
-```
-
-## Favoritos e historial
-
-Archivo principal: [backend/src/main/java/co/edu/uniquindio/backend/controller/FavoritoController.java](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/java/co/edu/uniquindio/backend/controller/FavoritoController.java)
-
-Responsabilidades:
-
-- consultar favoritos de un cliente
-- agregar y eliminar favoritos
-- consultar historial de interacciones normal y en reverso
+Gestiona catalogo, disponibilidad, finalidad, precios, area y asesor responsable.
 
 Rutas principales:
 
-```text
-/api/clientes/{clienteId}/favoritos
-/api/clientes/{clienteId}/historial
-/api/clientes/{clienteId}/historial/reverso
-```
-
-## Rotación de asesores
-
-Servicio relevante: [backend/src/main/java/co/edu/uniquindio/backend/service/RotacionAsesorService.java](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/java/co/edu/uniquindio/backend/service/RotacionAsesorService.java)
-
-El proyecto incluye una rueda de asesores basada en lista circular simple para:
-
-- recargar la rueda desde base de datos
-- consultar el orden actual
-- obtener el siguiente asesor
-- reiniciar la rotación
-
-Actualmente este servicio está implementado a nivel de servicio y puede ser reutilizado desde futuras rutas o flujos de asignación.
-
-## Endpoints disponibles
-
-### Inmuebles
-
-- `GET /api/inmuebles/test`
 - `GET /api/inmuebles`
 - `GET /api/inmuebles/{codigo}`
 - `POST /api/inmuebles`
 - `PUT /api/inmuebles/{codigo}`
 - `DELETE /api/inmuebles/{codigo}`
 
-### Clientes
+Estructuras usadas:
 
-- `GET /api/clientes/test`
+- `LinkedSimpleList<Inmueble>` para cargar y recorrer registros desde repositorio.
+- `ArbolPrecioInmuebles` para consultas por rango de precio.
+- `ArbolBinarioBusqueda<InmuebleOrdenadoDTO>` para ordenamientos comerciales.
+- `LinkedCircularDoubleList<Inmueble>` para carrusel de inmuebles destacados.
+
+### Personas
+
+Agrupa clientes, asesores y rotacion de asesores.
+
+Rutas principales:
+
 - `GET /api/clientes`
 - `GET /api/clientes/{id}`
-- `POST /api/clientes`
-- `PUT /api/clientes/{id}`
-- `DELETE /api/clientes/{id}`
-
-### Asesores
-
-- `GET /api/asesores/test`
 - `GET /api/asesores`
 - `GET /api/asesores/{id}`
-- `POST /api/asesores`
-- `PUT /api/asesores/{id}`
-- `DELETE /api/asesores/{id}`
+- `GET /api/rotacion-asesores`
+
+Estructuras usadas:
+
+- `LinkedSimpleList<Cliente>` y `LinkedSimpleList<Asesor>` para listados y recorridos.
+- `LinkedCircularSimpleList<Asesor>` para asignacion rotativa de asesores.
 
 ### Visitas
 
-- `GET /api/visitas/test`
+Gestiona agenda comercial, reprogramaciones, cancelaciones y estados de visita.
+
+Rutas principales:
+
 - `GET /api/visitas`
 - `GET /api/visitas/estado/{estado}`
-- `GET /api/visitas/{id}`
 - `POST /api/visitas`
 - `POST /api/visitas/agendar`
-- `PUT /api/visitas/{id}`
 - `PUT /api/visitas/{id}/reprogramar`
 - `PUT /api/visitas/{id}/cancelar`
-- `DELETE /api/visitas/{id}`
 
-### Favoritos e historial
+Estructuras usadas:
+
+- `LinkedSimpleList<Visita>` para listar, filtrar y validar visitas.
+
+### Solicitudes
+
+Registra solicitudes de atencion, visitas, compra, arriendo e informacion. Este modulo persiste en la tabla `solicitud_atencion`.
+
+Rutas principales:
+
+- `GET /api/solicitudes`
+- `GET /api/solicitudes/cliente/{idCliente}`
+- `GET /api/solicitudes/estado/{estado}`
+- `GET /api/solicitudes/pendientes`
+- `GET /api/solicitudes/prioritarias`
+- `POST /api/solicitudes`
+- `POST /api/solicitudes/cola/recargar`
+- `POST /api/solicitudes/cola/procesar`
+- `POST /api/solicitudes/cola-prioridad/procesar`
+- `PATCH /api/solicitudes/{id}/estado`
+- `PATCH /api/solicitudes/{id}/asesor`
+
+Estructuras usadas:
+
+- `LinkedSimpleList<SolicitudAtencion>` para resultados persistidos desde MariaDB.
+- `Cola<SolicitudAtencion>` para solicitudes pendientes en orden FIFO.
+- `ColaPrioridad<SolicitudAtencion>` para solicitudes con prioridad alta.
+
+### Operaciones y Contratos
+
+Operaciones registra procesos de venta/arriendo. Contratos gestiona estado contractual, vencimientos y contratos proximos a vencer. Los contratos persisten en la tabla `contrato`.
+
+Rutas principales:
+
+- `GET /api/operaciones`
+- `POST /api/operaciones`
+- `GET /api/contratos`
+- `GET /api/contratos/estado/{estado}`
+- `GET /api/contratos/proximos-vencer`
+- `GET /api/contratos/vencidos`
+- `POST /api/contratos`
+- `PATCH /api/contratos/{id}/estado`
+
+Estructuras usadas:
+
+- Arreglos tipados para interoperabilidad JSON en operaciones.
+- `LinkedSimpleList<Contrato>` en repositorio y servicio de contratos.
+- Reglas de vencimiento calculadas en `ContratoService`.
+
+### Monitoreo
+
+Agrupa alertas, eventos inusuales, motor de alertas comerciales y validaciones de negocio.
+
+Rutas principales:
+
+- `GET /api/alertas`
+- `GET /api/eventos-inusuales`
+- `GET /api/motor-alertas`
+- `GET /api/motor-alertas/contratos-proximos`
+- `GET /api/motor-alertas/contratos-vencidos`
+- `GET /api/motor-alertas/solicitudes-prioritarias`
+- `POST /api/validaciones`
+- `GET /api/validaciones/consistencia-general`
+
+Estructuras usadas:
+
+- `Cola` y `ColaPrioridad` en gestion de alertas/solicitudes.
+- `LinkedSimpleList<AlertaComercialDTO>` para generar alertas comerciales.
+- `TablaHashPropia<String, String>` para evitar procesar clientes o inmuebles repetidos en el motor de alertas.
+
+### Analitica y Busqueda
+
+Agrupa reportes, analisis de relaciones y busqueda rapida.
+
+Rutas principales:
+
+- `GET /api/reportes/resumen`
+- `GET /api/grafos/resumen`
+- `GET /api/grafos/nodos`
+- `GET /api/grafos/relaciones`
+- `GET /api/busqueda-hash/clientes/{idCliente}`
+- `GET /api/busqueda-hash/inmuebles/{codigoInmueble}`
+- `GET /api/busqueda-hash/asesores/{idAsesor}`
+
+Estructuras usadas:
+
+- `TablaHash` para agregaciones y reportes.
+- `TablaHashPropia` para busquedas directas por clave.
+- `GrafoNoDirigido` para relaciones entre clientes, inmuebles, asesores y zonas.
+
+### Favoritos e Historial
+
+Permite guardar inmuebles de interes y consultar actividad del cliente.
+
+Rutas principales:
 
 - `GET /api/clientes/{clienteId}/favoritos`
 - `POST /api/clientes/{clienteId}/favoritos/{codigoInmueble}`
@@ -261,9 +210,108 @@ Actualmente este servicio está implementado a nivel de servicio y puede ser reu
 - `GET /api/clientes/{clienteId}/historial`
 - `GET /api/clientes/{clienteId}/historial/reverso`
 
-## Modelo de datos
+Estructuras usadas:
 
-Definido en [backend/src/main/resources/schema.sql](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/resources/schema.sql).
+- `LinkedSimpleList<Inmueble>` para favoritos.
+- `LinkedDoubleList<Interaccion>` para historial.
+- `Pila` para navegacion inversa de historial de inmuebles.
+
+## Uso de Estructuras Propias
+
+Las estructuras propias se encuentran en:
+
+```text
+backend/src/main/java/co/edu/uniquindio/backend/estructuras
+```
+
+Resumen de uso:
+
+| Estructura | Uso principal | Modulos |
+| --- | --- | --- |
+| `LinkedSimpleList<T>` | Listados desde repositorios, recorridos y conversion a arreglos de salida | Inmuebles, clientes, asesores, visitas, contratos, solicitudes |
+| `LinkedDoubleList<T>` | Historial con recorrido en ambos sentidos | Historial de cliente |
+| `LinkedCircularSimpleList<T>` | Rotacion secuencial circular | Asesores |
+| `LinkedCircularDoubleList<T>` | Navegacion adelante/atras | Carrusel de inmuebles |
+| `Cola<T>` | Atencion FIFO | Solicitudes pendientes |
+| `ColaPrioridad<T>` | Atencion prioritaria | Solicitudes de alta prioridad |
+| `ArbolBinarioBusqueda<T>` | Ordenamiento por criterio comparable | Organizacion de inmuebles |
+| `ArbolPrecioInmuebles` | Consulta por rango de precio | Rangos de precio |
+| `TablaHash<K,V>` | Agregaciones para reportes | Reportes |
+| `TablaHashPropia<K,V>` | Busqueda por clave y control de duplicados | Busqueda rapida, motor de alertas |
+| `GrafoNoDirigido` | Relaciones entre entidades | Analisis comercial |
+| `Pila<T>` | Consulta inversa de actividad | Historial |
+
+## Criterio de Diseno para las Estructuras
+
+El proyecto usa estructuras propias cuando aportan una operacion clara al negocio:
+
+- Lista simple: recorrer datos persistidos sin depender de `ArrayList` como estructura principal.
+- Lista doble: permitir historial normal y reverso.
+- Lista circular: mantener ciclos de asignacion o navegacion.
+- Cola: procesar solicitudes en orden de llegada.
+- Cola de prioridad: atender primero solicitudes de mayor importancia.
+- Arbol: ordenar y filtrar inmuebles por precio o demanda.
+- Hash: acceder rapidamente por clave y contar elementos sin busqueda lineal.
+- Grafo: representar relaciones comerciales entre clientes, inmuebles, asesores y zonas.
+
+Los controladores devuelven arreglos tipados o DTOs para que Jackson entregue JSON normal al frontend. La estructura propia se conserva en repositorios/servicios, y la capa HTTP solo adapta la salida.
+
+## Diseno Frontend
+
+El frontend esta organizado por rutas protegidas y modulos agrupados:
+
+- `Sidebar`: muestra accesos segun rol.
+- `AppRouter`: declara rutas y protege vistas.
+- `services/api.js`: configura Axios con base URL `/api` y token Bearer.
+- `pages`: contiene vistas administrativas y de cliente.
+
+Modulos de administrador:
+
+- Panel principal
+- Inmuebles
+- Personas
+- Comercial
+- Monitoreo
+- Analitica
+
+Modulos de cliente:
+
+- Inicio
+- Catalogo
+- Mi actividad
+- Mis solicitudes
+
+## Seguridad
+
+La seguridad vive en `SecurityConfig` y `TokenAuthenticationFilter`.
+
+Reglas principales:
+
+- `/api/auth/login` y `/api/auth/register-cliente` son publicos.
+- Las rutas de consulta de catalogo requieren autenticacion.
+- Rutas administrativas como contratos, reportes, motor de alertas y validaciones requieren rol `ADMIN`.
+- Solicitudes quedan autenticadas para permitir flujos de cliente y administracion.
+- El token se guarda en `auth_token` y se valida en cada solicitud.
+
+Usuarios semilla:
+
+- `admin` / `Admin123*`
+- `cliente1` / `Cliente123*`
+- `cliente2` / `Cliente123*`
+
+## Persistencia
+
+El esquema se define en:
+
+```text
+backend/src/main/resources/schema.sql
+```
+
+Datos iniciales:
+
+```text
+backend/src/main/resources/data.sql
+```
 
 Tablas principales:
 
@@ -273,43 +321,46 @@ Tablas principales:
 - `visita`
 - `favorito`
 - `interaccion`
+- `auth_usuario`
+- `auth_token`
+- `operaciones`
+- `contrato`
+- `solicitud_atencion`
+- `alertas`
+- `eventos_inusuales`
 
-## Datos iniciales
+## Ejecucion
 
-Definidos en [backend/src/main/resources/data.sql](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/backend/src/main/resources/data.sql).
+Backend:
 
-El proyecto inserta registros de ejemplo para:
+```powershell
+cd backend
+.\gradlew.bat bootRun
+```
 
-- 2 inmuebles
-- 2 clientes
-- 2 asesores
-- 2 visitas
-- favoritos e interacciones iniciales
+Frontend:
 
-## Frontend
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-El frontend está creado con React y Vite, pero actualmente no representa todavía la solución funcional del negocio.
+Verificaciones utiles:
 
-Estado actual:
+```powershell
+cd backend
+.\gradlew.bat test
+```
 
-- `src/main.jsx` renderiza `App.jsx`
-- `src/App.jsx` conserva la plantilla de inicio de Vite/React
-- las carpetas `pages`, `components`, `router` y `services` existen como base para evolución futura
-- varios archivos dentro de esas carpetas están vacíos en este momento
+```powershell
+cd frontend
+npm run build
+```
 
-Esto significa que la mayor parte de la lógica implementada hoy está en el backend.
+## Observaciones Tecnicas
 
-## Observaciones importantes
-
-- El backend usa `spring.sql.init.mode=always`, por lo que intenta ejecutar `schema.sql` y `data.sql` al iniciar.
-- La contraseña de base de datos está escrita directamente en configuración. Para un siguiente paso recomendable, convendría moverla a variables de entorno o a un archivo no versionado.
-- En `backend/data/` existe un archivo `inmobiliaria_db.mv.db`, pero la configuración activa apunta a MariaDB, no a H2.
-- Algunos textos con tildes en respuestas HTTP y datos semilla muestran problemas de codificación. La documentación conserva el comportamiento actual, pero ese detalle podría corregirse después sin cambiar reglas de negocio.
-
-## Próximos pasos sugeridos
-
-- conectar el frontend con la API REST
-- documentar ejemplos de payloads JSON para cada endpoint
-- agregar pruebas de integración para servicios y controladores
-- externalizar la configuración sensible de base de datos
-
+- `spring.sql.init.mode=always` ejecuta `schema.sql` y `data.sql` al iniciar.
+- La configuracion actual apunta a MariaDB en `localhost:3306/inmobiliaria_db`.
+- Las respuestas HTTP convierten estructuras propias a arreglos cuando el frontend necesita JSON de lista.
+- La contrasena de base de datos esta en `application.properties`; para despliegue conviene moverla a variables de entorno.

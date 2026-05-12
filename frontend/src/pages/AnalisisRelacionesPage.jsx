@@ -134,7 +134,7 @@ function AnalisisRelacionesPage() {
 
       <section style={headerStyle}>
         <div>
-          <p style={eyebrowStyle}>GRAFO DE RELACIONES</p>
+          <p style={eyebrowStyle}>MAPA COMERCIAL</p>
 
           <h1 style={mainTitleStyle}>
             Análisis de <span style={titleAccentStyle}>relaciones</span>
@@ -162,7 +162,7 @@ function AnalisisRelacionesPage() {
               icono="🧩"
               titulo="Total registros"
               valor={resumen?.totalNodos || 0}
-              texto="Nodos del grafo"
+              texto="Entidades vinculadas"
             />
 
             <CardResumen
@@ -176,7 +176,7 @@ function AnalisisRelacionesPage() {
               icono="⭐"
               titulo="Mayor conexión"
               valor={resumen?.nodoMayorConexion || "Sin datos"}
-              texto="Nodo más conectado"
+              texto="Entidad con más conexiones"
               textValue
             />
 
@@ -184,14 +184,14 @@ function AnalisisRelacionesPage() {
               icono="📊"
               titulo="Conexiones máximas"
               valor={resumen?.gradoMayorConexion || 0}
-              texto="Grado más alto"
+              texto="Mayor actividad"
             />
           </section>
 
           <section style={panelStyle}>
             <div style={panelHeaderStyle}>
               <div>
-                <p style={eyebrowStyle}>CONSULTAS DEL GRAFO</p>
+                <p style={eyebrowStyle}>CONSULTAS</p>
                 <h2 style={titleStyle}>Consultas de relaciones</h2>
 
                 <p style={mutedTextStyle}>
@@ -201,7 +201,7 @@ function AnalisisRelacionesPage() {
               </div>
 
               <button type="button" onClick={cargarDatos} style={secondaryButton}>
-                Recargar grafo
+                Recargar relaciones
               </button>
             </div>
 
@@ -269,8 +269,8 @@ function AnalisisRelacionesPage() {
                 <h3 style={consultaTitleStyle}>Inmuebles similares</h3>
 
                 <p style={consultaTextStyle}>
-                  Busca inmuebles conectados o parecidos según la estructura de
-                  relaciones.
+                  Busca inmuebles conectados o parecidos según su comportamiento
+                  comercial.
                 </p>
 
                 <input
@@ -293,12 +293,12 @@ function AnalisisRelacionesPage() {
           <section style={panelStyle}>
             <div style={panelHeaderStyle}>
               <div>
-                <p style={eyebrowStyle}>NODOS</p>
+                <p style={eyebrowStyle}>ENTIDADES</p>
                 <h2 style={titleStyle}>Elementos relacionados</h2>
 
                 <p style={mutedTextStyle}>
-                  Cada elemento representa una entidad dentro del grafo:
-                  clientes, inmuebles, asesores o zonas.
+                  Cada elemento representa una entidad relacionada: clientes,
+                  inmuebles, asesores o zonas.
                 </p>
               </div>
             </div>
@@ -346,12 +346,12 @@ function AnalisisRelacionesPage() {
           <section style={panelStyle}>
             <div style={panelHeaderStyle}>
               <div>
-                <p style={eyebrowStyle}>ARISTAS</p>
+                <p style={eyebrowStyle}>CONEXIONES</p>
                 <h2 style={titleStyle}>Relaciones detectadas</h2>
 
                 <p style={mutedTextStyle}>
-                  Las relaciones muestran conexiones entre entidades y su peso o
-                  relevancia dentro del grafo.
+                  Las relaciones muestran conexiones entre entidades y su nivel
+                  de relevancia.
                 </p>
               </div>
             </div>
@@ -436,7 +436,7 @@ function ListadoRelaciones({ datos }) {
             {item.origen} <span style={arrowStyle}>→</span> {item.destino}
           </p>
 
-          <small style={resultWeightStyle}>Peso: {item.peso}</small>
+          <small style={resultWeightStyle}>Relevancia: {item.peso}</small>
         </div>
       ))}
     </div>

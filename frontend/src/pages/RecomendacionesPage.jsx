@@ -1,6 +1,7 @@
 import { useState } from "react";
 import recomendacionService from "../services/recomendacionService";
 import authService from "../services/authService";
+import solicitudRapidaHelper from "../utils/solicitudRapidaHelper";
 
 function RecomendacionesPage() {
   const rol = authService.getRol();
@@ -38,6 +39,25 @@ function RecomendacionesPage() {
       currency: "COP",
       maximumFractionDigits: 0,
     });
+  };
+
+  const crearSolicitudRapida = async (tipoSolicitud, inmueble) => {
+    try {
+      await solicitudRapidaHelper.crearSolicitudRapida(tipoSolicitud, inmueble);
+
+      if (tipoSolicitud === "COMPRA") {
+        alert("Intención de compra enviada correctamente.");
+      } else if (tipoSolicitud === "ARRIENDO") {
+        alert("Intención de arriendo enviada correctamente.");
+      } else if (tipoSolicitud === "VISITA") {
+        alert("Solicitud de visita enviada correctamente.");
+      } else {
+        alert("Solicitud de información enviada correctamente.");
+      }
+    } catch (error) {
+      console.error("Error al crear solicitud rápida:", error);
+      alert(error.message || "No se pudo enviar la solicitud.");
+    }
   };
 
   const obtenerMejorPuntaje = () => {
@@ -188,9 +208,11 @@ function RecomendacionesPage() {
                     <span style={chipStyle}>{inmueble.barrioZona}</span>
                     <span style={chipStyle}>{inmueble.habitaciones} hab.</span>
                     <span style={chipStyle}>{inmueble.area} m²</span>
+
                     {inmueble.banos !== undefined && (
                       <span style={chipStyle}>{inmueble.banos} baños</span>
                     )}
+
                     {inmueble.finalidad && (
                       <span style={chipStyle}>{inmueble.finalidad}</span>
                     )}
@@ -207,6 +229,46 @@ function RecomendacionesPage() {
                       {item.motivo || "Sin motivo registrado."}
                     </p>
                   </div>
+
+                  {rol === "CLIENTE" && (
+                    <div style={quickActionsStyle}>
+                      <button
+                        type="button"
+                        onClick={() => crearSolicitudRapida("VISITA", inmueble)}
+                        style={quickActionButton}
+                      >
+                        Solicitar visita
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => crearSolicitudRapida("COMPRA", inmueble)}
+                        style={quickBuyButton}
+                      >
+                        Me interesa comprar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          crearSolicitudRapida("ARRIENDO", inmueble)
+                        }
+                        style={quickRentButton}
+                      >
+                        Me interesa arrendar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          crearSolicitudRapida("INFORMACION", inmueble)
+                        }
+                        style={quickInfoButton}
+                      >
+                        Más información
+                      </button>
+                    </div>
+                  )}
                 </article>
               );
             })}
@@ -668,6 +730,55 @@ const reasonTextStyle = {
   margin: 0,
   lineHeight: 1.55,
   fontSize: "0.88rem",
+};
+
+const quickActionsStyle = {
+  display: "flex",
+  gap: "8px",
+  flexWrap: "wrap",
+  marginTop: "16px",
+  paddingTop: "14px",
+  borderTop: "1px solid #37333e",
+};
+
+const quickActionButton = {
+  padding: "9px 12px",
+  border: "1px solid #6d5f7a",
+  borderRadius: "12px",
+  background: "#3f2a57",
+  color: "#d2bbff",
+  fontWeight: "900",
+  cursor: "pointer",
+};
+
+const quickBuyButton = {
+  padding: "9px 12px",
+  border: "1px solid #225c37",
+  borderRadius: "12px",
+  background: "#12351f",
+  color: "#86efac",
+  fontWeight: "900",
+  cursor: "pointer",
+};
+
+const quickRentButton = {
+  padding: "9px 12px",
+  border: "1px solid #1d4ed8",
+  borderRadius: "12px",
+  background: "#10294f",
+  color: "#93c5fd",
+  fontWeight: "900",
+  cursor: "pointer",
+};
+
+const quickInfoButton = {
+  padding: "9px 12px",
+  border: "1px solid #826300",
+  borderRadius: "12px",
+  background: "#3a2d00",
+  color: "#ffd76a",
+  fontWeight: "900",
+  cursor: "pointer",
 };
 
 const criteriaGridStyle = {

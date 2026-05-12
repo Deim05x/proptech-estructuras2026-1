@@ -36,6 +36,10 @@ public class Cola<T> implements Iterable<T> {
         return tamaño;
     }
 
+    public int getTamano() {
+        return tamaño;
+    }
+
     /**
      * Encola un elemento (lo añade al final)
      * @param dato El dato a encolar

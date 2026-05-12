@@ -24,6 +24,10 @@ public class ColaPrioridad<T> {
         return tamaño;
     }
 
+    public int getTamano() {
+        return tamaño;
+    }
+
     public void encolar(T dato, int prioridad) {
         NodoPrioridad<T> nuevoNodo = new NodoPrioridad<>(dato, prioridad);
 

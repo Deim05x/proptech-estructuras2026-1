@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import ReportesPage from "./ReportesPage";
 import AnalisisRelacionesPage from "./AnalisisRelacionesPage";
+import BusquedaHashPage from "./BusquedaHashPage";
 
 function AnaliticaPage() {
   const [activeTab, setActiveTab] = useState("reportes");
@@ -20,6 +21,13 @@ function AnaliticaPage() {
       shortLabel: "Relaciones",
       icon: "🕸️",
       descripcion: "Relaciones entre clientes, inmuebles, asesores y zonas.",
+    },
+    {
+      id: "busqueda",
+      label: "Búsqueda rápida",
+      shortLabel: "Búsqueda",
+      icon: "⚡",
+      descripcion: "Consulta directa de registros clave del sistema.",
     },
   ];
 
@@ -65,8 +73,8 @@ function AnaliticaPage() {
 
         <InfoCard
           icono="🧠"
-          titulo="Decisiones"
-          texto="Apoyo visual para interpretar el comportamiento del negocio."
+          titulo="Búsqueda"
+          texto="Acceso rapido a informacion operativa."
         />
       </section>
 
@@ -132,6 +140,7 @@ function AnaliticaPage() {
       <section style={contentPanelStyle}>
         {activeTab === "reportes" && <ReportesPage />}
         {activeTab === "relaciones" && <AnalisisRelacionesPage />}
+        {activeTab === "busqueda" && <BusquedaHashPage />}
       </section>
     </div>
   );

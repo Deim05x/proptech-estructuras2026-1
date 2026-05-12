@@ -46,6 +46,25 @@ public class AuthService {
 
             authUsuarioRepository.guardar(admin);
         }
+
+        sembrarClienteSiNoExiste("cliente1", "Cliente123*", "CLI-001");
+        sembrarClienteSiNoExiste("cliente2", "Cliente123*", "CLI-002");
+    }
+
+    private void sembrarClienteSiNoExiste(String username, String password, String clienteId) {
+        if (authUsuarioRepository.existeUsername(username)) {
+            return;
+        }
+
+        AuthUsuario usuario = new AuthUsuario(
+                0,
+                username,
+                passwordEncoder.encode(password),
+                Role.CLIENTE,
+                clienteId,
+                true);
+
+        authUsuarioRepository.guardar(usuario);
     }
 
     public boolean registrarCliente(RegisterClienteRequest request) {

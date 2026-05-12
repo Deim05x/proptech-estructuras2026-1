@@ -1,50 +1,55 @@
 import { useEffect, useState } from "react";
-import alertaService from "../services/alertaService";
+import solicitudAtencionService from "../services/solicitudAtencionService";
 
-function AlertasPage() {
-  const [alertas, setAlertas] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [estadoFiltro, setEstadoFiltro] = useState("TODAS");
+function SolicitudesPage() {
+  const [solicitudes, setSolicitudes] = useState([]);
+  const [cargando, setCargando] = useState(false);
+  const [filtroEstado, setFiltroEstado] = useState("");
   const [cantidadCola, setCantidadCola] = useState(0);
-  const [cantidadColaPrioridad, setCantidadColaPrioridad] = useState(0);
+  const [cantidadPrioridad, setCantidadPrioridad] = useState(0);
+
+  const [procesamiento, setProcesamiento] = useState({
+    idAsesor: "",
+    respuesta: "",
+  });
 
   const [formulario, setFormulario] = useState({
     id: "",
-    tipo: "",
+    idCliente: "",
+    codigoInmueble: "",
+    tipoSolicitud: "ATENCION",
     descripcion: "",
-    nivelAtencion: "MEDIO",
     estado: "PENDIENTE",
+    prioridad: "MEDIA",
+    idAsesorAsignado: "",
+    respuesta: "",
   });
 
-  const cargarAlertas = async () => {
+  useEffect(() => {
+    cargarSolicitudes();
+  }, []);
+
+  const cargarSolicitudes = async () => {
     try {
       setCargando(true);
 
-      let data;
+      const data = filtroEstado
+        ? await solicitudAtencionService.listarPorEstado(filtroEstado)
+        : await solicitudAtencionService.listar();
 
-      if (estadoFiltro === "TODAS") {
-        data = await alertaService.listar();
-      } else {
-        data = await alertaService.listarPorEstado(estadoFiltro);
-      }
+      const cantidadNormal = await solicitudAtencionService.cantidadCola();
+      const cantidadPriori = await solicitudAtencionService.cantidadColaPrioridad();
 
-      const cantidadNormal = await alertaService.cantidadCola();
-      const cantidadPrioridad = await alertaService.cantidadColaPrioridad();
-
-      setAlertas(data || []);
+      setSolicitudes(data || []);
       setCantidadCola(cantidadNormal || 0);
-      setCantidadColaPrioridad(cantidadPrioridad || 0);
+      setCantidadPrioridad(cantidadPriori || 0);
     } catch (error) {
-      console.error("Error al cargar alertas:", error);
-      alert("No se pudieron cargar las alertas");
+      console.error("Error al cargar solicitudes:", error);
+      alert("No se pudieron cargar las solicitudes");
     } finally {
       setCargando(false);
     }
   };
-
-  useEffect(() => {
-    cargarAlertas();
-  }, [estadoFiltro]);
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
@@ -55,159 +60,130 @@ function AlertasPage() {
     });
   };
 
-  const limpiarFormulario = () => {
-    setFormulario({
-      id: "",
-      tipo: "",
-      descripcion: "",
-      nivelAtencion: "MEDIO",
-      estado: "PENDIENTE",
+  const manejarProcesamiento = (e) => {
+    const { name, value } = e.target;
+
+    setProcesamiento({
+      ...procesamiento,
+      [name]: value,
     });
   };
 
-  const crearAlerta = async (e) => {
+  const limpiarFormulario = () => {
+    setFormulario({
+      id: "",
+      idCliente: "",
+      codigoInmueble: "",
+      tipoSolicitud: "ATENCION",
+      descripcion: "",
+      estado: "PENDIENTE",
+      prioridad: "MEDIA",
+      idAsesorAsignado: "",
+      respuesta: "",
+    });
+  };
+
+  const crearSolicitud = async (e) => {
     e.preventDefault();
 
     try {
-      await alertaService.crear({
+      await solicitudAtencionService.crear({
         ...formulario,
         fechaCreacion: null,
+        fechaAtencion: null,
       });
 
-      alert("Alerta registrada correctamente");
+      alert("Solicitud registrada correctamente");
       limpiarFormulario();
-      cargarAlertas();
+      await cargarSolicitudes();
     } catch (error) {
-      console.error("Error al crear alerta:", error);
-      alert("No se pudo crear la alerta");
-    }
-  };
-
-  const generarAlertas = async () => {
-    try {
-      const respuesta = await alertaService.generarAutomaticas();
-      alert(respuesta);
-      cargarAlertas();
-    } catch (error) {
-      console.error("Error al generar alertas automáticas:", error);
-      alert("No se pudieron generar las alertas automáticas");
+      console.error("Error al crear solicitud:", error);
+      alert(error.response?.data || "No se pudo registrar la solicitud");
     }
   };
 
   const recargarCola = async () => {
     try {
-      await alertaService.recargarCola();
-      alert("Alertas pendientes actualizadas.");
-      cargarAlertas();
+      await solicitudAtencionService.recargarCola();
+      alert("Solicitudes pendientes actualizadas.");
+      await cargarSolicitudes();
     } catch (error) {
       console.error("Error al recargar pendientes:", error);
-      alert("No se pudieron recargar las alertas pendientes");
-    }
-  };
-
-  const procesarSiguiente = async () => {
-    try {
-      const respuesta = await alertaService.procesarSiguiente();
-
-      if (typeof respuesta === "string") {
-        alert("No hay alertas pendientes para procesar.");
-      } else {
-        alert(`Alerta procesada: ${respuesta.id}`);
-      }
-
-      cargarAlertas();
-    } catch (error) {
-      console.error("Error al procesar alerta:", error);
-      alert("No se pudo procesar la siguiente alerta");
+      alert("No se pudieron recargar los pendientes");
     }
   };
 
   const recargarColaPrioridad = async () => {
     try {
-      await alertaService.recargarColaPrioridad();
-      alert("Alertas prioritarias actualizadas.");
-      cargarAlertas();
+      await solicitudAtencionService.recargarColaPrioridad();
+      alert("Solicitudes prioritarias actualizadas.");
+      await cargarSolicitudes();
     } catch (error) {
       console.error("Error al recargar prioridad:", error);
-      alert("No se pudieron recargar las alertas prioritarias");
+      alert("No se pudieron recargar los casos prioritarios");
+    }
+  };
+
+  const procesarSiguiente = async () => {
+    try {
+      const data = await solicitudAtencionService.procesarSiguiente(
+        procesamiento.idAsesor,
+        procesamiento.respuesta
+      );
+
+      alert(`Solicitud procesada: ${data.id}`);
+      await cargarSolicitudes();
+    } catch (error) {
+      console.error("Error al procesar solicitud:", error);
+      alert(error.response?.data || "No se pudo procesar la solicitud");
     }
   };
 
   const procesarSiguientePrioritaria = async () => {
     try {
-      const respuesta = await alertaService.procesarSiguientePrioritaria();
+      const data = await solicitudAtencionService.procesarSiguientePrioritaria(
+        procesamiento.idAsesor,
+        procesamiento.respuesta
+      );
 
-      if (typeof respuesta === "string") {
-        alert("No hay alertas prioritarias para procesar.");
-      } else {
-        alert(
-          `Alerta prioritaria procesada: ${respuesta.id} - Nivel: ${respuesta.nivelAtencion}`
-        );
-      }
-
-      cargarAlertas();
+      alert(`Solicitud prioritaria procesada: ${data.id}`);
+      await cargarSolicitudes();
     } catch (error) {
-      console.error("Error al procesar alerta prioritaria:", error);
-      alert("No se pudo procesar la siguiente alerta prioritaria");
+      console.error("Error al procesar solicitud prioritaria:", error);
+      alert(error.response?.data || "No se pudo procesar la solicitud prioritaria");
     }
   };
 
   const cambiarEstado = async (id, estado) => {
     try {
-      await alertaService.cambiarEstado(id, estado);
+      await solicitudAtencionService.cambiarEstado(id, estado);
       alert("Estado actualizado correctamente");
-      cargarAlertas();
+      await cargarSolicitudes();
     } catch (error) {
       console.error("Error al cambiar estado:", error);
-      alert("No se pudo cambiar el estado de la alerta");
+      alert("No se pudo cambiar el estado");
+    }
+  };
+
+  const eliminarSolicitud = async (id) => {
+    const confirmar = window.confirm(`¿Seguro que deseas eliminar la solicitud ${id}?`);
+
+    if (!confirmar) return;
+
+    try {
+      await solicitudAtencionService.eliminar(id);
+      alert("Solicitud eliminada correctamente");
+      await cargarSolicitudes();
+    } catch (error) {
+      console.error("Error al eliminar solicitud:", error);
+      alert("No se pudo eliminar la solicitud");
     }
   };
 
   const contarPorEstado = (estado) => {
-    return alertas.filter(
-      (alerta) => (alerta.estado || "").toUpperCase() === estado
+    return solicitudes.filter(
+      (solicitud) => (solicitud.estado || "").toUpperCase() === estado
     ).length;
-  };
-
-  const contarCriticas = () => {
-    return alertas.filter((alerta) => {
-      const nivel = (alerta.nivelAtencion || "").toUpperCase();
-      return nivel === "CRITICO" || nivel === "CRÍTICO";
-    }).length;
-  };
-
-  const obtenerEstiloNivel = (nivel) => {
-    const valor = (nivel || "").toUpperCase();
-
-    if (valor === "CRITICO" || valor === "CRÍTICO") {
-      return {
-        background: "#3a1218",
-        color: "#ffb4ab",
-        border: "1px solid #7a2c35",
-      };
-    }
-
-    if (valor === "ALTO") {
-      return {
-        background: "#3a2d00",
-        color: "#ffd76a",
-        border: "1px solid #826300",
-      };
-    }
-
-    if (valor === "MEDIO") {
-      return {
-        background: "#3f2a57",
-        color: "#d2bbff",
-        border: "1px solid #6d5f7a",
-      };
-    }
-
-    return {
-      background: "#12351f",
-      color: "#86efac",
-      border: "1px solid #225c37",
-    };
   };
 
   const obtenerEstiloEstado = (estado) => {
@@ -221,7 +197,15 @@ function AlertasPage() {
       };
     }
 
-    if (valor === "REVISADA") {
+    if (valor === "EN_ATENCION") {
+      return {
+        background: "#10294f",
+        color: "#93c5fd",
+        border: "1px solid #1d4ed8",
+      };
+    }
+
+    if (valor === "ATENDIDA") {
       return {
         background: "#12351f",
         color: "#86efac",
@@ -229,7 +213,7 @@ function AlertasPage() {
       };
     }
 
-    if (valor === "DESCARTADA") {
+    if (valor === "RECHAZADA" || valor === "CANCELADA") {
       return {
         background: "#3a1218",
         color: "#ffb4ab",
@@ -244,77 +228,99 @@ function AlertasPage() {
     };
   };
 
+  const obtenerEstiloPrioridad = (prioridad) => {
+    const valor = (prioridad || "").toUpperCase();
+
+    if (valor === "ALTA") {
+      return {
+        background: "#3a1218",
+        color: "#ffb4ab",
+        border: "1px solid #7a2c35",
+      };
+    }
+
+    if (valor === "MEDIA") {
+      return {
+        background: "#3f2a57",
+        color: "#d2bbff",
+        border: "1px solid #6d5f7a",
+      };
+    }
+
+    return {
+      background: "#12351f",
+      color: "#86efac",
+      border: "1px solid #225c37",
+    };
+  };
+
   return (
     <div style={pageStyle}>
       <style>{animations}</style>
 
       <section style={headerStyle}>
         <div>
-          <p style={eyebrowStyle}>ATENCIÓN OPERATIVA</p>
+          <p style={eyebrowStyle}>ATENCIÓN COMERCIAL</p>
 
           <h1 style={mainTitleStyle}>
-            Gestión de <span style={titleAccentStyle}>alertas</span>
+            Gestión de <span style={titleAccentStyle}>solicitudes</span>
           </h1>
 
           <p style={descriptionStyle}>
-            Genera, revisa y atiende alertas operativas según su nivel de
-            urgencia y prioridad.
+            Administra solicitudes de atención, visitas, compra, arriendo e
+            información, priorizando los casos que requieren respuesta urgente.
           </p>
         </div>
 
         <div style={headerBadgeStyle}>
           <span style={statusDotStyle}></span>
-          <span>{alertas.length} alertas</span>
+          <span>{solicitudes.length} solicitudes</span>
         </div>
       </section>
 
       <section style={summaryGridStyle}>
         <SummaryCard
-          icono="🚨"
-          titulo="Total alertas"
-          valor={alertas.length}
-          texto="Registros cargados"
+          icono="📩"
+          titulo="Total"
+          valor={solicitudes.length}
+          texto="Solicitudes registradas"
         />
 
         <SummaryCard
           icono="⏳"
           titulo="Pendientes"
           valor={contarPorEstado("PENDIENTE")}
-          texto="Sin revisar"
+          texto="En espera de atención"
         />
 
         <SummaryCard
           icono="📥"
           titulo="Pendientes generales"
           valor={cantidadCola}
-          texto="Pendientes generales"
+          texto="Solicitudes por atender"
         />
 
         <SummaryCard
           icono="⚡"
           titulo="Prioridad"
-          valor={cantidadColaPrioridad}
-          texto={`${contarCriticas()} críticas`}
-          danger
+          valor={cantidadPrioridad}
+          texto="Casos urgentes"
         />
       </section>
 
       <section style={panelStyle}>
         <div style={panelHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>NUEVA ALERTA</p>
-            <h2 style={titleStyle}>Crear alerta manual</h2>
+            <p style={eyebrowStyle}>NUEVA SOLICITUD</p>
+            <h2 style={titleStyle}>Registrar solicitud manual</h2>
           </div>
-
-          <span style={modeBadgeStyle}>Registro manual</span>
         </div>
 
-        <form onSubmit={crearAlerta}>
+        <form onSubmit={crearSolicitud}>
           <div style={formGridStyle}>
             <input
-              type="text"
               name="id"
-              placeholder="ID alerta, ejemplo: AL-001"
+              placeholder="ID solicitud, ejemplo: SOL-001"
               value={formulario.id}
               onChange={manejarCambio}
               required
@@ -322,25 +328,44 @@ function AlertasPage() {
             />
 
             <input
-              type="text"
-              name="tipo"
-              placeholder="Tipo, ejemplo: VISITA_PENDIENTE"
-              value={formulario.tipo}
+              name="idCliente"
+              placeholder="ID cliente, ejemplo: CLI-001"
+              value={formulario.idCliente}
               onChange={manejarCambio}
               required
               style={inputStyle}
             />
 
+            <input
+              name="codigoInmueble"
+              placeholder="Código inmueble, ejemplo: INM-001"
+              value={formulario.codigoInmueble}
+              onChange={manejarCambio}
+              style={inputStyle}
+            />
+
             <select
-              name="nivelAtencion"
-              value={formulario.nivelAtencion}
+              name="tipoSolicitud"
+              value={formulario.tipoSolicitud}
               onChange={manejarCambio}
               style={inputStyle}
             >
-              <option value="BAJO">BAJO</option>
-              <option value="MEDIO">MEDIO</option>
-              <option value="ALTO">ALTO</option>
-              <option value="CRITICO">CRÍTICO</option>
+              <option value="ATENCION">ATENCIÓN</option>
+              <option value="VISITA">VISITA</option>
+              <option value="COMPRA">COMPRA</option>
+              <option value="ARRIENDO">ARRIENDO</option>
+              <option value="INFORMACION">INFORMACIÓN</option>
+            </select>
+
+            <select
+              name="prioridad"
+              value={formulario.prioridad}
+              onChange={manejarCambio}
+              style={inputStyle}
+            >
+              <option value="BAJA">BAJA</option>
+              <option value="MEDIA">MEDIA</option>
+              <option value="ALTA">ALTA</option>
             </select>
 
             <select
@@ -350,13 +375,15 @@ function AlertasPage() {
               style={inputStyle}
             >
               <option value="PENDIENTE">PENDIENTE</option>
-              <option value="REVISADA">REVISADA</option>
-              <option value="DESCARTADA">DESCARTADA</option>
+              <option value="EN_ATENCION">EN ATENCIÓN</option>
+              <option value="ATENDIDA">ATENDIDA</option>
+              <option value="RECHAZADA">RECHAZADA</option>
+              <option value="CANCELADA">CANCELADA</option>
             </select>
 
             <textarea
               name="descripcion"
-              placeholder="Descripción de la alerta"
+              placeholder="Descripción de la solicitud"
               value={formulario.descripcion}
               onChange={manejarCambio}
               required
@@ -366,7 +393,7 @@ function AlertasPage() {
 
           <div style={buttonRowStyle}>
             <button type="submit" style={primaryButton}>
-              Guardar alerta
+              Registrar solicitud
             </button>
 
             <button type="button" onClick={limpiarFormulario} style={secondaryButton}>
@@ -379,22 +406,54 @@ function AlertasPage() {
       <section style={panelStyle}>
         <div style={panelHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>AUTOMATIZACIÓN</p>
-            <h2 style={titleStyle}>Acciones automáticas</h2>
+            <p style={eyebrowStyle}>PROCESAMIENTO</p>
+            <h2 style={titleStyle}>Atención de solicitudes</h2>
 
             <p style={mutedTextStyle}>
-              Procesa alertas pendientes y prioriza los casos más urgentes.
+              Procesa la siguiente solicitud pendiente o atiende primero una de
+              alta prioridad.
             </p>
           </div>
 
           <span style={filterBadgeStyle}>
-            {estadoFiltro === "TODAS" ? "Todas" : estadoFiltro}
+            {filtroEstado || "Todas"}
           </span>
         </div>
 
-        <div style={actionsGridStyle}>
-          <button onClick={generarAlertas} style={primaryButton}>
-            Generar alertas automáticas
+        <div style={formGridStyle}>
+          <input
+            name="idAsesor"
+            placeholder="ID asesor asignado, ejemplo: ASE-001"
+            value={procesamiento.idAsesor}
+            onChange={manejarProcesamiento}
+            style={inputStyle}
+          />
+
+          <input
+            name="respuesta"
+            placeholder="Respuesta o nota de atención"
+            value={procesamiento.respuesta}
+            onChange={manejarProcesamiento}
+            style={inputStyle}
+          />
+
+          <select
+            value={filtroEstado}
+            onChange={(e) => setFiltroEstado(e.target.value)}
+            style={inputStyle}
+          >
+            <option value="">Todas</option>
+            <option value="PENDIENTE">Pendientes</option>
+            <option value="EN_ATENCION">En atención</option>
+            <option value="ATENDIDA">Atendidas</option>
+            <option value="RECHAZADA">Rechazadas</option>
+            <option value="CANCELADA">Canceladas</option>
+          </select>
+        </div>
+
+        <div style={buttonRowStyle}>
+          <button onClick={cargarSolicitudes} style={primaryButton}>
+            Aplicar filtro
           </button>
 
           <button onClick={recargarCola} style={secondaryButton}>
@@ -406,23 +465,12 @@ function AlertasPage() {
           </button>
 
           <button onClick={recargarColaPrioridad} style={priorityButton}>
-            Recargar alta prioridad
+            Recargar prioridad
           </button>
 
           <button onClick={procesarSiguientePrioritaria} style={priorityButton}>
-            Procesar alta prioridad
+            Procesar prioridad
           </button>
-
-          <select
-            value={estadoFiltro}
-            onChange={(e) => setEstadoFiltro(e.target.value)}
-            style={inputStyle}
-          >
-            <option value="TODAS">Todas</option>
-            <option value="PENDIENTE">Pendientes</option>
-            <option value="REVISADA">Revisadas</option>
-            <option value="DESCARTADA">Descartadas</option>
-          </select>
         </div>
       </section>
 
@@ -430,48 +478,51 @@ function AlertasPage() {
         <div style={panelHeaderStyle}>
           <div>
             <p style={eyebrowStyle}>REGISTROS</p>
-            <h2 style={titleStyle}>Listado de alertas</h2>
+            <h2 style={titleStyle}>Listado de solicitudes</h2>
           </div>
 
-          <button type="button" onClick={cargarAlertas} style={secondaryButton}>
+          <button onClick={cargarSolicitudes} style={secondaryButton}>
             Recargar
           </button>
         </div>
 
         {cargando ? (
-          <EmptyState texto="Cargando alertas..." />
-        ) : alertas.length === 0 ? (
-          <EmptyState texto="No hay alertas registradas." />
+          <EmptyState texto="Cargando solicitudes..." />
+        ) : solicitudes.length === 0 ? (
+          <EmptyState texto="No hay solicitudes registradas." />
         ) : (
           <div style={tableWrapperStyle}>
             <table style={tableStyle}>
               <thead>
                 <tr>
                   <th style={thStyle}>ID</th>
+                  <th style={thStyle}>Cliente</th>
+                  <th style={thStyle}>Inmueble</th>
                   <th style={thStyle}>Tipo</th>
-                  <th style={thStyle}>Descripción</th>
-                  <th style={thStyle}>Nivel</th>
+                  <th style={thStyle}>Prioridad</th>
                   <th style={thStyle}>Estado</th>
-                  <th style={thStyle}>Fecha</th>
+                  <th style={thStyle}>Asesor</th>
+                  <th style={thStyle}>Descripción</th>
                   <th style={thStyle}>Acciones</th>
                 </tr>
               </thead>
 
               <tbody>
-                {alertas.map((alerta) => (
-                  <tr key={alerta.id}>
-                    <td style={tdStrongStyle}>{alerta.id}</td>
-                    <td style={tdStyle}>{alerta.tipo}</td>
-                    <td style={tdDescriptionStyle}>{alerta.descripcion}</td>
+                {solicitudes.map((solicitud) => (
+                  <tr key={solicitud.id}>
+                    <td style={tdStrongStyle}>{solicitud.id}</td>
+                    <td style={tdStyle}>{solicitud.idCliente}</td>
+                    <td style={tdStyle}>{solicitud.codigoInmueble || "—"}</td>
+                    <td style={tdStyle}>{solicitud.tipoSolicitud}</td>
 
                     <td style={tdStyle}>
                       <span
                         style={{
                           ...pillStyle,
-                          ...obtenerEstiloNivel(alerta.nivelAtencion),
+                          ...obtenerEstiloPrioridad(solicitud.prioridad),
                         }}
                       >
-                        {alerta.nivelAtencion}
+                        {solicitud.prioridad}
                       </span>
                     </td>
 
@@ -479,29 +530,37 @@ function AlertasPage() {
                       <span
                         style={{
                           ...pillStyle,
-                          ...obtenerEstiloEstado(alerta.estado),
+                          ...obtenerEstiloEstado(solicitud.estado),
                         }}
                       >
-                        {alerta.estado}
+                        {solicitud.estado}
                       </span>
                     </td>
 
-                    <td style={tdStyle}>{alerta.fechaCreacion || "—"}</td>
+                    <td style={tdStyle}>{solicitud.idAsesorAsignado || "—"}</td>
+                    <td style={tdDescriptionStyle}>{solicitud.descripcion}</td>
 
                     <td style={tdStyle}>
                       <div style={actionRowStyle}>
                         <button
-                          onClick={() => cambiarEstado(alerta.id, "REVISADA")}
+                          onClick={() => cambiarEstado(solicitud.id, "ATENDIDA")}
                           style={miniSuccessButton}
                         >
-                          Revisar
+                          Atendida
                         </button>
 
                         <button
-                          onClick={() => cambiarEstado(alerta.id, "DESCARTADA")}
+                          onClick={() => cambiarEstado(solicitud.id, "RECHAZADA")}
                           style={miniDangerButton}
                         >
-                          Descartar
+                          Rechazar
+                        </button>
+
+                        <button
+                          onClick={() => eliminarSolicitud(solicitud.id)}
+                          style={miniDangerButton}
+                        >
+                          Eliminar
                         </button>
                       </div>
                     </td>
@@ -516,28 +575,15 @@ function AlertasPage() {
   );
 }
 
-function SummaryCard({ icono, titulo, valor, texto, danger }) {
+function SummaryCard({ icono, titulo, valor, texto }) {
   return (
-    <article
-      style={{
-        ...summaryCardStyle,
-        border: danger ? "1px solid #7a2c35" : "1px solid #37333e",
-      }}
-    >
-      <div
-        style={{
-          ...summaryIconStyle,
-          background: danger ? "#3a1218" : "#3f2a57",
-          border: danger ? "1px solid #7a2c35" : "1px solid #6d5f7a",
-        }}
-      >
-        {icono}
-      </div>
+    <article style={summaryCardStyle}>
+      <div style={summaryIconStyle}>{icono}</div>
 
       <div>
         <p style={summaryTitleStyle}>{titulo}</p>
         <strong style={summaryValueStyle}>{valor}</strong>
-        <small style={danger ? dangerTextStyle : summaryTextStyle}>{texto}</small>
+        <small style={summaryTextStyle}>{texto}</small>
       </div>
     </article>
   );
@@ -546,14 +592,14 @@ function SummaryCard({ icono, titulo, valor, texto, danger }) {
 function EmptyState({ texto }) {
   return (
     <div style={emptyStateStyle}>
-      <span style={{ fontSize: "2rem" }}>🚨</span>
+      <span style={{ fontSize: "2rem" }}>📩</span>
       <p>{texto}</p>
     </div>
   );
 }
 
 const animations = `
-  @keyframes fadeUpAlertas {
+  @keyframes fadeUpSolicitudes {
     from {
       opacity: 0;
       transform: translateY(18px);
@@ -565,7 +611,7 @@ const animations = `
     }
   }
 
-  @keyframes pulseAlertas {
+  @keyframes pulseSolicitudes {
     0%, 100% {
       opacity: 1;
       transform: scale(1);
@@ -583,7 +629,7 @@ const animations = `
 `;
 
 const pageStyle = {
-  animation: "fadeUpAlertas 0.55s ease both",
+  animation: "fadeUpSolicitudes 0.55s ease both",
 };
 
 const headerStyle = {
@@ -649,7 +695,7 @@ const statusDotStyle = {
   borderRadius: "50%",
   background: "#22c55e",
   boxShadow: "0 0 14px rgba(34,197,94,0.8)",
-  animation: "pulseAlertas 1.8s ease-in-out infinite",
+  animation: "pulseSolicitudes 1.8s ease-in-out infinite",
 };
 
 const summaryGridStyle = {
@@ -663,6 +709,7 @@ const summaryCardStyle = {
   padding: "16px",
   borderRadius: "22px",
   background: "#2c2833",
+  border: "1px solid #37333e",
   boxShadow: "0 18px 38px rgba(0,0,0,0.18)",
   display: "flex",
   alignItems: "center",
@@ -674,6 +721,8 @@ const summaryIconStyle = {
   height: "46px",
   minWidth: "46px",
   borderRadius: "16px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -699,12 +748,6 @@ const summaryValueStyle = {
 const summaryTextStyle = {
   display: "block",
   color: "#8f849e",
-  marginTop: "3px",
-};
-
-const dangerTextStyle = {
-  display: "block",
-  color: "#ffb4ab",
   marginTop: "3px",
 };
 
@@ -736,6 +779,7 @@ const titleStyle = {
 const mutedTextStyle = {
   color: "#9f92b2",
   margin: "6px 0 0",
+  lineHeight: 1.55,
 };
 
 const formGridStyle = {
@@ -759,7 +803,6 @@ const textareaStyle = {
   ...inputStyle,
   gridColumn: "1 / -1",
   minHeight: "90px",
-  paddingTop: "12px",
   resize: "vertical",
 };
 
@@ -768,12 +811,6 @@ const buttonRowStyle = {
   gap: "10px",
   flexWrap: "wrap",
   marginTop: "16px",
-};
-
-const actionsGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-  gap: "10px",
 };
 
 const primaryButton = {
@@ -805,25 +842,18 @@ const priorityButton = {
   color: "#ffb4ab",
   fontWeight: "900",
   cursor: "pointer",
-  boxShadow: "0 14px 28px rgba(127,29,29,0.22)",
 };
 
-const modeBadgeStyle = {
+const filterBadgeStyle = {
   padding: "8px 12px",
   borderRadius: "999px",
-  background: "#3f2a57",
-  border: "1px solid #6d5f7a",
+  background: "#15121b",
+  border: "1px solid #37333e",
   color: "#d2bbff",
   fontWeight: "900",
   fontSize: "0.76rem",
   textTransform: "uppercase",
   letterSpacing: "0.08em",
-};
-
-const filterBadgeStyle = {
-  ...modeBadgeStyle,
-  background: "#15121b",
-  border: "1px solid #37333e",
 };
 
 const tableWrapperStyle = {
@@ -864,7 +894,7 @@ const tdStrongStyle = {
 
 const tdDescriptionStyle = {
   ...tdStyle,
-  minWidth: "260px",
+  minWidth: "240px",
   lineHeight: 1.45,
 };
 
@@ -911,4 +941,4 @@ const emptyStateStyle = {
   textAlign: "center",
 };
 
-export default AlertasPage;
+export default SolicitudesPage;

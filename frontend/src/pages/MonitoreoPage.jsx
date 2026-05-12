@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import AlertasPage from "./AlertasPage";
 import EventosInusualesPage from "./EventosInusualesPage";
+import MotorAlertasPage from "./MotorAlertasPage";
+import ValidacionesPage from "./ValidacionesPage";
 
 function MonitoreoPage() {
   const [activeTab, setActiveTab] = useState("alertas");
@@ -12,7 +14,7 @@ function MonitoreoPage() {
       label: "Alertas",
       shortLabel: "Alertas",
       icon: "🚨",
-      descripcion: "Cola de alertas, prioridad y seguimiento operativo.",
+      descripcion: "Alertas, prioridad y seguimiento operativo.",
     },
     {
       id: "eventos",
@@ -20,6 +22,20 @@ function MonitoreoPage() {
       shortLabel: "Eventos",
       icon: "📊",
       descripcion: "Registro de situaciones anómalas o patrones relevantes.",
+    },
+    {
+      id: "motor",
+      label: "Motor de alertas",
+      shortLabel: "Motor",
+      icon: "⚡",
+      descripcion: "Generacion de alertas comerciales y operativas.",
+    },
+    {
+      id: "validaciones",
+      label: "Validaciones",
+      shortLabel: "Validar",
+      icon: "✅",
+      descripcion: "Revision de reglas y controles del negocio.",
     },
   ];
 
@@ -65,8 +81,14 @@ function MonitoreoPage() {
 
         <InfoCard
           icono="⚡"
-          titulo="Prioridad"
-          texto="Atención ordenada según nivel de importancia."
+          titulo="Motor"
+          texto="Generacion de alertas por estado y prioridad."
+        />
+
+        <InfoCard
+          icono="✅"
+          titulo="Validaciones"
+          texto="Controles internos para mantener datos consistentes."
         />
       </section>
 
@@ -132,6 +154,8 @@ function MonitoreoPage() {
       <section style={contentPanelStyle}>
         {activeTab === "alertas" && <AlertasPage />}
         {activeTab === "eventos" && <EventosInusualesPage />}
+        {activeTab === "motor" && <MotorAlertasPage />}
+        {activeTab === "validaciones" && <ValidacionesPage />}
       </section>
     </div>
   );

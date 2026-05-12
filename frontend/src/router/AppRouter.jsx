@@ -26,6 +26,15 @@ import GestionInmobiliariaPage from "../pages/GestionInmobiliariaPage.jsx";
 import PersonasPage from "../pages/PersonasPage";
 import MonitoreoPage from "../pages/MonitoreoPage";
 import AnaliticaPage from "../pages/AnaliticaPage";
+import ComercialPage from "../pages/ComercialPage";
+import CatalogoClientePage from "../pages/CatalogoClientePage";
+import ContratosPage from "../pages/ContratosPage";
+import SolicitudesPage from "../pages/SolicitudesPage";
+import MisSolicitudesPage from "../pages/MisSolicitudesPage";
+import RangoPrecioPage from "../pages/RangoPrecioPage";
+import BusquedaHashPage from "../pages/BusquedaHashPage";
+import MotorAlertasPage from "../pages/MotorAlertasPage";
+import ValidacionesPage from "../pages/ValidacionesPage";
 function AppRouter() {
   return (
     <Routes>
@@ -42,33 +51,106 @@ function AppRouter() {
       />
 
       <Route
+        path="/comercial"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <ComercialPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/catalogo-cliente"
+        element={
+          <ProtectedRoute rolesPermitidos={["CLIENTE"]}>
+            <CatalogoClientePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/rangos-precio"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN", "CLIENTE"]}>
+            <RangoPrecioPage />
+          </ProtectedRoute>
+        }
+      />
+
+     <Route path="/validaciones" 
+      element={
+        <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+          <ValidacionesPage />
+        </ProtectedRoute>
+      }
+       />
+
+<Route 
+path="/Busqueda-Hash" 
+element={
+<ProtectedRoute rolesPermitidos={["ADMIN"]}>
+  <BusquedaHashPage />
+</ProtectedRoute>
+}
+/>
+<Route
+path="/busqueda-hash"
+element={
+<ProtectedRoute rolesPermitidos={["ADMIN"]}>
+  <BusquedaHashPage />
+</ProtectedRoute>
+}
+/>
+<Route path="/motor-alertas" element={
+  <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+    <MotorAlertasPage />
+  </ProtectedRoute>
+} />
+
+     <Route
         path="/clientes"
         element={
           <ProtectedRoute rolesPermitidos={["ADMIN"]}>
             <ClientesPage />
           </ProtectedRoute>
-          
-        }
-        
+
+        } 
       />
-      <Route
-  path="/mi-actividad"
+<Route
+  path="/mis-solicitudes"
   element={
     <ProtectedRoute rolesPermitidos={["CLIENTE"]}>
-      <MiActividadPage />
+      <MisSolicitudesPage />
     </ProtectedRoute>
   }
 />
 
-      <Route
-  path="/asesores"
+<Route
+  path="/solicitudes"
   element={
     <ProtectedRoute rolesPermitidos={["ADMIN"]}>
-      <AsesoresModuloPage />
+      <SolicitudesPage />
     </ProtectedRoute>
   }
 />
-    
+      <Route
+        path="/mi-actividad"
+        element={
+          <ProtectedRoute rolesPermitidos={["CLIENTE"]}>
+            <MiActividadPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/asesores"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <AsesoresModuloPage />
+          </ProtectedRoute>
+        }
+      />
+
 
       <Route
         path="/rotacion-asesores"
@@ -175,71 +257,78 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
-<Route
-  path="/descubrir-inmuebles"
-  element={
-    <ProtectedRoute rolesPermitidos={["ADMIN", "CLIENTE"]}>
-      <DescubrirInmueblesPage />
-    </ProtectedRoute>
-  }
-/> 
+      <Route
+        path="/descubrir-inmuebles"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN", "CLIENTE"]}>
+            <DescubrirInmueblesPage />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/analisis-relaciones"
-  element={
-    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
-      <AnalisisRelacionesPage />
-    </ProtectedRoute>
-  }
-/> 
+      <Route
+        path="/analisis-relaciones"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <AnalisisRelacionesPage />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/inmuebles-admin"
-  element={
-    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
-      <GestionInmobiliariaPage />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/inmuebles-admin"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <GestionInmobiliariaPage />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/personas"
-  element={
-    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
-      <PersonasPage />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/personas"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <PersonasPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/contratos"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <ContratosPage />
+          </ProtectedRoute>
+        } />
+      <Route
+        path="/monitoreo"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <MonitoreoPage />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/monitoreo"
-  element={
-    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
-      <MonitoreoPage />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/analitica"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <AnaliticaPage />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/analitica"
-  element={
-    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
-      <AnaliticaPage />
-    </ProtectedRoute>
-  }
-/>
+      <Route path="/registro-cliente" element={<RegistroClientePage />} />
 
-<Route path="/registro-cliente" element={<RegistroClientePage />} />
+      <Route
+        path="/eventos-inusuales"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <EventosInusualesPage />
+          </ProtectedRoute>
+        }
+      />
+    </Routes> 
 
-<Route
-  path="/eventos-inusuales"
-  element={
-    <ProtectedRoute rolesPermitidos={["ADMIN"]}>
-      <EventosInusualesPage />
-    </ProtectedRoute>
-  }
-/>
-    </Routes>
+    
 
 
 

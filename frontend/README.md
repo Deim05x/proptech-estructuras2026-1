@@ -1,14 +1,16 @@
-# Frontend
+# Frontend PropTech
 
-Este directorio contiene la aplicación cliente del proyecto, construida con React + Vite.
+Aplicacion cliente construida con React + Vite para consumir la API del backend PropTech.
 
 ## Stack
 
 - React 19
+- React Router
+- Axios
 - Vite 8
 - ESLint 9
 
-## Scripts disponibles
+## Scripts
 
 ```powershell
 npm install
@@ -18,51 +20,43 @@ npm run lint
 npm run preview
 ```
 
-## Estado actual
+## Diseno
 
-En el estado actual del repositorio, el frontend todavía está en una fase inicial:
+La interfaz esta organizada por rutas protegidas y por rol:
 
-- [src/main.jsx](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/frontend/src/main.jsx) monta `App.jsx`.
-- [src/App.jsx](/c:/Users/mateo/OneDrive/Documents/proptech-estructuras2026-1/frontend/src/App.jsx) conserva la interfaz base de la plantilla de Vite/React.
-- Existen carpetas para `pages`, `components`, `router` y `services`, preparadas para la construcción de la interfaz del sistema.
-- Varios archivos de esas carpetas están vacíos y aún no contienen lógica funcional.
+- `src/router/AppRouter.jsx`: define rutas y permisos.
+- `src/components/Sidebar.jsx`: muestra los modulos disponibles para administrador o cliente.
+- `src/components/ProtectedRoute.jsx`: valida sesion y rol permitido.
+- `src/services/api.js`: configura Axios con `http://localhost:8080/api` y token Bearer.
+- `src/pages`: contiene las vistas funcionales.
 
-## Estructura base
+## Modulos
 
-```text
-frontend/
-|-- public/
-|-- src/
-|   |-- components/
-|   |-- pages/
-|   |-- router/
-|   |-- services/
-|   |-- App.jsx
-|   `-- main.jsx
-|-- package.json
-`-- vite.config.js
-```
+Administrador:
 
-## Objetivo esperado
+- Panel principal
+- Inmuebles
+- Personas
+- Comercial
+- Monitoreo
+- Analitica
 
-La estructura creada sugiere una futura interfaz para:
+Cliente:
 
-- dashboard
-- inmuebles
-- clientes
-- asesores
-- visitas
-- alertas
-- operaciones
+- Inicio
+- Catalogo
+- Mi actividad
+- Mis solicitudes
 
-Sin embargo, esa navegación todavía no está implementada ni conectada al backend.
+## Relacion con Estructuras del Backend
 
-## Relación con el backend
+El frontend no implementa estructuras de datos propias. Su responsabilidad es presentar y operar los flujos que el backend resuelve con estructuras Java:
 
-La API del proyecto vive en `backend/` y se ejecuta por defecto en:
+- Rangos de precio consume resultados generados con arbol de precios.
+- Busqueda rapida consume resultados de tabla hash.
+- Rotacion de asesores consume la rueda circular del backend.
+- Solicitudes consume colas normal y prioritaria.
+- Analisis de relaciones consume el grafo de relaciones.
+- Historial consume recorridos de lista doble y pila.
 
-```text
-http://localhost:8080
-```
-
-Cuando el frontend evolucione, la carpeta `src/services` puede centralizar las llamadas HTTP hacia esa API.
+El detalle completo esta documentado en el README principal del repositorio.

@@ -4,6 +4,7 @@ import InmueblesPage from "./InmueblesPage";
 import DescubrirInmueblesPage from "./DescubrirInmueblesPage";
 import CarruselInmueblesPage from "./CarruselInmueblesPage";
 import OrdenamientoPage from "./OrdenamientoPage";
+import RangoPrecioPage from "./RangoPrecioPage";
 
 function GestionInmobiliariaPage() {
   const [activeTab, setActiveTab] = useState("inmuebles");
@@ -36,6 +37,13 @@ function GestionInmobiliariaPage() {
       shortLabel: "Organizar",
       icon: "🌳",
       descripcion: "Clasificacion y organizacion del catalogo comercial.",
+    },
+    {
+      id: "rangos",
+      label: "Rangos de precio",
+      shortLabel: "Rangos",
+      icon: "💰",
+      descripcion: "Consulta de inmuebles por valor de referencia.",
     },
   ];
 
@@ -88,6 +96,12 @@ function GestionInmobiliariaPage() {
           icono="🌳"
           titulo="Organizacion"
           texto="Organizacion clara del inventario."
+        />
+
+        <InfoCard
+          icono="💰"
+          titulo="Rangos"
+          texto="Segmentacion del catalogo por precio."
         />
       </section>
 
@@ -155,6 +169,7 @@ function GestionInmobiliariaPage() {
         {activeTab === "descubrir" && <DescubrirInmueblesPage />}
         {activeTab === "carrusel" && <CarruselInmueblesPage />}
         {activeTab === "ordenamiento" && <OrdenamientoPage />}
+        {activeTab === "rangos" && <RangoPrecioPage />}
       </section>
     </div>
   );

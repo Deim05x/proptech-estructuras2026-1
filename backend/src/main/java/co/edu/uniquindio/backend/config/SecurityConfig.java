@@ -33,7 +33,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
@@ -51,26 +51,34 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register-cliente").permitAll()
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/inmuebles/**",
                                 "/api/carrusel-inmuebles/**",
                                 "/api/recomendaciones/**",
-                                "/api/ordenamientos/**")
+                                "/api/ordenamientos/**",
+                                "/api/rangos-precio/**")
                         .authenticated()
                         .requestMatchers("/api/clientes/**").authenticated()
+                        .requestMatchers("/api/busqueda-hash/**").hasAnyRole("ADMIN", "CLIENTE")
                         .requestMatchers("/api/visitas/**").authenticated()
+                        .requestMatchers("/api/validaciones/**").hasRole("ADMIN")
+                        .requestMatchers("/api/solicitudes/**").authenticated()
                         .requestMatchers(
-        "/api/asesores/**",
-        "/api/rotacion-asesores/**",
-        "/api/operaciones/**",
-        "/api/alertas/**",
-        "/api/reportes/**",
-        "/api/grafos/**",
-        "/api/historial-inmuebles/**",
-        "/api/eventos-inusuales/**"
-).hasRole("ADMIN")
+                                "/api/asesores/**",
+                                "/api/rotacion-asesores/**",
+                                "/api/operaciones/**",
+                                "/api/alertas/**",
+                                "/api/contratos/**",
+                                "/api/reportes/**",
+                                "/api/grafos/**",
+                                "/api/historial-inmuebles/**",
+                                "/api/eventos-inusuales/**",
+                                "/api/motor-alertas",
+                                "/api/motor-alertas/**")
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated());
 
         return http.build();

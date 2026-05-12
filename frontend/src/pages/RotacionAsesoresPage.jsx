@@ -72,16 +72,15 @@ function RotacionAsesoresPage() {
 
       <section style={headerStyle}>
         <div>
-          <p style={eyebrowStyle}>LISTA CIRCULAR</p>
+          <p style={eyebrowStyle}>ASIGNACIÓN COMERCIAL</p>
 
           <h1 style={mainTitleStyle}>
             Rotación de <span style={titleAccentStyle}>asesores</span>
           </h1>
 
           <p style={descriptionStyle}>
-            Gestiona la rueda de atención comercial usando una estructura
-            circular. Permite obtener el siguiente asesor, reiniciar la rotación
-            y recargar la rueda desde el backend.
+            Gestiona la rueda de atención comercial, consulta el turno activo y
+            mantén equilibrada la asignación de asesores.
           </p>
         </div>
 
@@ -152,8 +151,8 @@ function RotacionAsesoresPage() {
             value={cargando ? "Cargando" : "Sincronizado"}
           />
           <InfoRow
-            label="Estructura"
-            value="Lista circular"
+            label="Asignación"
+            value="Rotación activa"
           />
         </div>
 

@@ -92,6 +92,16 @@ function InicioClientePage() {
             boton="Ver actividad"
             onClick={() => navigate("/mi-actividad")}
           />
+
+
+
+          <ActionCard
+            icono="📩"
+            titulo="Mis solicitudes"
+            texto="Envía solicitudes de visita, compra, arriendo o información y revisa su estado."
+            boton="Ver solicitudes"
+            onClick={() => navigate("/mis-solicitudes")}
+          />
         </div>
       </section>
 

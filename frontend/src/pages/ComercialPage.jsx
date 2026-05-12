@@ -1,33 +1,41 @@
 import { useState } from "react";
 
-import ClientesPage from "./ClientesPage";
-import AsesoresPage from "./AsesoresPage";
-import RotacionAsesoresPage from "./RotacionAsesoresPage";
+import ContratosPage from "./ContratosPage";
+import OperacionesPage from "./OperacionesPage";
+import SolicitudesPage from "./SolicitudesPage";
+import VisitasPage from "./VisitasPage";
 
-function PersonasPage() {
-  const [activeTab, setActiveTab] = useState("clientes");
+function ComercialPage() {
+  const [activeTab, setActiveTab] = useState("visitas");
 
   const tabs = [
     {
-      id: "clientes",
-      label: "Clientes",
-      shortLabel: "Clientes",
-      icon: "👥",
-      descripcion: "Gestión de clientes, preferencias y datos de búsqueda.",
+      id: "visitas",
+      label: "Visitas",
+      shortLabel: "Visitas",
+      icon: "📅",
+      descripcion: "Agenda comercial y seguimiento de citas.",
     },
     {
-      id: "asesores",
-      label: "Asesores",
-      shortLabel: "Asesores",
-      icon: "🧑‍💼",
-      descripcion: "Administración de asesores comerciales y cierres.",
+      id: "solicitudes",
+      label: "Solicitudes",
+      shortLabel: "Solicitudes",
+      icon: "📩",
+      descripcion: "Solicitudes de compra, arriendo y visitas.",
     },
     {
-      id: "rotacion",
-      label: "Rotación de asesores",
-      shortLabel: "Rotación",
-      icon: "🔁",
-      descripcion: "Asignación equilibrada de atención comercial.",
+      id: "operaciones",
+      label: "Operaciones",
+      shortLabel: "Operaciones",
+      icon: "💼",
+      descripcion: "Ventas, arriendos y procesos comerciales.",
+    },
+    {
+      id: "contratos",
+      label: "Contratos",
+      shortLabel: "Contratos",
+      icon: "📄",
+      descripcion: "Registro y consulta de contratos activos.",
     },
   ];
 
@@ -39,41 +47,47 @@ function PersonasPage() {
 
       <section style={heroStyle}>
         <div>
-          <p style={eyebrowStyle}>MÓDULO ADMINISTRATIVO</p>
+          <p style={eyebrowStyle}>GESTION COMERCIAL</p>
 
           <h1 style={titleStyle}>
-            Gestión de <span style={titleAccentStyle}>personas</span>
+            Operacion <span style={titleAccentStyle}>comercial</span>
           </h1>
 
           <p style={descriptionStyle}>
-            Administra clientes, asesores y la rotación de atención comercial
-            desde un solo centro de control del sistema PropTech.
+            Gestiona visitas, solicitudes, operaciones y contratos desde un solo
+            modulo de trabajo.
           </p>
         </div>
 
         <div style={heroBadgeStyle}>
           <span style={heroBadgeDotStyle}></span>
-          <span>Personas activo</span>
+          <span>Comercial activo</span>
         </div>
       </section>
 
       <section style={summaryGridStyle}>
         <InfoCard
-          icono="👥"
-          titulo="Clientes"
-          texto="Registro, edición y seguimiento de clientes."
+          icono="📅"
+          titulo="Visitas"
+          texto="Agenda y seguimiento de citas."
         />
 
         <InfoCard
-          icono="🧑‍💼"
-          titulo="Asesores"
-          texto="Control de asesores y especialidades."
+          icono="📩"
+          titulo="Solicitudes"
+          texto="Entrada comercial de clientes."
         />
 
         <InfoCard
-          icono="🔁"
-          titulo="Rotación"
-          texto="Asignación equilibrada de atención comercial."
+          icono="💼"
+          titulo="Operaciones"
+          texto="Control de ventas y arriendos."
+        />
+
+        <InfoCard
+          icono="📄"
+          titulo="Contratos"
+          texto="Estado contractual y vencimientos."
         />
       </section>
 
@@ -128,7 +142,7 @@ function PersonasPage() {
         <div style={activeIconStyle}>{tabActiva?.icon}</div>
 
         <div>
-          <p style={eyebrowStyle}>SECCIÓN ACTIVA</p>
+          <p style={eyebrowStyle}>SECCION ACTIVA</p>
 
           <h2 style={moduleTitleStyle}>{tabActiva?.label}</h2>
 
@@ -137,9 +151,10 @@ function PersonasPage() {
       </section>
 
       <section style={contentPanelStyle}>
-        {activeTab === "clientes" && <ClientesPage />}
-        {activeTab === "asesores" && <AsesoresPage />}
-        {activeTab === "rotacion" && <RotacionAsesoresPage />}
+        {activeTab === "visitas" && <VisitasPage />}
+        {activeTab === "solicitudes" && <SolicitudesPage />}
+        {activeTab === "operaciones" && <OperacionesPage />}
+        {activeTab === "contratos" && <ContratosPage />}
       </section>
     </div>
   );
@@ -159,7 +174,7 @@ function InfoCard({ icono, titulo, texto }) {
 }
 
 const animations = `
-  @keyframes fadeUpPersonas {
+  @keyframes fadeUpComercial {
     from {
       opacity: 0;
       transform: translateY(18px);
@@ -171,7 +186,7 @@ const animations = `
     }
   }
 
-  @keyframes pulsePersonas {
+  @keyframes pulseComercial {
     0%, 100% {
       opacity: 1;
       transform: scale(1);
@@ -183,7 +198,7 @@ const animations = `
     }
   }
 
-  @keyframes glowPersonas {
+  @keyframes glowComercial {
     0%, 100% {
       box-shadow: 0 0 0 rgba(124, 58, 237, 0);
     }
@@ -203,7 +218,7 @@ const pageStyle = {
   width: "100%",
   color: "#e8dfee",
   background: "transparent",
-  animation: "fadeUpPersonas 0.55s ease both",
+  animation: "fadeUpComercial 0.55s ease both",
 };
 
 const heroStyle = {
@@ -234,7 +249,7 @@ const titleStyle = {
   color: "#ffffff",
   fontSize: "clamp(2rem, 4vw, 3.4rem)",
   lineHeight: 1.08,
-  letterSpacing: "-0.05em",
+  letterSpacing: 0,
 };
 
 const titleAccentStyle = {
@@ -269,7 +284,7 @@ const heroBadgeDotStyle = {
   borderRadius: "50%",
   background: "#22c55e",
   boxShadow: "0 0 16px rgba(34,197,94,0.8)",
-  animation: "pulsePersonas 1.8s ease-in-out infinite",
+  animation: "pulseComercial 1.8s ease-in-out infinite",
 };
 
 const summaryGridStyle = {
@@ -303,7 +318,7 @@ const infoIconStyle = {
   alignItems: "center",
   justifyContent: "center",
   fontSize: "1.45rem",
-  animation: "glowPersonas 3.3s ease-in-out infinite",
+  animation: "glowComercial 3.3s ease-in-out infinite",
 };
 
 const infoTitleStyle = {
@@ -414,7 +429,7 @@ const moduleTitleStyle = {
   margin: "5px 0",
   color: "#ffffff",
   fontSize: "1.4rem",
-  letterSpacing: "-0.03em",
+  letterSpacing: 0,
 };
 
 const moduleDescriptionStyle = {
@@ -432,4 +447,4 @@ const contentPanelStyle = {
   overflow: "hidden",
 };
 
-export default PersonasPage;
+export default ComercialPage;

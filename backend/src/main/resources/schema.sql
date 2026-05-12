@@ -91,6 +91,35 @@ CREATE TABLE IF NOT EXISTS operaciones (
     comision DOUBLE NOT NULL,
     estado_proceso VARCHAR(40) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS contrato (
+    id VARCHAR(30) PRIMARY KEY,
+    codigo_inmueble VARCHAR(30) NOT NULL,
+    id_cliente VARCHAR(30) NOT NULL,
+    id_asesor VARCHAR(30) NOT NULL,
+    id_operacion VARCHAR(30),
+    tipo_contrato VARCHAR(40) NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    valor DOUBLE NOT NULL,
+    estado VARCHAR(40) NOT NULL,
+    observacion VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS solicitud_atencion (
+    id VARCHAR(30) PRIMARY KEY,
+    id_cliente VARCHAR(30) NOT NULL,
+    codigo_inmueble VARCHAR(30),
+    tipo_solicitud VARCHAR(40) NOT NULL,
+    descripcion VARCHAR(255) NOT NULL,
+    estado VARCHAR(40) NOT NULL,
+    prioridad VARCHAR(30) NOT NULL,
+    fecha_creacion DATETIME NOT NULL,
+    fecha_atencion DATETIME,
+    id_asesor_asignado VARCHAR(30),
+    respuesta VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS alertas (
     id VARCHAR(40) PRIMARY KEY,
     tipo VARCHAR(60) NOT NULL,
