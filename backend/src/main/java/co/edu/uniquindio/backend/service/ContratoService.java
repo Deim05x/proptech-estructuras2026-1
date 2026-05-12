@@ -5,6 +5,16 @@ import co.edu.uniquindio.backend.model.Contrato;
 import co.edu.uniquindio.backend.repository.ContratoRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio para contratos, estados y vencimientos.
+ *
+ * <p>Uso de estructuras propias: recibe {@link LinkedSimpleList} desde el
+ * repositorio para listar contratos, filtrar por estado y calcular vencimientos
+ * antes de convertir la salida a arreglo.</p>
+ *
+ * <p>Justificacion: contratos se consultan como colecciones secuenciales y las
+ * reglas de vencimiento se aplican durante el recorrido de la lista.</p>
+ */
 @Service
 public class ContratoService {
 

@@ -3,6 +3,13 @@ package co.edu.uniquindio.backend.estructuras.arboles;
 import co.edu.uniquindio.backend.estructuras.listas.SimpleList.LinkedSimpleList;
 import co.edu.uniquindio.backend.model.Inmueble;
 
+/**
+ * Arbol binario especializado para ordenar inmuebles por precio.
+ *
+ * <p>Justificacion en PropTech: las consultas por rango de precio son un flujo
+ * principal del cliente. El arbol permite podar ramas que quedan por fuera del
+ * rango solicitado y devolver inmuebles ordenados por valor de referencia.</p>
+ */
 public class ArbolPrecioInmuebles {
 
     private NodoArbolPrecio raiz;

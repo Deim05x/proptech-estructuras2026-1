@@ -5,6 +5,17 @@ import co.edu.uniquindio.backend.model.Inmueble;
 import co.edu.uniquindio.backend.repository.InmuebleRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio base del catalogo de inmuebles.
+ *
+ * <p>Uso de estructuras propias: obtiene inmuebles en {@link LinkedSimpleList}
+ * desde el repositorio y los convierte a arreglos solo en el borde de salida
+ * hacia la API.</p>
+ *
+ * <p>Justificacion: el catalogo se recorre con frecuencia para busquedas,
+ * filtros y validaciones; la lista simple es suficiente y mantiene bajo el
+ * costo conceptual de una coleccion secuencial propia.</p>
+ */
 @Service
 public class InmuebleService {
 

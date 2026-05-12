@@ -8,6 +8,16 @@ import co.edu.uniquindio.backend.model.Operacion;
 import co.edu.uniquindio.backend.model.Visita;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de reportes agregados.
+ *
+ * <p>Uso de estructuras propias: usa {@link TablaHash} para acumular conteos y
+ * valores por clave, como zona, rango de precio, inmueble o estado de
+ * operacion.</p>
+ *
+ * <p>Justificacion: las agregaciones por clave son el caso natural de una tabla
+ * hash y evitan comparar cada registro contra todos los demas.</p>
+ */
 @Service
 public class ReporteService {
 

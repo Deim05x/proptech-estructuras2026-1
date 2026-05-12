@@ -2,6 +2,16 @@ package co.edu.uniquindio.backend.estructuras.listas.DoubleList;
 
 import java.util.Iterator;
 
+/**
+ * Lista doblemente enlazada generica con recorrido hacia adelante y hacia
+ * atras.
+ *
+ * <p>Justificacion en PropTech: se usa para historiales de interacciones,
+ * donde el cliente puede consultar actividad cronologica y tambien navegar en
+ * sentido inverso sin reconstruir la coleccion.</p>
+ *
+ * @param <T> tipo comparable almacenado en la lista
+ */
 public class LinkedDoubleList<T extends Comparable<T>> implements Iterable<T> {
     private NodeDouble<T> first;
     private NodeDouble<T> last;

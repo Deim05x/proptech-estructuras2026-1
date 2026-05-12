@@ -1,12 +1,14 @@
 package co.edu.uniquindio.backend.estructuras.hashTables;
 
 /**
- * Tabla hash genérica propia.
- * 
- * Maneja colisiones mediante encadenamiento.
+ * Tabla hash generica propia con manejo de colisiones por encadenamiento.
  *
- * @param <K> Tipo de la clave
- * @param <V> Tipo del valor
+ * <p>Justificacion en PropTech: se usa en reportes y agregaciones cuando el
+ * sistema necesita acumular datos por clave, como conteos por estado, tipo o
+ * categoria, evitando recorridos repetidos sobre toda la coleccion.</p>
+ *
+ * @param <K> tipo de clave
+ * @param <V> tipo de valor asociado
  */
 public class TablaHash<K, V> {
 

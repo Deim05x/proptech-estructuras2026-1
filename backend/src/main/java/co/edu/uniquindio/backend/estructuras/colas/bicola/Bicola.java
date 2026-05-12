@@ -3,9 +3,13 @@ package co.edu.uniquindio.backend.estructuras.colas.bicola;
 import java.util.Iterator;
 
 /**
- * Clase genérica Bicola (Double-Ended Queue - Deque)
- * Permite insertar y extraer elementos por ambos extremos
- * @param <T> Tipo de datos a almacenar en la bicola
+ * Bicola propia que permite insertar y extraer por ambos extremos.
+ *
+ * <p>Justificacion en PropTech: queda disponible para procesos donde una
+ * agenda o flujo de atencion necesite agregar y retirar elementos tanto por el
+ * frente como por el final, manteniendo una estructura propia y controlada.</p>
+ *
+ * @param <T> tipo de dato almacenado en la bicola
  */
 public class Bicola<T> implements Iterable<T> {
     private NodoBicola<T> inicio;

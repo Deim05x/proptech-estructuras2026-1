@@ -7,6 +7,17 @@ import co.edu.uniquindio.backend.model.Visita;
 import co.edu.uniquindio.backend.repository.VisitaRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio para agenda y seguimiento de visitas.
+ *
+ * <p>Uso de estructuras propias: recupera visitas en {@link LinkedSimpleList}
+ * y recorre esa estructura para consultas por estado, busquedas por id y
+ * conversion a arreglos de respuesta.</p>
+ *
+ * <p>Justificacion: la agenda requiere recorridos filtrados frecuentes y la
+ * lista simple mantiene la logica de consulta alineada con las estructuras del
+ * proyecto.</p>
+ */
 @Service
 public class VisitaService {
 

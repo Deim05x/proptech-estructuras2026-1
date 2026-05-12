@@ -9,6 +9,17 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Servicio para registrar, consultar y procesar solicitudes de atencion.
+ *
+ * <p>Uso de estructuras propias: {@link LinkedSimpleList} recibe los datos del
+ * repositorio, {@link Cola} conserva solicitudes pendientes en orden FIFO y
+ * {@link ColaPrioridad} separa solicitudes de mayor urgencia comercial.</p>
+ *
+ * <p>Justificacion: el modulo necesita diferenciar entre atencion por turno y
+ * atencion prioritaria. Las colas hacen explicita esa regla y evitan mezclar el
+ * orden operativo con la respuesta JSON enviada al frontend.</p>
+ */
 @Service
 public class SolicitudAtencionService {
 

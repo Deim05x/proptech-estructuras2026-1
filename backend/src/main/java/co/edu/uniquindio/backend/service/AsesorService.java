@@ -5,6 +5,15 @@ import co.edu.uniquindio.backend.model.Asesor;
 import co.edu.uniquindio.backend.repository.AsesorRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio base para asesores comerciales.
+ *
+ * <p>Uso de estructuras propias: usa {@link LinkedSimpleList} para recorrer
+ * asesores desde la base de datos antes de responder a la API.</p>
+ *
+ * <p>Justificacion: sirve como fuente secuencial para listados y para otros
+ * modulos, como la rotacion circular de asesores.</p>
+ */
 @Service
 public class AsesorService {
 

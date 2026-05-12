@@ -7,6 +7,17 @@ import co.edu.uniquindio.backend.model.Inmueble;
 import co.edu.uniquindio.backend.repository.InmuebleRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de consulta de inmuebles por rango de precio.
+ *
+ * <p>Uso de estructuras propias: construye un {@link ArbolPrecioInmuebles}
+ * desde los inmuebles persistidos y devuelve el resultado en
+ * {@link LinkedSimpleList} antes de convertirlo a arreglo para JSON.</p>
+ *
+ * <p>Justificacion: el arbol permite recorrer solo las ramas necesarias para
+ * rangos de precio y conservar una explicacion clara sobre cantidad de nodos y
+ * altura de la estructura consultada.</p>
+ */
 @Service
 public class ConsultaRangoPrecioService {
 

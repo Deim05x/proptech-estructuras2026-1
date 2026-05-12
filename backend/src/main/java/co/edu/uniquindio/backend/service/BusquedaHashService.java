@@ -11,6 +11,17 @@ import co.edu.uniquindio.backend.repository.ClienteRepository;
 import co.edu.uniquindio.backend.repository.InmuebleRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de busqueda directa por identificadores del dominio.
+ *
+ * <p>Uso de estructuras propias: carga clientes, inmuebles o asesores en una
+ * {@link TablaHashPropia} y usa {@link LinkedSimpleList} como fuente de datos
+ * proveniente de los repositorios.</p>
+ *
+ * <p>Justificacion: la tabla hash permite explicar busquedas por clave con
+ * indice, colisiones, cubetas ocupadas y factor de carga, datos utiles para
+ * documentar el comportamiento de la estructura.</p>
+ */
 @Service
 public class BusquedaHashService {
 

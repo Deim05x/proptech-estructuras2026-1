@@ -13,6 +13,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * Servicio para generar y procesar alertas operativas.
+ *
+ * <p>Uso de estructuras propias: {@link Cola} conserva alertas pendientes en
+ * orden de llegada y {@link ColaPrioridad} permite procesar primero las alertas
+ * con mayor nivel de atencion.</p>
+ *
+ * <p>Justificacion: el monitoreo necesita dos lecturas del mismo flujo: una
+ * cronologica y otra priorizada para riesgos comerciales u operativos.</p>
+ */
 @Service
 public class AlertaService {
 

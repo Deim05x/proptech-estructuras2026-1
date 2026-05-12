@@ -5,6 +5,15 @@ import co.edu.uniquindio.backend.model.Interaccion;
 import co.edu.uniquindio.backend.repository.InteraccionRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de historial de interacciones del cliente.
+ *
+ * <p>Uso de estructuras propias: recibe una {@link LinkedDoubleList} desde el
+ * repositorio para entregar historial normal y reverso.</p>
+ *
+ * <p>Justificacion: la lista doble permite recorrer actividad hacia adelante y
+ * hacia atras sin duplicar los datos ni reconstruir la secuencia.</p>
+ */
 @Service
 public class InteraccionService {
 

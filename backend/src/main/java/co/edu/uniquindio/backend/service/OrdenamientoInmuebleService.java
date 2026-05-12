@@ -6,6 +6,16 @@ import co.edu.uniquindio.backend.model.Inmueble;
 import co.edu.uniquindio.backend.model.Visita;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de ordenamiento comercial de inmuebles.
+ *
+ * <p>Uso de estructuras propias: inserta DTOs comparables en
+ * {@link ArbolBinarioBusqueda} y luego recorre el arbol en orden ascendente o
+ * descendente segun el criterio solicitado.</p>
+ *
+ * <p>Justificacion: el arbol separa el criterio de comparacion de la salida y
+ * hace visible el mecanismo usado para ordenar por precio, area o demanda.</p>
+ */
 @Service
 public class OrdenamientoInmuebleService {
 

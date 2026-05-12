@@ -1,10 +1,13 @@
 package co.edu.uniquindio.backend.estructuras.colas.colaprioridad;
 
 /**
- * Cola de prioridad propia.
+ * Cola propia que conserva primero los elementos con mayor prioridad numerica.
  *
- * Inserta los elementos de forma ordenada según prioridad.
- * Mayor prioridad queda más cerca del inicio.
+ * <p>Justificacion en PropTech: permite atender primero solicitudes de alta
+ * intencion comercial, como compra o arriendo, sin perder el control explicito
+ * de la prioridad asignada por las reglas de negocio.</p>
+ *
+ * @param <T> tipo de dato almacenado en la cola de prioridad
  */
 public class ColaPrioridad<T> {
 

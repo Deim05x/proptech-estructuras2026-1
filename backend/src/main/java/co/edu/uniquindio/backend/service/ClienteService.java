@@ -5,6 +5,16 @@ import co.edu.uniquindio.backend.model.Cliente;
 import co.edu.uniquindio.backend.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio base para clientes.
+ *
+ * <p>Uso de estructuras propias: trabaja con {@link LinkedSimpleList} para
+ * listar y buscar clientes cargados desde la persistencia.</p>
+ *
+ * <p>Justificacion: las operaciones de clientes son recorridos secuenciales
+ * simples, por lo que la lista propia cubre el caso sin introducir estructuras
+ * mas complejas.</p>
+ */
 @Service
 public class ClienteService {
 

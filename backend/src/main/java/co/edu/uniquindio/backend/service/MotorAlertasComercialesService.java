@@ -11,6 +11,17 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Servicio que genera alertas comerciales a partir de contratos y solicitudes.
+ *
+ * <p>Uso de estructuras propias: acumula alertas en {@link LinkedSimpleList} y
+ * usa {@link TablaHashPropia} para detectar clientes o inmuebles repetidos en
+ * reglas de alta intencion comercial.</p>
+ *
+ * <p>Justificacion: las listas mantienen una salida ordenada y controlada,
+ * mientras la tabla hash evita reprocesar claves ya detectadas durante la
+ * generacion de alertas.</p>
+ */
 @Service
 public class MotorAlertasComercialesService {
 

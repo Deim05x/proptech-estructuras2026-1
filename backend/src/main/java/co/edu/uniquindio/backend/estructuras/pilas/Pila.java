@@ -1,11 +1,13 @@
 package co.edu.uniquindio.backend.estructuras.pilas;
 
 /**
- * Pila genérica propia.
- * Funciona bajo el principio LIFO:
- * Last In, First Out.
+ * Pila propia LIFO: el ultimo elemento apilado es el primero en salir.
  *
- * @param <T> tipo de dato almacenado
+ * <p>Justificacion en PropTech: se usa para consultar historial en sentido
+ * inverso, por ejemplo ultimas propiedades revisadas por un cliente. La ultima
+ * actividad registrada queda disponible primero.</p>
+ *
+ * @param <T> tipo de dato almacenado en la pila
  */
 public class Pila<T> {
 

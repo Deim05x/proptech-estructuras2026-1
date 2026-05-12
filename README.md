@@ -329,6 +329,25 @@ Tablas principales:
 - `alertas`
 - `eventos_inusuales`
 
+## Documentacion JavaDoc
+
+La documentacion navegable de clases y estructuras se genera desde el backend:
+
+```powershell
+cd backend
+.\gradlew.bat javadoc
+```
+
+El archivo principal queda en:
+
+```text
+backend/build/docs/javadoc/index.html
+```
+
+Alli se pueden revisar los paquetes, servicios y estructuras propias. Las
+clases principales incluyen la justificacion de uso de listas, colas, arboles,
+tablas hash, grafos y pilas dentro de los flujos del sistema.
+
 ## Ejecucion
 
 Backend:

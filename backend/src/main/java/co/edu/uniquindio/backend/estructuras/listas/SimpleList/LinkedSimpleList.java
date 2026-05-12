@@ -2,6 +2,16 @@ package co.edu.uniquindio.backend.estructuras.listas.SimpleList;
 
 import java.util.Iterator;
 
+/**
+ * Lista simplemente enlazada generica para recorridos secuenciales.
+ *
+ * <p>Justificacion en PropTech: se usa como estructura base para transportar
+ * resultados de repositorios y recorrer colecciones de inmuebles, clientes,
+ * asesores, visitas, contratos y solicitudes sin depender de colecciones
+ * nativas como estructura principal del negocio.</p>
+ *
+ * @param <T> tipo comparable almacenado en la lista
+ */
 public class LinkedSimpleList<T extends Comparable<T>> implements Iterable<T> {
     private Node<T> first;
     private int size;

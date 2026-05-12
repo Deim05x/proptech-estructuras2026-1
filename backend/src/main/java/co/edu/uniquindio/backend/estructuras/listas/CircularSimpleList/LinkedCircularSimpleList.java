@@ -2,6 +2,15 @@ package co.edu.uniquindio.backend.estructuras.listas.CircularSimpleList;
 
 import java.util.Iterator;
 
+/**
+ * Lista circular simplemente enlazada para ciclos secuenciales.
+ *
+ * <p>Justificacion en PropTech: permite rotar asesores de forma continua. Al
+ * terminar la lista, la siguiente asignacion vuelve al primer asesor sin
+ * requerir reiniciar manualmente el recorrido.</p>
+ *
+ * @param <T> tipo comparable almacenado en la lista circular
+ */
 public class LinkedCircularSimpleList<T extends Comparable<T>> implements Iterable<T> {
     private NodeCircularSimple<T> first;
     private NodeCircularSimple<T> last;

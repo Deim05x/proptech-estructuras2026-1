@@ -1,9 +1,14 @@
 package co.edu.uniquindio.backend.estructuras.grafos;
 
 /**
- * Grafo no dirigido genérico usando matriz de adyacencia.
+ * Grafo no dirigido propio basado en matriz de adyacencia.
  *
- * @param <T> tipo de dato que representa cada vértice
+ * <p>Justificacion en PropTech: representa relaciones comerciales entre
+ * clientes, inmuebles, asesores y zonas. Como las relaciones no tienen una
+ * direccion unica en el analisis, permite medir conexiones y pesos de
+ * interaccion de forma simetrica.</p>
+ *
+ * @param <T> tipo de dato que representa cada vertice
  */
 public class GrafoNoDirigido<T> {
 

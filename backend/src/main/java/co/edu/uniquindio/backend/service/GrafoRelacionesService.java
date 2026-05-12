@@ -9,6 +9,17 @@ import co.edu.uniquindio.backend.model.Operacion;
 import co.edu.uniquindio.backend.model.Visita;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de analisis de relaciones comerciales.
+ *
+ * <p>Uso de estructuras propias: construye un {@link GrafoNoDirigido} donde
+ * los vertices representan clientes, inmuebles, asesores y zonas, y las aristas
+ * representan visitas u operaciones.</p>
+ *
+ * <p>Justificacion: el grafo permite medir grados, pesos y nodos centrales
+ * para entender conexiones comerciales sin forzar la informacion a una lista
+ * plana.</p>
+ */
 @Service
 public class GrafoRelacionesService {
 

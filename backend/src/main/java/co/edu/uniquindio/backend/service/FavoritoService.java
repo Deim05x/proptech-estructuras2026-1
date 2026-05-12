@@ -7,6 +7,17 @@ import co.edu.uniquindio.backend.repository.FavoritoRepository;
 import co.edu.uniquindio.backend.repository.InmuebleRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de inmuebles favoritos por cliente.
+ *
+ * <p>Uso de estructuras propias: el repositorio retorna favoritos en
+ * {@link LinkedSimpleList}, que se transforma a arreglo para que el frontend
+ * reciba JSON simple.</p>
+ *
+ * <p>Justificacion: los favoritos son una coleccion secuencial de inmuebles de
+ * interes, adecuada para lista simple y registro posterior en historial de
+ * interacciones.</p>
+ */
 @Service
 public class FavoritoService {
 

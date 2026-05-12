@@ -5,6 +5,16 @@ import co.edu.uniquindio.backend.model.Asesor;
 import co.edu.uniquindio.backend.repository.AsesorRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de asignacion rotativa de asesores.
+ *
+ * <p>Uso de estructuras propias: carga asesores desde {@link LinkedSimpleList}
+ * y los organiza en {@link LinkedCircularSimpleList} para avanzar de forma
+ * continua por la rueda de asignacion.</p>
+ *
+ * <p>Justificacion: la lista circular expresa naturalmente la regla de rotar
+ * asesores y volver al inicio cuando todos han tenido turno.</p>
+ */
 @Service
 public class RotacionAsesorService {
 

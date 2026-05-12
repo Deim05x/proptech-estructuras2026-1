@@ -2,6 +2,15 @@ package co.edu.uniquindio.backend.estructuras.listas.CircularDoubleList;
 
 import java.util.Iterator;
 
+/**
+ * Lista circular doblemente enlazada para navegacion bidireccional continua.
+ *
+ * <p>Justificacion en PropTech: soporta el carrusel de inmuebles destacados,
+ * permitiendo avanzar y retroceder entre propiedades sin quedar fuera de los
+ * limites de la lista.</p>
+ *
+ * @param <T> tipo comparable almacenado en la lista circular doble
+ */
 public class LinkedCircularDoubleList<T extends Comparable<T>> implements Iterable<T> {
     private NodeCircularDouble<T> first;
     private NodeCircularDouble<T> last;

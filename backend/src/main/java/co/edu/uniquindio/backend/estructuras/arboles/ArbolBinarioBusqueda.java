@@ -1,7 +1,11 @@
 package co.edu.uniquindio.backend.estructuras.arboles;
 
 /**
- * Árbol binario de búsqueda genérico.
+ * Arbol binario de busqueda generico para elementos comparables.
+ *
+ * <p>Justificacion en PropTech: organiza elementos comparables para entregar
+ * resultados ascendentes o descendentes, especialmente en ordenamientos
+ * comerciales de inmuebles por precio, demanda u otros criterios medibles.</p>
  *
  * @param <T> tipo de dato comparable
  */

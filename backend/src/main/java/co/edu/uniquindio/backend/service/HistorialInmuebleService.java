@@ -8,6 +8,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Servicio de historial de cambios sobre inmuebles.
+ *
+ * <p>Uso de estructuras propias: guarda estados previos en una {@link Pila}
+ * para permitir deshacer el ultimo cambio registrado.</p>
+ *
+ * <p>Justificacion: el comportamiento LIFO coincide con la accion de deshacer:
+ * se restaura primero el cambio mas reciente.</p>
+ */
 @Service
 public class HistorialInmuebleService {
 

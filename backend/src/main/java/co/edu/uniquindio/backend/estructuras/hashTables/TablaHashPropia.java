@@ -1,5 +1,16 @@
 package co.edu.uniquindio.backend.estructuras.hashTables;
 
+/**
+ * Tabla hash propia con encadenamiento separado y metricas de uso.
+ *
+ * <p>Justificacion en PropTech: permite busquedas directas por identificador
+ * de cliente, inmueble o asesor, y tambien evita duplicados al generar alertas
+ * comerciales. Sus metricas de colisiones, cubetas ocupadas y factor de carga
+ * ayudan a explicar el comportamiento de la estructura.</p>
+ *
+ * @param <K> tipo de clave
+ * @param <V> tipo de valor asociado
+ */
 public class TablaHashPropia<K, V> {
 
     private EntradaHash<K, V>[] tabla;

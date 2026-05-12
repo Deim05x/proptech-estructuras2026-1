@@ -3,8 +3,13 @@ package co.edu.uniquindio.backend.estructuras.colas.cola;
 import java.util.Iterator;
 
 /**
- * Clase genérica Cola (FIFO - First In First Out)
- * @param <T> Tipo de datos a almacenar en la cola
+ * Cola FIFO propia para procesar elementos en orden de llegada.
+ *
+ * <p>Justificacion en PropTech: modela la atencion de solicitudes pendientes
+ * cuando se debe respetar el turno de registro y todas comparten la misma
+ * urgencia operativa.</p>
+ *
+ * @param <T> tipo de dato almacenado en la cola
  */
 public class Cola<T> implements Iterable<T> {
     private Nodo<T> inicio;

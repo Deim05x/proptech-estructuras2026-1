@@ -7,6 +7,18 @@ import co.edu.uniquindio.backend.model.*;
 import co.edu.uniquindio.backend.repository.*;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio central de validaciones de negocio antes de visitas, operaciones y
+ * contratos.
+ *
+ * <p>Uso de estructuras propias: consulta repositorios que devuelven
+ * {@link LinkedSimpleList} y recorre esas listas para validar consistencia,
+ * disponibilidad, sobrecarga de asesores y relaciones entre entidades.</p>
+ *
+ * <p>Justificacion: las validaciones recorren datos del dominio sin convertir
+ * la logica interna a colecciones nativas, manteniendo coherencia con el
+ * objetivo del proyecto de usar estructuras propias en procesos criticos.</p>
+ */
 @Service
 public class ValidacionNegocioService {
 

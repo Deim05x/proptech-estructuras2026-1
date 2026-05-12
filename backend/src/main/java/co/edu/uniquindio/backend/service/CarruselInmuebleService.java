@@ -6,6 +6,16 @@ import co.edu.uniquindio.backend.model.Inmueble;
 import co.edu.uniquindio.backend.repository.InmuebleRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de carrusel de inmuebles.
+ *
+ * <p>Uso de estructuras propias: toma inmuebles desde {@link LinkedSimpleList}
+ * y los ubica en {@link LinkedCircularDoubleList} para navegar al siguiente o
+ * al anterior de forma continua.</p>
+ *
+ * <p>Justificacion: la lista circular doble evita bordes artificiales en la
+ * navegacion y permite retroceder o avanzar sin reconstruir la secuencia.</p>
+ */
 @Service
 public class CarruselInmuebleService {
 
