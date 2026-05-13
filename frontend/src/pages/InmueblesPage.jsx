@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import inmuebleService from "../services/inmuebleService";
 import historialInmuebleService from "../services/historialInmuebleService";
+import InmuebleCover from "../components/InmuebleCover";
 
 function InmueblesPage() {
   const [inmuebles, setInmuebles] = useState([]);
@@ -24,6 +25,7 @@ function InmueblesPage() {
     estado: "",
     disponible: true,
     idAsesorResponsable: "",
+    imagenUrl: "",
   });
 
   useEffect(() => {
@@ -85,6 +87,7 @@ function InmueblesPage() {
       estado: "",
       disponible: true,
       idAsesorResponsable: "",
+      imagenUrl: "",
     });
 
     setEditando(false);
@@ -146,6 +149,7 @@ function InmueblesPage() {
       estado: inmueble.estado || "",
       disponible: inmueble.disponible ?? true,
       idAsesorResponsable: inmueble.idAsesorResponsable || "",
+      imagenUrl: inmueble.imagenUrl || "",
     });
 
     setEditando(true);
@@ -456,6 +460,15 @@ function InmueblesPage() {
               required
               style={inputStyle}
             />
+
+            <input
+              type="text"
+              name="imagenUrl"
+              placeholder="Ruta imagen, ejemplo: /inmuebles/inm-001.jpg"
+              value={formulario.imagenUrl}
+              onChange={manejarCambio}
+              style={inputStyle}
+            />
           </div>
 
           <label style={checkLabelStyle}>
@@ -507,9 +520,7 @@ function InmueblesPage() {
           <div style={cardsGridStyle}>
             {inmuebles.map((inmueble) => (
               <article key={inmueble.codigo} style={cardStyle}>
-                <div style={imagePlaceholderStyle}>
-                  <span>🏠</span>
-                </div>
+                <InmuebleCover inmueble={inmueble} height={120} />
 
                 <div style={cardTopStyle}>
                   <div>
@@ -902,20 +913,6 @@ const cardStyle = {
   padding: "18px",
   boxShadow: "0 18px 38px rgba(0,0,0,0.20)",
   transition: "0.28s ease",
-};
-
-const imagePlaceholderStyle = {
-  height: "120px",
-  borderRadius: "20px",
-  background: "linear-gradient(135deg, #3f2a57, #7c3aed)",
-  marginBottom: "16px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  fontSize: "3rem",
-  border: "1px solid #6d5f7a",
-  boxShadow: "0 0 22px rgba(124,58,237,0.18)",
 };
 
 const cardTopStyle = {

@@ -91,7 +91,7 @@ public class VisitaController {
 
         return ResponseEntity
                 .badRequest()
-                .body("No se pudo agregar la visita. Verifica que el id exista y que no esté repetido.");
+                .body("No se pudo agregar la visita. Verifica cliente, inmueble, asesor, fecha y hora.");
     }
 
     @PostMapping("/agendar")

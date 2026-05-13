@@ -112,6 +112,7 @@ public class HistorialInmuebleService {
         copia.setEstado(original.getEstado());
         copia.setDisponible(original.isDisponible());
         copia.setIdAsesorResponsable(original.getIdAsesorResponsable());
+        copia.setImagenUrl(original.getImagenUrl());
 
         return copia;
     }

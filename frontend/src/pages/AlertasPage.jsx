@@ -1,32 +1,25 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import alertaService from "../services/alertaService";
 
 function AlertasPage() {
   const [alertas, setAlertas] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [estadoFiltro, setEstadoFiltro] = useState("TODAS");
+  const [estadoFiltro, setEstadoFiltro] = useState("PENDIENTE");
   const [cantidadCola, setCantidadCola] = useState(0);
   const [cantidadColaPrioridad, setCantidadColaPrioridad] = useState(0);
 
   const [formulario, setFormulario] = useState({
-    id: "",
     tipo: "",
     descripcion: "",
     nivelAtencion: "MEDIO",
     estado: "PENDIENTE",
   });
 
-  const cargarAlertas = async () => {
+  const cargarAlertas = useCallback(async () => {
     try {
       setCargando(true);
 
-      let data;
-
-      if (estadoFiltro === "TODAS") {
-        data = await alertaService.listar();
-      } else {
-        data = await alertaService.listarPorEstado(estadoFiltro);
-      }
+      const data = await alertaService.listarPorEstado(estadoFiltro);
 
       const cantidadNormal = await alertaService.cantidadCola();
       const cantidadPrioridad = await alertaService.cantidadColaPrioridad();
@@ -40,11 +33,11 @@ function AlertasPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [estadoFiltro]);
 
   useEffect(() => {
     cargarAlertas();
-  }, [estadoFiltro]);
+  }, [cargarAlertas]);
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
@@ -57,7 +50,6 @@ function AlertasPage() {
 
   const limpiarFormulario = () => {
     setFormulario({
-      id: "",
       tipo: "",
       descripcion: "",
       nivelAtencion: "MEDIO",
@@ -156,7 +148,8 @@ function AlertasPage() {
     try {
       await alertaService.cambiarEstado(id, estado);
       alert("Estado actualizado correctamente");
-      cargarAlertas();
+      setAlertas((actuales) => actuales.filter((alerta) => alerta.id !== id));
+      await cargarAlertas();
     } catch (error) {
       console.error("Error al cambiar estado:", error);
       alert("No se pudo cambiar el estado de la alerta");
@@ -313,16 +306,6 @@ function AlertasPage() {
           <div style={formGridStyle}>
             <input
               type="text"
-              name="id"
-              placeholder="ID alerta, ejemplo: AL-001"
-              value={formulario.id}
-              onChange={manejarCambio}
-              required
-              style={inputStyle}
-            />
-
-            <input
-              type="text"
               name="tipo"
               placeholder="Tipo, ejemplo: VISITA_PENDIENTE"
               value={formulario.tipo}
@@ -388,7 +371,7 @@ function AlertasPage() {
           </div>
 
           <span style={filterBadgeStyle}>
-            {estadoFiltro === "TODAS" ? "Todas" : estadoFiltro}
+            {estadoFiltro}
           </span>
         </div>
 
@@ -418,7 +401,6 @@ function AlertasPage() {
             onChange={(e) => setEstadoFiltro(e.target.value)}
             style={inputStyle}
           >
-            <option value="TODAS">Todas</option>
             <option value="PENDIENTE">Pendientes</option>
             <option value="REVISADA">Revisadas</option>
             <option value="DESCARTADA">Descartadas</option>
@@ -489,21 +471,25 @@ function AlertasPage() {
                     <td style={tdStyle}>{alerta.fechaCreacion || "—"}</td>
 
                     <td style={tdStyle}>
-                      <div style={actionRowStyle}>
-                        <button
-                          onClick={() => cambiarEstado(alerta.id, "REVISADA")}
-                          style={miniSuccessButton}
-                        >
-                          Revisar
-                        </button>
+                      {(alerta.estado || "").toUpperCase() === "PENDIENTE" ? (
+                        <div style={actionRowStyle}>
+                          <button
+                            onClick={() => cambiarEstado(alerta.id, "REVISADA")}
+                            style={miniSuccessButton}
+                          >
+                            Revisar
+                          </button>
 
-                        <button
-                          onClick={() => cambiarEstado(alerta.id, "DESCARTADA")}
-                          style={miniDangerButton}
-                        >
-                          Descartar
-                        </button>
-                      </div>
+                          <button
+                            onClick={() => cambiarEstado(alerta.id, "DESCARTADA")}
+                            style={miniDangerButton}
+                          >
+                            Descartar
+                          </button>
+                        </div>
+                      ) : (
+                        <span style={mutedMiniTextStyle}>Sin acciones</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -880,6 +866,12 @@ const actionRowStyle = {
   display: "flex",
   gap: "8px",
   flexWrap: "wrap",
+};
+
+const mutedMiniTextStyle = {
+  color: "#8f849e",
+  fontSize: "0.78rem",
+  fontWeight: "800",
 };
 
 const miniSuccessButton = {

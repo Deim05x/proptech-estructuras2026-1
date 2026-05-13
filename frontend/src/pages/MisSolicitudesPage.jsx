@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import solicitudAtencionService from "../services/solicitudAtencionService";
 import authService from "../services/authService";
 
@@ -7,19 +7,9 @@ function MisSolicitudesPage() {
 
   const [solicitudes, setSolicitudes] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [generandoSolicitud, setGenerandoSolicitud] = useState(false);
 
-  const [formulario, setFormulario] = useState({
-    id: "",
-    codigoInmueble: "",
-    tipoSolicitud: "VISITA",
-    descripcion: "",
-  });
-
-  useEffect(() => {
-    cargarMisSolicitudes();
-  }, []);
-
-  const cargarMisSolicitudes = async () => {
+  const cargarMisSolicitudes = useCallback(async () => {
     if (!clienteId) return;
 
     try {
@@ -32,61 +22,44 @@ function MisSolicitudesPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [clienteId]);
 
-  const manejarCambio = (e) => {
-    const { name, value } = e.target;
+  useEffect(() => {
+    cargarMisSolicitudes();
+  }, [cargarMisSolicitudes]);
 
-    setFormulario({
-      ...formulario,
-      [name]: value,
-    });
-  };
-
-  const limpiarFormulario = () => {
-    setFormulario({
-      id: "",
-      codigoInmueble: "",
-      tipoSolicitud: "VISITA",
-      descripcion: "",
-    });
-  };
-
-  const crearSolicitud = async (e) => {
-    e.preventDefault();
+  const generarSolicitud = async () => {
+    if (!clienteId) {
+      alert("No se encontro el cliente autenticado.");
+      return;
+    }
 
     try {
+      setGenerandoSolicitud(true);
+
       await solicitudAtencionService.crear({
-        id: formulario.id,
         idCliente: clienteId,
-        codigoInmueble: formulario.codigoInmueble,
-        tipoSolicitud: formulario.tipoSolicitud,
-        descripcion: formulario.descripcion,
+        tipoSolicitud: "ATENCION",
         estado: "PENDIENTE",
-        prioridad:
-          formulario.tipoSolicitud === "COMPRA" ||
-          formulario.tipoSolicitud === "ARRIENDO"
-            ? "ALTA"
-            : formulario.tipoSolicitud === "VISITA"
-            ? "MEDIA"
-            : "BAJA",
+        prioridad: "MEDIA",
         fechaCreacion: null,
         fechaAtencion: null,
         idAsesorAsignado: "",
         respuesta: "",
       });
 
-      alert("Solicitud enviada correctamente");
-      limpiarFormulario();
+      alert("Solicitud generada correctamente.");
       await cargarMisSolicitudes();
     } catch (error) {
-      console.error("Error al crear solicitud:", error);
-      alert(error.response?.data || "No se pudo enviar la solicitud");
+      console.error("Error al generar solicitud:", error);
+      alert(error.response?.data || "No se pudo generar la solicitud");
+    } finally {
+      setGenerandoSolicitud(false);
     }
   };
 
   const cancelarSolicitud = async (id) => {
-    const confirmar = window.confirm("¿Seguro que deseas cancelar esta solicitud?");
+    const confirmar = window.confirm("Seguro que deseas cancelar esta solicitud?");
 
     if (!confirmar) return;
 
@@ -109,69 +82,17 @@ function MisSolicitudesPage() {
   const obtenerEstiloEstado = (estado) => {
     const valor = (estado || "").toUpperCase();
 
-    if (valor === "PENDIENTE") {
-      return {
-        background: "#3a2d00",
-        color: "#ffd76a",
-        border: "1px solid #826300",
-      };
-    }
+    if (valor === "PENDIENTE") return badgePendingStyle;
+    if (valor === "EN_ATENCION") return badgeActiveStyle;
+    if (valor === "ATENDIDA") return badgeDoneStyle;
+    if (valor === "CANCELADA" || valor === "RECHAZADA") return badgeDangerStyle;
 
-    if (valor === "EN_ATENCION") {
-      return {
-        background: "#10294f",
-        color: "#93c5fd",
-        border: "1px solid #1d4ed8",
-      };
-    }
-
-    if (valor === "ATENDIDA") {
-      return {
-        background: "#12351f",
-        color: "#86efac",
-        border: "1px solid #225c37",
-      };
-    }
-
-    if (valor === "CANCELADA" || valor === "RECHAZADA") {
-      return {
-        background: "#3a1218",
-        color: "#ffb4ab",
-        border: "1px solid #7a2c35",
-      };
-    }
-
-    return {
-      background: "#15121b",
-      color: "#ccc3d8",
-      border: "1px solid #37333e",
-    };
+    return badgeNeutralStyle;
   };
 
-  const obtenerEstiloPrioridad = (prioridad) => {
-    const valor = (prioridad || "").toUpperCase();
-
-    if (valor === "ALTA") {
-      return {
-        background: "#3a1218",
-        color: "#ffb4ab",
-        border: "1px solid #7a2c35",
-      };
-    }
-
-    if (valor === "MEDIA") {
-      return {
-        background: "#3f2a57",
-        color: "#d2bbff",
-        border: "1px solid #6d5f7a",
-      };
-    }
-
-    return {
-      background: "#12351f",
-      color: "#86efac",
-      border: "1px solid #225c37",
-    };
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "-";
+    return String(fecha).replace("T", " ").slice(0, 19);
   };
 
   return (
@@ -187,8 +108,8 @@ function MisSolicitudesPage() {
           </h1>
 
           <p style={descriptionStyle}>
-            Envía solicitudes de visita, atención, compra, arriendo o
-            información y consulta el estado de seguimiento de cada una.
+            Genera solicitudes de atencion para que el equipo admin las revise,
+            te asigne un asesor y haga seguimiento.
           </p>
         </div>
 
@@ -199,102 +120,48 @@ function MisSolicitudesPage() {
       </section>
 
       <section style={summaryGridStyle}>
-        <SummaryCard
-          icono="📩"
-          titulo="Total"
-          valor={solicitudes.length}
-          texto="Solicitudes enviadas"
-        />
-
-        <SummaryCard
-          icono="⏳"
-          titulo="Pendientes"
-          valor={contarPorEstado("PENDIENTE")}
-          texto="En espera"
-        />
-
-        <SummaryCard
-          icono="🔵"
-          titulo="En atención"
-          valor={contarPorEstado("EN_ATENCION")}
-          texto="Asignadas a asesor"
-        />
-
-        <SummaryCard
-          icono="✅"
-          titulo="Atendidas"
-          valor={contarPorEstado("ATENDIDA")}
-          texto="Finalizadas"
-        />
+        <SummaryCard titulo="Total" valor={solicitudes.length} texto="Enviadas" />
+        <SummaryCard titulo="Pendientes" valor={contarPorEstado("PENDIENTE")} texto="En espera" />
+        <SummaryCard titulo="En atencion" valor={contarPorEstado("EN_ATENCION")} texto="Con asesor" />
+        <SummaryCard titulo="Atendidas" valor={contarPorEstado("ATENDIDA")} texto="Finalizadas" />
       </section>
 
       <section style={panelStyle}>
         <div style={panelHeaderStyle}>
           <div>
             <p style={eyebrowStyle}>NUEVA SOLICITUD</p>
-            <h2 style={titleStyle}>Enviar solicitud</h2>
+            <h2 style={titleStyle}>Generar solicitud</h2>
 
             <p style={mutedTextStyle}>
-              Tu solicitud será registrada para que un asesor pueda revisarla y
-              hacer seguimiento.
+              El codigo se crea automaticamente y la solicitud queda pendiente
+              para que un administrador asigne el asesor.
             </p>
           </div>
 
           <span style={modeBadgeStyle}>{clienteId || "Sin cliente"}</span>
         </div>
 
-        <form onSubmit={crearSolicitud}>
-          <div style={formGridStyle}>
-            <input
-              name="id"
-              placeholder="ID solicitud, ejemplo: SOL-001"
-              value={formulario.id}
-              onChange={manejarCambio}
-              required
-              style={inputStyle}
-            />
-
-            <input
-              name="codigoInmueble"
-              placeholder="Código inmueble, ejemplo: INM-001"
-              value={formulario.codigoInmueble}
-              onChange={manejarCambio}
-              style={inputStyle}
-            />
-
-            <select
-              name="tipoSolicitud"
-              value={formulario.tipoSolicitud}
-              onChange={manejarCambio}
-              style={inputStyle}
-            >
-              <option value="VISITA">Solicitar visita</option>
-              <option value="ATENCION">Solicitar atención</option>
-              <option value="COMPRA">Intención de compra</option>
-              <option value="ARRIENDO">Intención de arriendo</option>
-              <option value="INFORMACION">Solicitar información</option>
-            </select>
-
-            <textarea
-              name="descripcion"
-              placeholder="Describe tu solicitud"
-              value={formulario.descripcion}
-              onChange={manejarCambio}
-              required
-              style={textareaStyle}
-            />
+        <div style={requestBoxStyle}>
+          <div>
+            <strong style={requestTitleStyle}>Solicitud general de asesoria</strong>
+            <p style={mutedTextStyle}>
+              No necesitas escribir codigos ni descripciones. El sistema registra
+              la solicitud con tus datos de cliente.
+            </p>
           </div>
 
-          <div style={buttonRowStyle}>
-            <button type="submit" style={primaryButton}>
-              Enviar solicitud
-            </button>
-
-            <button type="button" onClick={limpiarFormulario} style={secondaryButton}>
-              Limpiar
-            </button>
-          </div>
-        </form>
+          <button
+            type="button"
+            onClick={generarSolicitud}
+            disabled={generandoSolicitud}
+            style={{
+              ...primaryButton,
+              ...(generandoSolicitud ? disabledButtonStyle : {}),
+            }}
+          >
+            {generandoSolicitud ? "Generando..." : "Generar solicitud"}
+          </button>
+        </div>
       </section>
 
       <section style={panelStyle}>
@@ -320,7 +187,7 @@ function MisSolicitudesPage() {
                 <div style={cardTopStyle}>
                   <div>
                     <h3 style={cardTitleStyle}>
-                      {solicitud.tipoSolicitud} · {solicitud.id}
+                      {solicitud.tipoSolicitud} - {solicitud.id}
                     </h3>
 
                     <p style={cardSubtitleStyle}>
@@ -328,26 +195,15 @@ function MisSolicitudesPage() {
                     </p>
                   </div>
 
-                  <span
-                    style={{
-                      ...pillStyle,
-                      ...obtenerEstiloEstado(solicitud.estado),
-                    }}
-                  >
+                  <span style={{ ...pillStyle, ...obtenerEstiloEstado(solicitud.estado) }}>
                     {solicitud.estado}
                   </span>
                 </div>
 
                 <div style={chipGridStyle}>
-                  <span
-                    style={{
-                      ...pillStyle,
-                      ...obtenerEstiloPrioridad(solicitud.prioridad),
-                    }}
-                  >
-                    Prioridad {solicitud.prioridad}
+                  <span style={chipStyle}>
+                    Prioridad: {solicitud.prioridad || "MEDIA"}
                   </span>
-
                   <span style={chipStyle}>
                     Asesor: {solicitud.idAsesorAsignado || "Sin asignar"}
                   </span>
@@ -364,7 +220,7 @@ function MisSolicitudesPage() {
 
                 <div style={cardFooterStyle}>
                   <small style={dateTextStyle}>
-                    Creada: {solicitud.fechaCreacion || "—"}
+                    Creada: {formatearFecha(solicitud.fechaCreacion)}
                   </small>
 
                   {solicitud.estado === "PENDIENTE" && (
@@ -386,10 +242,10 @@ function MisSolicitudesPage() {
   );
 }
 
-function SummaryCard({ icono, titulo, valor, texto }) {
+function SummaryCard({ titulo, valor, texto }) {
   return (
     <article style={summaryCardStyle}>
-      <div style={summaryIconStyle}>{icono}</div>
+      <div style={summaryIconStyle}>SOL</div>
 
       <div>
         <p style={summaryTitleStyle}>{titulo}</p>
@@ -403,7 +259,7 @@ function SummaryCard({ icono, titulo, valor, texto }) {
 function EmptyState({ texto }) {
   return (
     <div style={emptyStateStyle}>
-      <span style={{ fontSize: "2rem" }}>📩</span>
+      <strong>Solicitudes</strong>
       <p>{texto}</p>
     </div>
   );
@@ -537,7 +393,9 @@ const summaryIconStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: "1.35rem",
+  color: "#d2bbff",
+  fontSize: "0.74rem",
+  fontWeight: "900",
 };
 
 const summaryTitleStyle = {
@@ -591,37 +449,37 @@ const mutedTextStyle = {
   color: "#9f92b2",
   margin: "6px 0 0",
   lineHeight: 1.55,
+  maxWidth: "820px",
 };
 
-const formGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  gap: "12px",
+const modeBadgeStyle = {
+  padding: "8px 12px",
+  borderRadius: "999px",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
+  color: "#d2bbff",
+  fontWeight: "900",
+  fontSize: "0.76rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
 };
 
-const inputStyle = {
-  width: "100%",
-  padding: "12px 13px",
-  borderRadius: "14px",
-  border: "1px solid #37333e",
-  outline: "none",
+const requestBoxStyle = {
+  padding: "18px",
+  borderRadius: "20px",
   background: "#15121b",
-  color: "#e8dfee",
-  fontWeight: "650",
-};
-
-const textareaStyle = {
-  ...inputStyle,
-  gridColumn: "1 / -1",
-  minHeight: "90px",
-  resize: "vertical",
-};
-
-const buttonRowStyle = {
+  border: "1px solid #37333e",
   display: "flex",
-  gap: "10px",
+  justifyContent: "space-between",
+  gap: "18px",
+  alignItems: "center",
   flexWrap: "wrap",
-  marginTop: "16px",
+};
+
+const requestTitleStyle = {
+  display: "block",
+  color: "#ffffff",
+  fontSize: "1rem",
 };
 
 const primaryButton = {
@@ -635,6 +493,11 @@ const primaryButton = {
   boxShadow: "0 14px 28px rgba(124,58,237,0.24)",
 };
 
+const disabledButtonStyle = {
+  opacity: 0.72,
+  cursor: "not-allowed",
+};
+
 const secondaryButton = {
   padding: "11px 16px",
   border: "1px solid #6d5f7a",
@@ -643,18 +506,6 @@ const secondaryButton = {
   color: "#d2bbff",
   fontWeight: "900",
   cursor: "pointer",
-};
-
-const modeBadgeStyle = {
-  padding: "8px 12px",
-  borderRadius: "999px",
-  background: "#3f2a57",
-  border: "1px solid #6d5f7a",
-  color: "#d2bbff",
-  fontWeight: "900",
-  fontSize: "0.76rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
 };
 
 const cardsGridStyle = {
@@ -696,6 +547,36 @@ const pillStyle = {
   fontSize: "0.75rem",
   fontWeight: "900",
   whiteSpace: "nowrap",
+};
+
+const badgePendingStyle = {
+  background: "#3a2d00",
+  color: "#ffd76a",
+  border: "1px solid #826300",
+};
+
+const badgeActiveStyle = {
+  background: "#10294f",
+  color: "#93c5fd",
+  border: "1px solid #1d4ed8",
+};
+
+const badgeDoneStyle = {
+  background: "#12351f",
+  color: "#86efac",
+  border: "1px solid #225c37",
+};
+
+const badgeDangerStyle = {
+  background: "#3a1218",
+  color: "#ffb4ab",
+  border: "1px solid #7a2c35",
+};
+
+const badgeNeutralStyle = {
+  background: "#15121b",
+  color: "#ccc3d8",
+  border: "1px solid #37333e",
 };
 
 const chipGridStyle = {

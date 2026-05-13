@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import historialService from "../services/historialService";
 import authService from "../services/authService";
 
@@ -9,30 +9,11 @@ function HistorialPage() {
   const [clienteId, setClienteId] = useState(
     rol === "CLIENTE" ? clienteAutenticado || "" : ""
   );
-
   const [historial, setHistorial] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [modoReverso, setModoReverso] = useState(false);
 
-  const [formulario, setFormulario] = useState({
-    codigoInmueble: "",
-    tipoInteraccion: "CONSULTADO",
-    descripcion: "",
-  });
-
-  useEffect(() => {
-    if (rol === "CLIENTE" && clienteId) {
-      cargarHistorial();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (clienteId) {
-      cargarHistorial();
-    }
-  }, [modoReverso]);
-
-  const cargarHistorial = async () => {
+  const cargarHistorial = useCallback(async () => {
     if (!clienteId || !clienteId.trim()) {
       alert("Debes ingresar el ID del cliente");
       return;
@@ -40,7 +21,6 @@ function HistorialPage() {
 
     try {
       setCargando(true);
-
       const data = modoReverso
         ? await historialService.listarReversoPorCliente(clienteId)
         : await historialService.listarPorCliente(clienteId);
@@ -52,107 +32,100 @@ function HistorialPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [clienteId, modoReverso]);
 
-  const manejarCambio = (e) => {
-    const { name, value } = e.target;
-
-    setFormulario({
-      ...formulario,
-      [name]: value,
-    });
-  };
-
-  const limpiarFormulario = () => {
-    setFormulario({
-      codigoInmueble: "",
-      tipoInteraccion: "CONSULTADO",
-      descripcion: "",
-    });
-  };
-
-  const registrarInteraccion = async (e) => {
-    e.preventDefault();
-
-    if (!clienteId.trim()) {
-      alert("Debes ingresar el ID del cliente");
-      return;
+  useEffect(() => {
+    if (rol === "CLIENTE" && clienteId) {
+      cargarHistorial();
     }
+  }, [cargarHistorial, clienteId, rol]);
 
-    try {
-      await historialService.crear({
-        idCliente: clienteId,
-        codigoInmueble: formulario.codigoInmueble,
-        tipoInteraccion: formulario.tipoInteraccion,
-      });
+  const tiposDeInteraccion = useMemo(() => {
+    return historial.map((item) => (item.tipoInteraccion || "").toUpperCase());
+  }, [historial]);
 
-      alert("Interacción registrada correctamente");
-      limpiarFormulario();
-      await cargarHistorial();
-    } catch (error) {
-      console.error("Error al registrar interacción:", error);
-      alert("No se pudo registrar la interacción");
-    }
+  const cambiarModo = () => {
+    setModoReverso((actual) => !actual);
   };
 
-  const cambiarModo = async () => {
-    setModoReverso(!modoReverso);
+  const contarPorTexto = (texto) => {
+    return tiposDeInteraccion.filter((tipo) => tipo.includes(texto)).length;
+  };
+
+  const contarSolicitudes = () => {
+    return tiposDeInteraccion.filter((tipo) => tipo.startsWith("SOLICITUD_"))
+      .length;
   };
 
   const obtenerEstiloTipo = (tipo) => {
     const valor = (tipo || "").toUpperCase();
 
-    if (valor === "CONSULTADO") {
-      return {
-        background: "#10294f",
-        color: "#93c5fd",
-        border: "1px solid #1d4ed8",
-      };
+    if (valor.includes("VISITA")) {
+      return badgeBlueStyle;
     }
 
-    if (valor === "VISITADO") {
-      return {
-        background: "#12351f",
-        color: "#86efac",
-        border: "1px solid #225c37",
-      };
+    if (valor.includes("FAVORITO")) {
+      return badgePurpleStyle;
     }
 
-    if (valor === "GUARDADO") {
-      return {
-        background: "#3f2a57",
-        color: "#d2bbff",
-        border: "1px solid #6d5f7a",
-      };
+    if (valor.includes("COMPRA") || valor.includes("ARRIENDO")) {
+      return badgeGreenStyle;
     }
 
-    if (valor === "DESCARTADO") {
-      return {
-        background: "#3a1218",
-        color: "#ffb4ab",
-        border: "1px solid #7a2c35",
-      };
+    if (valor.includes("CANCELAR") || valor.includes("ELIMINAR")) {
+      return badgeRedStyle;
     }
 
-    if (valor === "NEGOCIADO") {
-      return {
-        background: "#3a2d00",
-        color: "#ffd76a",
-        border: "1px solid #826300",
-      };
+    if (valor.includes("INFORMACION")) {
+      return badgeGoldStyle;
     }
 
-    return {
-      background: "#15121b",
-      color: "#ccc3d8",
-      border: "1px solid #37333e",
-    };
+    return badgeNeutralStyle;
   };
 
-  const contarPorTipo = (tipo) => {
-    return historial.filter(
-      (item) => (item.tipoInteraccion || "").toUpperCase() === tipo
-    ).length;
+  const obtenerDescripcionInteraccion = (item) => {
+    const tipo = (item.tipoInteraccion || "").toUpperCase();
+    const codigo = item.codigoInmueble || "el inmueble";
+
+    if (tipo === "FAVORITO") {
+      return `Agregaste ${codigo} a favoritos desde la card del inmueble.`;
+    }
+
+    if (tipo === "ELIMINAR_FAVORITO") {
+      return `Eliminaste ${codigo} de tu lista de favoritos.`;
+    }
+
+    if (tipo === "SOLICITUD_COMPRA") {
+      return `Enviaste una intencion de compra para ${codigo}.`;
+    }
+
+    if (tipo === "SOLICITUD_ARRIENDO") {
+      return `Enviaste una intencion de arriendo para ${codigo}.`;
+    }
+
+    if (tipo === "SOLICITUD_VISITA" || tipo === "AGENDAR_VISITA") {
+      return `Solicitaste una visita para ${codigo}.`;
+    }
+
+    if (tipo === "SOLICITUD_INFORMACION") {
+      return `Pediste mas informacion sobre ${codigo}.`;
+    }
+
+    if (tipo === "REPROGRAMAR_VISITA") {
+      return `Reprogramaste una visita asociada a ${codigo}.`;
+    }
+
+    if (tipo === "CANCELAR_VISITA") {
+      return `Cancelaste una visita asociada a ${codigo}.`;
+    }
+
+    return `Actividad registrada automaticamente sobre ${codigo}.`;
+  };
+
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "-";
+
+    return String(fecha).replace("T", " ").slice(0, 19);
   };
 
   return (
@@ -161,16 +134,16 @@ function HistorialPage() {
 
       <section style={headerStyle}>
         <div>
-          <p style={eyebrowStyle}>REGISTRO DE INTERACCIONES</p>
+          <p style={eyebrowStyle}>REGISTRO AUTOMATICO</p>
 
           <h1 style={mainTitleStyle}>
             Mi <span style={titleAccentStyle}>historial</span>
           </h1>
 
           <p style={descriptionStyle}>
-            Consulta el historial de interacción del cliente con los inmuebles,
-            revisa actividad reciente o anterior y registra nuevas interacciones
-            comerciales.
+            Consulta la actividad generada automaticamente cuando guardas
+            favoritos, solicitas visitas o manifiestas interes por comprar,
+            arrendar o recibir informacion.
           </p>
         </div>
 
@@ -182,31 +155,27 @@ function HistorialPage() {
 
       <section style={summaryGridStyle}>
         <SummaryCard
-          icono="🕘"
           titulo="Total"
           valor={historial.length}
           texto="Interacciones cargadas"
         />
 
         <SummaryCard
-          icono="🔎"
-          titulo="Consultados"
-          valor={contarPorTipo("CONSULTADO")}
-          texto="Inmuebles revisados"
+          titulo="Solicitudes"
+          valor={contarSolicitudes()}
+          texto="Acciones enviadas"
         />
 
         <SummaryCard
-          icono="📅"
-          titulo="Visitados"
-          valor={contarPorTipo("VISITADO")}
-          texto="Visitas o recorridos"
+          titulo="Visitas"
+          valor={contarPorTexto("VISITA")}
+          texto="Agenda y cambios"
         />
 
         <SummaryCard
-          icono="⭐"
-          titulo="Guardados"
-          valor={contarPorTipo("GUARDADO")}
-          texto="Interés marcado"
+          titulo="Favoritos"
+          valor={contarPorTexto("FAVORITO")}
+          texto="Interes marcado"
         />
       </section>
 
@@ -218,7 +187,7 @@ function HistorialPage() {
 
             <p style={mutedTextStyle}>
               {rol === "CLIENTE"
-                ? "Estás consultando el historial asociado a tu cuenta."
+                ? "Estas consultando el historial asociado a tu cuenta."
                 : "Ingresa el ID del cliente para consultar su historial."}
             </p>
           </div>
@@ -255,60 +224,18 @@ function HistorialPage() {
       <section style={panelStyle}>
         <div style={panelHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>NUEVA INTERACCIÓN</p>
-            <h2 style={titleStyle}>Registrar interacción</h2>
+            <p style={eyebrowStyle}>AUTOMATIZACION</p>
+            <h2 style={titleStyle}>Interacciones automaticas</h2>
 
             <p style={mutedTextStyle}>
-              Registra una acción del cliente sobre un inmueble específico.
+              El historial se actualiza solo cuando realizas acciones reales
+              dentro del sistema. Ya no necesitas escribir codigos ni registrar
+              interacciones manualmente.
             </p>
           </div>
+
+          <span style={modeBadgeStyle}>Sin captura manual</span>
         </div>
-
-        <form onSubmit={registrarInteraccion}>
-          <div style={formGridStyle}>
-            <input
-              type="text"
-              name="codigoInmueble"
-              placeholder="Código inmueble, ejemplo: INM-001"
-              value={formulario.codigoInmueble}
-              onChange={manejarCambio}
-              required
-              style={inputStyle}
-            />
-
-            <select
-              name="tipoInteraccion"
-              value={formulario.tipoInteraccion}
-              onChange={manejarCambio}
-              style={inputStyle}
-            >
-              <option value="CONSULTADO">CONSULTADO</option>
-              <option value="VISITADO">VISITADO</option>
-              <option value="GUARDADO">GUARDADO</option>
-              <option value="DESCARTADO">DESCARTADO</option>
-              <option value="NEGOCIADO">NEGOCIADO</option>
-            </select>
-
-            <input
-              type="text"
-              name="descripcion"
-              placeholder="Descripción"
-              value={formulario.descripcion}
-              onChange={manejarCambio}
-              style={inputStyle}
-            />
-          </div>
-
-          <div style={buttonRowStyle}>
-            <button type="submit" style={primaryButton}>
-              Registrar interacción
-            </button>
-
-            <button type="button" onClick={limpiarFormulario} style={secondaryButton}>
-              Limpiar
-            </button>
-          </div>
-        </form>
       </section>
 
       <section style={panelStyle}>
@@ -318,7 +245,8 @@ function HistorialPage() {
             <h2 style={titleStyle}>Historial de actividad</h2>
 
             <p style={mutedTextStyle}>
-              Lista de interacciones registradas para el cliente consultado.
+              Lista de interacciones generadas por favoritos, solicitudes y
+              visitas del cliente consultado.
             </p>
           </div>
 
@@ -330,7 +258,7 @@ function HistorialPage() {
         {cargando ? (
           <EmptyState texto="Cargando historial..." />
         ) : historial.length === 0 ? (
-          <EmptyState texto="No hay historial registrado." />
+          <EmptyState texto="No hay historial registrado. Se llenara automaticamente cuando uses el catalogo." />
         ) : (
           <div style={tableWrapperStyle}>
             <table style={tableStyle}>
@@ -339,14 +267,14 @@ function HistorialPage() {
                   <th style={thStyle}>Cliente</th>
                   <th style={thStyle}>Inmueble</th>
                   <th style={thStyle}>Tipo</th>
-                  <th style={thStyle}>Descripción</th>
+                  <th style={thStyle}>Detalle</th>
                   <th style={thStyle}>Fecha</th>
                 </tr>
               </thead>
 
               <tbody>
                 {historial.map((item, index) => (
-                  <tr key={`${item.codigoInmueble}-${index}`}>
+                  <tr key={`${item.codigoInmueble}-${item.tipoInteraccion}-${index}`}>
                     <td style={tdStrongStyle}>{item.idCliente || clienteId}</td>
                     <td style={tdStyle}>{item.codigoInmueble}</td>
 
@@ -362,12 +290,10 @@ function HistorialPage() {
                     </td>
 
                     <td style={tdDescriptionStyle}>
-                      {item.descripcion || formulario.descripcion || "—"}
+                      {obtenerDescripcionInteraccion(item)}
                     </td>
 
-                    <td style={tdStyle}>
-                      {item.fecha || item.fechaInteraccion || "—"}
-                    </td>
+                    <td style={tdStyle}>{formatearFecha(item.fecha)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -379,10 +305,10 @@ function HistorialPage() {
   );
 }
 
-function SummaryCard({ icono, titulo, valor, texto }) {
+function SummaryCard({ titulo, valor, texto }) {
   return (
     <article style={summaryCardStyle}>
-      <div style={summaryIconStyle}>{icono}</div>
+      <div style={summaryIconStyle}>ACT</div>
 
       <div>
         <p style={summaryTitleStyle}>{titulo}</p>
@@ -396,7 +322,7 @@ function SummaryCard({ icono, titulo, valor, texto }) {
 function EmptyState({ texto }) {
   return (
     <div style={emptyStateStyle}>
-      <span style={{ fontSize: "2rem" }}>🕘</span>
+      <strong>Actividad automatica</strong>
       <p>{texto}</p>
     </div>
   );
@@ -534,7 +460,9 @@ const summaryIconStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: "1.35rem",
+  color: "#d2bbff",
+  fontSize: "0.74rem",
+  fontWeight: "900",
 };
 
 const summaryTitleStyle = {
@@ -588,6 +516,7 @@ const mutedTextStyle = {
   color: "#9f92b2",
   margin: "6px 0 0",
   lineHeight: 1.55,
+  maxWidth: "820px",
 };
 
 const formRowStyle = {
@@ -597,15 +526,9 @@ const formRowStyle = {
   alignItems: "center",
 };
 
-const formGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  gap: "12px",
-};
-
 const inputStyle = {
   width: "100%",
-  maxWidth: "100%",
+  maxWidth: "420px",
   padding: "12px 13px",
   borderRadius: "14px",
   border: "1px solid #37333e",
@@ -613,13 +536,6 @@ const inputStyle = {
   background: "#15121b",
   color: "#e8dfee",
   fontWeight: "650",
-};
-
-const buttonRowStyle = {
-  display: "flex",
-  gap: "10px",
-  flexWrap: "wrap",
-  marginTop: "16px",
 };
 
 const primaryButton = {
@@ -705,6 +621,42 @@ const pillStyle = {
   fontSize: "0.75rem",
   fontWeight: "900",
   whiteSpace: "nowrap",
+};
+
+const badgeBlueStyle = {
+  background: "#10294f",
+  color: "#93c5fd",
+  border: "1px solid #1d4ed8",
+};
+
+const badgePurpleStyle = {
+  background: "#3f2a57",
+  color: "#d2bbff",
+  border: "1px solid #6d5f7a",
+};
+
+const badgeGreenStyle = {
+  background: "#12351f",
+  color: "#86efac",
+  border: "1px solid #225c37",
+};
+
+const badgeRedStyle = {
+  background: "#3a1218",
+  color: "#ffb4ab",
+  border: "1px solid #7a2c35",
+};
+
+const badgeGoldStyle = {
+  background: "#3a2d00",
+  color: "#ffd76a",
+  border: "1px solid #826300",
+};
+
+const badgeNeutralStyle = {
+  background: "#15121b",
+  color: "#ccc3d8",
+  border: "1px solid #37333e",
 };
 
 const emptyStateStyle = {

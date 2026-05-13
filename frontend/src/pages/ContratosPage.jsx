@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import contratoService from "../services/contratoService";
 
 function ContratosPage() {
@@ -21,11 +21,7 @@ function ContratosPage() {
     observacion: "",
   });
 
-  useEffect(() => {
-    cargarContratos();
-  }, []);
-
-  const cargarContratos = async () => {
+  const cargarContratos = useCallback(async () => {
     try {
       setCargando(true);
 
@@ -40,7 +36,11 @@ function ContratosPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [filtroEstado]);
+
+  useEffect(() => {
+    cargarContratos();
+  }, [cargarContratos]);
 
   const cargarProximosAVencer = async () => {
     try {
@@ -98,10 +98,16 @@ function ContratosPage() {
   };
 
   const prepararContrato = () => {
-    return {
+    const contrato = {
       ...formulario,
       valor: Number(formulario.valor),
     };
+
+    if (!editando) {
+      delete contrato.id;
+    }
+
+    return contrato;
   };
 
   const guardarContrato = async (e) => {
@@ -306,20 +312,6 @@ function ContratosPage() {
           <div style={formGridStyle}>
             <input
               type="text"
-              name="id"
-              placeholder="ID contrato, ejemplo: CON-001"
-              value={formulario.id}
-              disabled={editando}
-              onChange={manejarCambio}
-              required
-              style={{
-                ...inputStyle,
-                ...(editando ? disabledInputStyle : {}),
-              }}
-            />
-
-            <input
-              type="text"
               name="codigoInmueble"
               placeholder="Código inmueble, ejemplo: INM-001"
               value={formulario.codigoInmueble}
@@ -345,15 +337,6 @@ function ContratosPage() {
               value={formulario.idAsesor}
               onChange={manejarCambio}
               required
-              style={inputStyle}
-            />
-
-            <input
-              type="text"
-              name="idOperacion"
-              placeholder="ID operación, opcional"
-              value={formulario.idOperacion}
-              onChange={manejarCambio}
               style={inputStyle}
             />
 
@@ -808,11 +791,6 @@ const inputStyle = {
   background: "#15121b",
   color: "#e8dfee",
   fontWeight: "650",
-};
-
-const disabledInputStyle = {
-  opacity: 0.65,
-  cursor: "not-allowed",
 };
 
 const buttonRowStyle = {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import visitaService from "../services/visitaService";
 
 function VisitasPage() {
@@ -30,7 +30,7 @@ function VisitasPage() {
     observacion: "",
   });
 
-  const cargarVisitas = async () => {
+  const cargarVisitas = useCallback(async () => {
     try {
       setCargando(true);
 
@@ -45,11 +45,11 @@ function VisitasPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [filtroEstado]);
 
   useEffect(() => {
     cargarVisitas();
-  }, [filtroEstado]);
+  }, [cargarVisitas]);
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
@@ -114,8 +114,13 @@ function VisitasPage() {
 
     const visita = {
       ...formulario,
-      id: Number(formulario.id),
     };
+
+    if (editando) {
+      visita.id = Number(formulario.id);
+    } else {
+      delete visita.id;
+    }
 
     try {
       if (editando) {
@@ -347,20 +352,6 @@ function VisitasPage() {
 
         <form onSubmit={manejarSubmitPrincipal}>
           <div style={formGridStyle}>
-            <input
-              type="number"
-              name="id"
-              placeholder="ID"
-              value={formulario.id}
-              onChange={manejarCambio}
-              disabled={editando}
-              required
-              style={{
-                ...inputStyle,
-                ...(editando ? disabledInputStyle : {}),
-              }}
-            />
-
             <input
               type="text"
               name="idCliente"
@@ -910,11 +901,6 @@ const inputStyle = {
   background: "#15121b",
   color: "#e8dfee",
   fontWeight: "650",
-};
-
-const disabledInputStyle = {
-  opacity: 0.65,
-  cursor: "not-allowed",
 };
 
 const twoColumnsStyle = {

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import favoritoService from "../services/favoritoService";
 import authService from "../services/authService";
+import InmuebleCover from "../components/InmuebleCover";
 
 function FavoritosPage() {
   const rol = authService.getRol();
@@ -10,17 +11,10 @@ function FavoritosPage() {
     rol === "CLIENTE" ? clienteAutenticado || "" : ""
   );
 
-  const [codigoInmueble, setCodigoInmueble] = useState("");
   const [favoritos, setFavoritos] = useState([]);
   const [cargando, setCargando] = useState(false);
 
-  useEffect(() => {
-    if (rol === "CLIENTE" && clienteId) {
-      cargarFavoritos();
-    }
-  }, []);
-
-  const cargarFavoritos = async () => {
+  const cargarFavoritos = useCallback(async () => {
     if (!clienteId || !clienteId.trim()) {
       alert("Debes ingresar el ID del cliente");
       return;
@@ -36,27 +30,13 @@ function FavoritosPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [clienteId]);
 
-  const agregarFavorito = async (e) => {
-    e.preventDefault();
-
-    if (!clienteId.trim() || !codigoInmueble.trim()) {
-      alert("Debes ingresar cliente e inmueble");
-      return;
+  useEffect(() => {
+    if (rol === "CLIENTE" && clienteId) {
+      cargarFavoritos();
     }
-
-    try {
-      await favoritoService.agregar(clienteId, codigoInmueble);
-
-      alert("Favorito agregado correctamente");
-      setCodigoInmueble("");
-      await cargarFavoritos();
-    } catch (error) {
-      console.error("Error al agregar favorito:", error);
-      alert("No se pudo agregar el favorito");
-    }
-  };
+  }, [cargarFavoritos, clienteId, rol]);
 
   const eliminarFavorito = async (codigo) => {
     const confirmar = window.confirm(
@@ -154,9 +134,9 @@ function FavoritosPage() {
 
         <SummaryCard
           icono="🏠"
-          titulo="Nuevo favorito"
-          valor={codigoInmueble || "—"}
-          texto="Código pendiente por agregar"
+          titulo="Agregar desde catalogo"
+          valor="Catalogo"
+          texto="Desde la card del inmueble"
           textValue
         />
       </section>
@@ -166,11 +146,11 @@ function FavoritosPage() {
           <div style={panelHeaderStyle}>
             <div>
               <p style={eyebrowStyle}>CONSULTA</p>
-              <h2 style={titleStyle}>Buscar favoritos</h2>
+              <h2 style={titleStyle}>Favoritos de la cuenta</h2>
 
               <p style={mutedTextStyle}>
                 {rol === "CLIENTE"
-                  ? "Estás consultando los favoritos asociados a tu cuenta."
+                  ? "Estos favoritos se sincronizan cuando guardas un inmueble desde el catalogo."
                   : "Ingresa el ID del cliente para consultar sus favoritos."}
               </p>
             </div>
@@ -198,36 +178,6 @@ function FavoritosPage() {
               Cargar favoritos
             </button>
           </div>
-        </div>
-
-        <div style={panelStyle}>
-          <div style={panelHeaderStyle}>
-            <div>
-              <p style={eyebrowStyle}>NUEVO FAVORITO</p>
-              <h2 style={titleStyle}>Agregar inmueble</h2>
-
-              <p style={mutedTextStyle}>
-                Escribe el código del inmueble que deseas agregar a tu lista de
-                favoritos.
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={agregarFavorito}>
-            <div style={formRowStyle}>
-              <input
-                type="text"
-                placeholder="Código del inmueble, ejemplo: INM-001"
-                value={codigoInmueble}
-                onChange={(e) => setCodigoInmueble(e.target.value)}
-                style={inputStyle}
-              />
-
-              <button type="submit" style={primaryButton}>
-                Agregar favorito
-              </button>
-            </div>
-          </form>
         </div>
       </section>
 
@@ -259,7 +209,7 @@ function FavoritosPage() {
 
               return (
                 <article key={`${codigo}-${index}`} style={cardStyle}>
-                  <div style={imagePlaceholderStyle}>⭐</div>
+                  <InmuebleCover inmueble={favorito} height={120} />
 
                   <div style={cardTopStyle}>
                     <div>
@@ -631,20 +581,6 @@ const cardStyle = {
   transition: "0.28s ease",
 };
 
-const imagePlaceholderStyle = {
-  height: "120px",
-  borderRadius: "20px",
-  background: "linear-gradient(135deg, #3f2a57, #7c3aed)",
-  marginBottom: "16px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  fontSize: "3rem",
-  border: "1px solid #6d5f7a",
-  boxShadow: "0 0 22px rgba(124,58,237,0.18)",
-};
-
 const cardTopStyle = {
   display: "flex",
   justifyContent: "space-between",
@@ -743,3 +679,4 @@ const emptyStateStyle = {
 };
 
 export default FavoritosPage;
+

@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS inmueble (
     banos INT NOT NULL,
     estado VARCHAR(40) NOT NULL,
     disponible BOOLEAN NOT NULL,
-    asesor_id_responsable VARCHAR(20)
+    asesor_id_responsable VARCHAR(20),
+    imagen_url VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS cliente (

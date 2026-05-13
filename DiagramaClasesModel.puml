@@ -1,0 +1,246 @@
+@startuml
+left to right direction
+
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 55
+hide circle
+hide empty members
+
+skinparam class {
+  BackgroundColor #F8FAFC
+  BorderColor #1E3A8A
+  ArrowColor #334155
+}
+
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #CBD5E1
+}
+
+title Diagrama de clases - Paquete Model
+
+package "Autenticacion" as autenticacion {
+  enum Role {
+    ADMIN
+    CLIENTE
+  }
+
+  class AuthUsuario <<Model, Comparable>> {
+    - id: int
+    - username: String
+    - passwordHash: String
+    - rol: Role
+    - clienteId: String
+    - activo: boolean
+    + compareTo(otro: AuthUsuario): int
+  }
+
+  class AuthToken <<Model, Comparable>> {
+    - id: int
+    - token: String
+    - username: String
+    - rol: Role
+    - clienteId: String
+    - creadoEn: LocalDateTime
+    - expiraEn: LocalDateTime
+    - revocado: boolean
+    + compareTo(otro: AuthToken): int
+  }
+}
+
+package "Actores" as actores {
+  class Cliente <<Model, Comparable>> {
+    - id: String
+    - nombre: String
+    - correo: String
+    - telefono: String
+    - tipoCliente: String
+    - presupuesto: double
+    - zonasInteres: String
+    - tipoInmuebleDeseado: String
+    - habitacionesMinimas: int
+    - estadoBusqueda: String
+    + compareTo(otro: Cliente): int
+  }
+
+  class Asesor <<Model, Comparable>> {
+    - id: String
+    - nombre: String
+    - contacto: String
+    - especialidadZona: String
+    - cantidadCierres: int
+    + compareTo(otro: Asesor): int
+  }
+}
+
+package "Inventario" as inventario {
+  class Inmueble <<Model, Comparable>> {
+    - codigo: String
+    - direccion: String
+    - ciudad: String
+    - barrioZona: String
+    - tipoInmueble: String
+    - finalidad: String
+    - precio: double
+    - area: double
+    - habitaciones: int
+    - banos: int
+    - estado: String
+    - disponible: boolean
+    - idAsesorResponsable: String
+    + compareTo(otro: Inmueble): int
+  }
+}
+
+package "Gestion comercial" as gestion {
+  class Visita <<Model, Comparable>> {
+    - id: int
+    - idCliente: String
+    - codigoInmueble: String
+    - idAsesor: String
+    - fecha: LocalDate
+    - hora: LocalTime
+    - estado: String
+    - observacion: String
+    + compareTo(otra: Visita): int
+  }
+
+  class SolicitudAtencion <<Model, Comparable>> {
+    - id: String
+    - idCliente: String
+    - codigoInmueble: String
+    - tipoSolicitud: String
+    - descripcion: String
+    - estado: String
+    - prioridad: String
+    - fechaCreacion: LocalDateTime
+    - fechaAtencion: LocalDateTime
+    - idAsesorAsignado: String
+    - respuesta: String
+    + estaPendiente(): boolean
+    + esAltaPrioridad(): boolean
+    + esSolicitudDeVisita(): boolean
+    + esIntencionComercial(): boolean
+    + compareTo(otra: SolicitudAtencion): int
+  }
+
+  class Operacion <<Model, Comparable>> {
+    - id: String
+    - codigoInmueble: String
+    - idCliente: String
+    - idAsesor: String
+    - fecha: LocalDate
+    - tipoOperacion: String
+    - valorAcordado: double
+    - comision: double
+    - estadoProceso: String
+    + compareTo(otra: Operacion): int
+  }
+
+  class Contrato <<Model, Comparable>> {
+    - id: String
+    - codigoInmueble: String
+    - idCliente: String
+    - idAsesor: String
+    - idOperacion: String
+    - tipoContrato: String
+    - fechaInicio: LocalDate
+    - fechaFin: LocalDate
+    - valor: double
+    - estado: String
+    - observacion: String
+    + estaProximoAVencer(dias: int): boolean
+    + estaVencido(): boolean
+    + compareTo(otro: Contrato): int
+  }
+}
+
+package "Actividad y monitoreo" as monitoreo {
+  class Interaccion <<Model, Comparable>> {
+    - id: int
+    - idCliente: String
+    - codigoInmueble: String
+    - tipoInteraccion: String
+    - fecha: LocalDateTime
+    + compareTo(otra: Interaccion): int
+  }
+
+  class Alerta <<Model, Comparable>> {
+    - id: String
+    - tipo: String
+    - descripcion: String
+    - nivelAtencion: String
+    - fechaCreacion: LocalDateTime
+    - estado: String
+    + compareTo(otra: Alerta): int
+  }
+
+  class EventoInusual <<Model, Comparable>> {
+    - id: String
+    - tipo: String
+    - descripcion: String
+    - nivelAtencion: String
+    - fechaDeteccion: LocalDateTime
+    - estado: String
+    - entidadReferencia: String
+    + compareTo(otro: EventoInusual): int
+  }
+}
+
+' Orden visual de los grupos del modelo.
+autenticacion -[hidden]right-> actores
+actores -[hidden]right-> inventario
+inventario -[hidden]right-> gestion
+gestion -[hidden]right-> monitoreo
+
+' Relaciones de autenticacion.
+AuthUsuario --> Role : rol
+AuthToken --> Role : rol
+AuthUsuario "0..*" --> "0..1" Cliente : clienteId
+AuthToken "0..*" --> "0..1" Cliente : clienteId
+AuthToken ..> AuthUsuario : username
+
+' Relaciones principales del dominio inmobiliario.
+Asesor "1" --> "0..*" Inmueble : idAsesorResponsable
+
+Cliente "1" --> "0..*" Visita : idCliente
+Inmueble "1" --> "0..*" Visita : codigoInmueble
+Asesor "1" --> "0..*" Visita : idAsesor
+
+Cliente "1" --> "0..*" SolicitudAtencion : idCliente
+Inmueble "0..1" --> "0..*" SolicitudAtencion : codigoInmueble
+Asesor "0..1" --> "0..*" SolicitudAtencion : idAsesorAsignado
+
+Cliente "1" --> "0..*" Operacion : idCliente
+Inmueble "1" --> "0..*" Operacion : codigoInmueble
+Asesor "1" --> "0..*" Operacion : idAsesor
+
+Cliente "1" --> "0..*" Contrato : idCliente
+Inmueble "1" --> "0..*" Contrato : codigoInmueble
+Asesor "1" --> "0..*" Contrato : idAsesor
+Operacion "1" --> "0..1" Contrato : idOperacion
+
+Cliente "1" --> "0..*" Interaccion : idCliente
+Inmueble "1" --> "0..*" Interaccion : codigoInmueble
+
+' Relaciones conceptuales de monitoreo.
+EventoInusual ..> Alerta : puede derivar seguimiento
+EventoInusual ..> Inmueble : entidadReferencia
+EventoInusual ..> Visita : entidadReferencia
+EventoInusual ..> Operacion : entidadReferencia
+Alerta ..> Visita : tipo/descripcion
+Alerta ..> Inmueble : tipo/descripcion
+Alerta ..> Operacion : tipo/descripcion
+
+note bottom
+  Las relaciones entre clases del paquete model se guardan como llaves simples:
+  idCliente, codigoInmueble, idAsesor, idOperacion, clienteId y entidadReferencia.
+  Por eso el diagrama muestra asociaciones logicas del dominio, no atributos objeto.
+end note
+
+@enduml

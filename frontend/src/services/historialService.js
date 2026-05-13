@@ -10,11 +10,6 @@ const historialService = {
     const response = await api.get(`/clientes/${clienteId}/historial/reverso`);
     return response.data;
   },
-
-  crear: async (historial) => {
-    const response = await api.post("/interacciones", historial);
-    return response.data;
-  },
 };
 
 export default historialService;

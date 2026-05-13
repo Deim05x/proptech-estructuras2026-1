@@ -68,6 +68,8 @@ public class InmuebleService {
             return false;
         }
 
+        asignarImagenPorDefecto(inmueble);
+
         return inmuebleRepository.guardar(inmueble);
     }
 
@@ -86,6 +88,7 @@ public class InmuebleService {
         }
 
         inmuebleActualizado.setCodigo(codigo);
+        asignarImagenPorDefecto(inmuebleActualizado);
 
         return inmuebleRepository.actualizar(codigo, inmuebleActualizado);
     }
@@ -101,5 +104,18 @@ public class InmuebleService {
         }
 
         return inmuebleRepository.eliminar(codigo);
+    }
+
+    private void asignarImagenPorDefecto(Inmueble inmueble) {
+        if (inmueble == null || inmueble.getCodigo() == null || inmueble.getCodigo().trim().isEmpty()) {
+            return;
+        }
+
+        if (inmueble.getImagenUrl() != null && !inmueble.getImagenUrl().trim().isEmpty()) {
+            inmueble.setImagenUrl(inmueble.getImagenUrl().trim());
+            return;
+        }
+
+        inmueble.setImagenUrl("/inmuebles/" + inmueble.getCodigo().trim().toLowerCase() + ".jpg");
     }
 }

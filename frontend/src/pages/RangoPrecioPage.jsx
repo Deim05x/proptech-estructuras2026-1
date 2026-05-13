@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import rangoPrecioService from "../services/rangoPrecioService";
+import InmuebleCover from "../components/InmuebleCover";
 
 function RangoPrecioPage() {
   const [resultado, setResultado] = useState(null);
@@ -218,7 +219,7 @@ function RangoPrecioPage() {
           <div style={cardsGridStyle}>
             {inmuebles.map((inmueble) => (
               <article key={inmueble.codigo} style={cardStyle}>
-                <div style={imagePlaceholderStyle}>🏠</div>
+                <InmuebleCover inmueble={inmueble} height={130} />
 
                 <div style={cardTopStyle}>
                   <div>
@@ -556,20 +557,6 @@ const cardStyle = {
   borderRadius: "24px",
   padding: "18px",
   boxShadow: "0 18px 38px rgba(0,0,0,0.20)",
-};
-
-const imagePlaceholderStyle = {
-  height: "130px",
-  borderRadius: "20px",
-  background: "linear-gradient(135deg, #3f2a57, #7c3aed)",
-  marginBottom: "16px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  fontSize: "3rem",
-  border: "1px solid #6d5f7a",
-  boxShadow: "0 0 22px rgba(124,58,237,0.18)",
 };
 
 const cardTopStyle = {

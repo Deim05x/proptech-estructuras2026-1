@@ -61,12 +61,17 @@ function OperacionesPage() {
   };
 
   const prepararOperacionParaEnviar = () => {
-    return {
+    const operacion = {
       ...formulario,
-      id: Number(formulario.id),
       valorAcordado: Number(formulario.valorAcordado),
       comision: Number(formulario.comision),
     };
+
+    if (!editando) {
+      delete operacion.id;
+    }
+
+    return operacion;
   };
 
   const guardarOperacion = async (e) => {
@@ -365,20 +370,6 @@ function OperacionesPage() {
 
         <form onSubmit={guardarOperacion}>
           <div style={formGridStyle}>
-            <input
-              type="number"
-              name="id"
-              placeholder="ID operación, ejemplo: 1"
-              value={formulario.id}
-              onChange={manejarCambio}
-              disabled={editando}
-              required
-              style={{
-                ...inputStyle,
-                ...(editando ? disabledInputStyle : {}),
-              }}
-            />
-
             <input
               type="text"
               name="codigoInmueble"
@@ -865,11 +856,6 @@ const inputStyle = {
   background: "#15121b",
   color: "#e8dfee",
   fontWeight: "650",
-};
-
-const disabledInputStyle = {
-  opacity: 0.65,
-  cursor: "not-allowed",
 };
 
 const buttonRowStyle = {

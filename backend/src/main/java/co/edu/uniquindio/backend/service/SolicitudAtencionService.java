@@ -8,6 +8,8 @@ import co.edu.uniquindio.backend.repository.SolicitudAtencionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Servicio para registrar, consultar y procesar solicitudes de atencion.
@@ -23,13 +25,19 @@ import java.time.LocalDateTime;
 @Service
 public class SolicitudAtencionService {
 
+    private static final DateTimeFormatter ID_SOLICITUD_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+
     private final SolicitudAtencionRepository solicitudRepository;
+    private final InteraccionService interaccionService;
 
     private final Cola<SolicitudAtencion> colaSolicitudes = new Cola<>();
     private final ColaPrioridad<SolicitudAtencion> colaAltaPrioridad = new ColaPrioridad<>();
 
-    public SolicitudAtencionService(SolicitudAtencionRepository solicitudRepository) {
+    public SolicitudAtencionService(SolicitudAtencionRepository solicitudRepository,
+                                    InteraccionService interaccionService) {
         this.solicitudRepository = solicitudRepository;
+        this.interaccionService = interaccionService;
     }
 
     public SolicitudAtencion[] listar() {
@@ -47,6 +55,7 @@ public class SolicitudAtencionService {
     }
 
     public SolicitudAtencion crear(SolicitudAtencion solicitud) {
+        prepararSolicitudNueva(solicitud);
         validarSolicitud(solicitud);
 
         if (solicitud.getEstado() == null || solicitud.getEstado().isBlank()) {
@@ -70,6 +79,8 @@ public class SolicitudAtencionService {
                 colaAltaPrioridad.encolar(guardada, obtenerPrioridadNumerica(guardada));
             }
         }
+
+        registrarInteraccionSolicitud(guardada);
 
         return guardada;
     }
@@ -195,10 +206,75 @@ public class SolicitudAtencionService {
     public SolicitudAtencion asignarAsesor(String id, String idAsesor) {
         SolicitudAtencion solicitud = buscarPorId(id);
         solicitud.setIdAsesorAsignado(idAsesor);
-        return solicitudRepository.actualizar(id, solicitud);
+
+        if (solicitud.getEstado() == null || solicitud.getEstado().equalsIgnoreCase("PENDIENTE")) {
+            solicitud.setEstado("EN_ATENCION");
+        }
+
+        if (solicitud.getFechaAtencion() == null) {
+            solicitud.setFechaAtencion(LocalDateTime.now());
+        }
+
+        if (solicitud.getRespuesta() == null || solicitud.getRespuesta().isBlank()) {
+            solicitud.setRespuesta("Asesor asignado para seguimiento.");
+        }
+
+        SolicitudAtencion actualizada = solicitudRepository.actualizar(id, solicitud);
+        recargarCola();
+        recargarColaPrioridad();
+        return actualizada;
+    }
+
+    private void prepararSolicitudNueva(SolicitudAtencion solicitud) {
+        if (solicitud == null) {
+            return;
+        }
+
+        if (solicitud.getId() == null || solicitud.getId().isBlank()) {
+            solicitud.setId(generarIdSolicitud());
+        }
+
+        if (solicitud.getTipoSolicitud() == null || solicitud.getTipoSolicitud().isBlank()) {
+            solicitud.setTipoSolicitud("ATENCION");
+        }
+
+        if (solicitud.getDescripcion() == null || solicitud.getDescripcion().isBlank()) {
+            solicitud.setDescripcion(generarDescripcionAutomatica(solicitud));
+        }
+    }
+
+    private String generarIdSolicitud() {
+        String id;
+
+        do {
+            id = "SOL-" +
+                    LocalDateTime.now().format(ID_SOLICITUD_FORMATTER) +
+                    "-" +
+                    ThreadLocalRandom.current().nextInt(100, 1000);
+        } while (solicitudRepository.existe(id));
+
+        return id;
+    }
+
+    private String generarDescripcionAutomatica(SolicitudAtencion solicitud) {
+        String cliente = solicitud.getIdCliente() == null || solicitud.getIdCliente().isBlank()
+                ? "el cliente"
+                : "el cliente " + solicitud.getIdCliente();
+
+        if (solicitud.getCodigoInmueble() != null && !solicitud.getCodigoInmueble().isBlank()) {
+            return "Solicitud generada automaticamente por " + cliente +
+                    " sobre el inmueble " + solicitud.getCodigoInmueble() + ".";
+        }
+
+        return "Solicitud general generada automaticamente por " + cliente +
+                " para recibir atencion de un asesor.";
     }
 
     private void validarSolicitud(SolicitudAtencion solicitud) {
+        if (solicitud == null) {
+            throw new RuntimeException("La solicitud no puede ser nula");
+        }
+
         if (solicitud.getId() == null || solicitud.getId().isBlank()) {
             throw new RuntimeException("El ID de la solicitud es obligatorio");
         }
@@ -242,6 +318,32 @@ public class SolicitudAtencionService {
         }
 
         return 1;
+    }
+
+    private void registrarInteraccionSolicitud(SolicitudAtencion solicitud) {
+        if (solicitud == null) {
+            return;
+        }
+
+        String codigoInmueble = solicitud.getCodigoInmueble();
+
+        if (codigoInmueble == null || codigoInmueble.isBlank()) {
+            return;
+        }
+
+        interaccionService.registrarInteraccion(
+                solicitud.getIdCliente(),
+                codigoInmueble,
+                obtenerTipoInteraccionSolicitud(solicitud.getTipoSolicitud())
+        );
+    }
+
+    private String obtenerTipoInteraccionSolicitud(String tipoSolicitud) {
+        if (tipoSolicitud == null || tipoSolicitud.isBlank()) {
+            return "SOLICITUD";
+        }
+
+        return "SOLICITUD_" + tipoSolicitud.trim().toUpperCase();
     }
 
     private SolicitudAtencion[] convertirAArreglo(

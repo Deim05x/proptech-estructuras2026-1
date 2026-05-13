@@ -77,7 +77,7 @@ public class VisitaService {
         }
 
         if (visita.getId() <= 0) {
-            return false;
+            visita.setId(generarIdVisita());
         }
 
         if (visita.getFecha() == null || visita.getHora() == null) {
@@ -198,5 +198,15 @@ public class VisitaService {
         }
 
         return visitaRepository.eliminar(id);
+    }
+
+    private int generarIdVisita() {
+        int id = visitaRepository.obtenerSiguienteId();
+
+        while (buscarPorId(id) != null) {
+            id++;
+        }
+
+        return id;
     }
 }

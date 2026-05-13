@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import carruselInmuebleService from "../services/CarruselInmuebleService";
+import InmuebleCover from "../components/InmuebleCover";
 
 function CarruselInmueblesPage() {
   const [inmuebleActual, setInmuebleActual] = useState(null);
@@ -209,7 +210,7 @@ function CarruselInmueblesPage() {
             </div>
           ) : (
             <article style={propertyCardStyle}>
-              <div style={imagePlaceholderStyle}>🏡</div>
+              <InmuebleCover inmueble={inmuebleActual} height={180} />
 
               <div style={cardTopStyle}>
                 <div>
@@ -545,20 +546,6 @@ const propertyCardStyle = {
   borderRadius: "24px",
   padding: "18px",
   boxShadow: "0 18px 38px rgba(0,0,0,0.20)",
-};
-
-const imagePlaceholderStyle = {
-  height: "180px",
-  borderRadius: "20px",
-  background: "linear-gradient(135deg, #3f2a57, #7c3aed)",
-  marginBottom: "16px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  fontSize: "4rem",
-  border: "1px solid #6d5f7a",
-  boxShadow: "0 0 22px rgba(124,58,237,0.18)",
 };
 
 const cardTopStyle = {

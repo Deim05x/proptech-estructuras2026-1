@@ -17,7 +17,8 @@ public class FavoritoRepository {
     public LinkedSimpleList<Inmueble> obtenerFavoritosPorCliente(String clienteId) {
         String sql = """
                 SELECT i.codigo, i.direccion, i.ciudad, i.barrio_zona, i.tipo_inmueble, i.finalidad,
-                       i.precio, i.area, i.habitaciones, i.banos, i.estado, i.disponible, i.asesor_id_responsable
+                       i.precio, i.area, i.habitaciones, i.banos, i.estado, i.disponible,
+                       i.asesor_id_responsable, i.imagen_url
                 FROM favorito f
                 INNER JOIN inmueble i ON f.inmueble_codigo = i.codigo
                 WHERE f.cliente_id = ?
@@ -41,7 +42,8 @@ public class FavoritoRepository {
                         rs.getInt("banos"),
                         rs.getString("estado"),
                         rs.getBoolean("disponible"),
-                        rs.getString("asesor_id_responsable")
+                        rs.getString("asesor_id_responsable"),
+                        rs.getString("imagen_url")
                 ));
             }
 

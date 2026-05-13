@@ -1,0 +1,827 @@
+@startuml
+top to bottom direction
+
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 55
+skinparam ranksep 65
+hide circle
+hide empty members
+
+skinparam class {
+  BackgroundColor #FFF7ED
+  BorderColor #9A3412
+  ArrowColor #334155
+}
+
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #CBD5E1
+}
+
+title Diagrama de clases organizado - Backend PropTech
+
+package "Config" as config {
+  class BackendApplication <<SpringBootApplication>> {
+    + main(args: String[]): void
+  }
+
+  class SecurityConfig <<Configuration>> {
+    + passwordEncoder(): PasswordEncoder
+    + corsConfigurationSource(): CorsConfigurationSource
+    + securityFilterChain(...): SecurityFilterChain
+  }
+
+  class CorsConfig <<Configuration>> {
+    + corsConfigurer(): WebMvcConfigurer
+  }
+}
+
+package "Security" as security {
+  class TokenAuthenticationFilter <<Filter>> {
+    - authService: AuthService
+    # doFilterInternal(...): void
+  }
+
+  class CustomUserDetailsService <<Service>> {
+    - authUsuarioRepository: AuthUsuarioRepository
+    + loadUserByUsername(username: String): UserDetails
+  }
+}
+
+package "Controller" as controller {
+  class AuthController <<RestController>> {
+    - authService: AuthService
+  }
+
+  class ClienteController <<RestController>> {
+    - clienteService: ClienteService
+  }
+
+  class AsesorController <<RestController>> {
+    - asesorService: AsesorService
+  }
+
+  class InmuebleController <<RestController>> {
+    - inmuebleService: InmuebleService
+  }
+
+  class VisitaController <<RestController>> {
+    - visitaService: VisitaService
+  }
+
+  class OperacionController <<RestController>> {
+    - operacionService: OperacionService
+  }
+
+  class ContratoController <<RestController>> {
+    - contratoService: ContratoService
+  }
+
+  class SolicitudAtencionController <<RestController>> {
+    - solicitudAtencionService: SolicitudAtencionService
+  }
+
+  class FavoritoController <<RestController>> {
+    - favoritoService: FavoritoService
+    - interaccionService: InteraccionService
+    - sesionUsuarioService: SesionUsuarioService
+  }
+
+  class InteraccionController <<RestController>> {
+    - interaccionService: InteraccionService
+    - sesionUsuarioService: SesionUsuarioService
+  }
+
+  class AlertaController <<RestController>> {
+    - alertaService: AlertaService
+  }
+
+  class EventoInusualController <<RestController>> {
+    - eventoInusualService: EventoInusualService
+  }
+
+  class ConsultaRangoPrecioController <<RestController>> {
+    - consultaRangoPrecioService: ConsultaRangoPrecioService
+  }
+
+  class OrdenamientoInmuebleController <<RestController>> {
+    - ordenamientoInmuebleService: OrdenamientoInmuebleService
+  }
+
+  class BusquedaHashController <<RestController>> {
+    - busquedaHashService: BusquedaHashService
+  }
+
+  class RecomendacionController <<RestController>> {
+    - recomendacionService: RecomendacionService
+    - sesionUsuarioService: SesionUsuarioService
+  }
+
+  class ReporteController <<RestController>> {
+    - reporteService: ReporteService
+  }
+
+  class GrafoRelacionesController <<RestController>> {
+    - grafoRelacionesService: GrafoRelacionesService
+  }
+
+  class HistorialInmuebleController <<RestController>> {
+    - historialInmuebleService: HistorialInmuebleService
+  }
+
+  class CarruselInmuebleController <<RestController>> {
+    - carruselInmuebleService: CarruselInmuebleService
+  }
+
+  class RotacionAsesorController <<RestController>> {
+    - rotacionAsesorService: RotacionAsesorService
+  }
+
+  class MotorAlertasComercialesController <<RestController>> {
+    - motorAlertasComercialesService: MotorAlertasComercialesService
+  }
+
+  class ValidacionNegocioController <<RestController>> {
+    - validacionNegocioService: ValidacionNegocioService
+  }
+}
+
+package "Service" as service {
+  class AuthService <<Service>> {
+    - authUsuarioRepository: AuthUsuarioRepository
+    - authTokenRepository: AuthTokenRepository
+    - clienteRepository: ClienteRepository
+    + registrarCliente(): boolean
+    + login(): LoginResponse
+    + validarToken(): AuthToken
+  }
+
+  class SesionUsuarioService <<Service>> {
+    - authUsuarioRepository: AuthUsuarioRepository
+    + obtenerUsuarioAutenticado(): AuthUsuario
+    + puedeAccederACliente(): boolean
+  }
+
+  class ClienteService <<Service>> {
+    - clienteRepository: ClienteRepository
+    + listarClientes(): Cliente[]
+    + buscarPorId(): Cliente
+    + guardarCliente(): boolean
+  }
+
+  class AsesorService <<Service>> {
+    - asesorRepository: AsesorRepository
+    + listarAsesores(): Asesor[]
+    + buscarPorId(): Asesor
+    + guardarAsesor(): boolean
+  }
+
+  class InmuebleService <<Service>> {
+    - inmuebleRepository: InmuebleRepository
+    + listarInmuebles(): Inmueble[]
+    + buscarPorCodigo(): Inmueble
+    + guardarInmueble(): boolean
+  }
+
+  class VisitaService <<Service>> {
+    - visitaRepository: VisitaRepository
+    - interaccionService: InteraccionService
+    + agendarVisita(): boolean
+    + reprogramarVisita(): boolean
+    + cancelarVisita(): boolean
+  }
+
+  class OperacionService <<Service>> {
+    - operacionRepository: OperacionRepository
+    - inmuebleRepository: InmuebleRepository
+    - clienteRepository: ClienteRepository
+    - asesorRepository: AsesorRepository
+    + registrarOperacion(): boolean
+    + listarOperaciones(): Operacion[]
+  }
+
+  class ContratoService <<Service>> {
+    - contratoRepository: ContratoRepository
+    + crearContrato(): Contrato
+    + listarVencidos(): Contrato[]
+    + actualizarEstadosAutomaticos(): void
+  }
+
+  class SolicitudAtencionService <<Service>> {
+    - solicitudAtencionRepository: SolicitudAtencionRepository
+    - colaSolicitudes: Cola<SolicitudAtencion>
+    - colaPrioridad: ColaPrioridad<SolicitudAtencion>
+    + crearSolicitud(): SolicitudAtencion
+    + procesarSiguiente(): SolicitudAtencion
+  }
+
+  class FavoritoService <<Service>> {
+    - favoritoRepository: FavoritoRepository
+    - clienteRepository: ClienteRepository
+    - inmuebleRepository: InmuebleRepository
+    - interaccionService: InteraccionService
+    + agregarFavorito(): boolean
+    + eliminarFavorito(): boolean
+  }
+
+  class InteraccionService <<Service>> {
+    - interaccionRepository: InteraccionRepository
+    + registrarInteraccion(): boolean
+    + obtenerHistorialCliente(): Interaccion[]
+  }
+
+  class AlertaService <<Service>> {
+    - alertaRepository: AlertaRepository
+    - visitaService: VisitaService
+    - inmuebleService: InmuebleService
+    - operacionService: OperacionService
+    - colaAlertas: Cola<Alerta>
+    - colaPrioridad: ColaPrioridad<Alerta>
+    + generarAlertasAutomaticas(): int
+    + procesarSiguienteAlerta(): Alerta
+  }
+
+  class EventoInusualService <<Service>> {
+    - eventoInusualRepository: EventoInusualRepository
+    - inmuebleService: InmuebleService
+    - visitaService: VisitaService
+    - operacionService: OperacionService
+    - alertaService: AlertaService
+    + detectarEventosInusuales(): int
+  }
+
+  class ConsultaRangoPrecioService <<Service>> {
+    - inmuebleRepository: InmuebleRepository
+    + buscarPorRango(): Inmueble[]
+    + listarOrdenadosPorPrecio(): Inmueble[]
+  }
+
+  class OrdenamientoInmuebleService <<Service>> {
+    - inmuebleService: InmuebleService
+    - visitaService: VisitaService
+    + ordenarInmuebles(): Inmueble[]
+  }
+
+  class BusquedaHashService <<Service>> {
+    - clienteRepository: ClienteRepository
+    - inmuebleRepository: InmuebleRepository
+    - asesorRepository: AsesorRepository
+    + buscarClientePorId(): Object
+    + buscarInmueblePorCodigo(): Object
+  }
+
+  class RecomendacionService <<Service>> {
+    - clienteRepository: ClienteRepository
+    - inmuebleService: InmuebleService
+    + recomendarPorCliente(): Inmueble[]
+  }
+
+  class ReporteService <<Service>> {
+    - inmuebleService: InmuebleService
+    - visitaService: VisitaService
+    - operacionService: OperacionService
+    + generarResumenGeneral(): Object
+    + generarReportesAgrupados(): Object[]
+  }
+
+  class GrafoRelacionesService <<Service>> {
+    - inmuebleService: InmuebleService
+    - visitaService: VisitaService
+    - operacionService: OperacionService
+    + listarNodos(): Object[]
+    + listarRelaciones(): Object[]
+  }
+
+  class HistorialInmuebleService <<Service>> {
+    - inmuebleRepository: InmuebleRepository
+    - historialCambios: Pila<AccionInmueble>
+    + capturarEstadoAntesDeCambio(): boolean
+    + deshacerUltimoCambio(): Object
+  }
+
+  class CarruselInmuebleService <<Service>> {
+    - inmuebleRepository: InmuebleRepository
+    - carrusel: LinkedCircularDoubleList<Inmueble>
+    + siguiente(): Inmueble
+    + anterior(): Inmueble
+  }
+
+  class RotacionAsesorService <<Service>> {
+    - asesorRepository: AsesorRepository
+    - ruedaAsesores: LinkedCircularSimpleList<Asesor>
+    + obtenerSiguienteAsesor(): Asesor
+  }
+
+  class MotorAlertasComercialesService <<Service>> {
+    - contratoRepository: ContratoRepository
+    - solicitudAtencionRepository: SolicitudAtencionRepository
+    + generarAlertasComerciales(): Object[]
+  }
+
+  class ValidacionNegocioService <<Service>> {
+    - clienteRepository: ClienteRepository
+    - inmuebleRepository: InmuebleRepository
+    - asesorRepository: AsesorRepository
+    - visitaRepository: VisitaRepository
+    - operacionRepository: OperacionRepository
+    - contratoRepository: ContratoRepository
+    - solicitudAtencionRepository: SolicitudAtencionRepository
+    + validarReglasDeNegocio(): Object
+  }
+}
+
+package "Repository" as repository {
+  class ClienteRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD Cliente
+  }
+
+  class AsesorRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD Asesor
+  }
+
+  class InmuebleRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD Inmueble
+  }
+
+  class VisitaRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD Visita
+    + reprogramar()
+    + cancelar()
+  }
+
+  class OperacionRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD Operacion
+  }
+
+  class ContratoRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD Contrato
+    + listarVencimientos()
+  }
+
+  class SolicitudAtencionRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD SolicitudAtencion
+    + listarPendientes()
+  }
+
+  class FavoritoRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + guardarFavorito()
+    + eliminarFavorito()
+  }
+
+  class InteraccionRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + guardarInteraccion()
+    + obtenerHistorialPorCliente()
+  }
+
+  class AlertaRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD Alerta
+    + actualizarEstado()
+  }
+
+  class EventoInusualRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + CRUD EventoInusual
+    + actualizarEstado()
+  }
+
+  class AuthUsuarioRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + buscarPorUsername()
+    + guardar()
+  }
+
+  class AuthTokenRepository <<Repository>> {
+    - jdbcTemplate: JdbcTemplate
+    + buscarTokenValido()
+    + revocar()
+  }
+}
+
+package "Model" as model {
+  enum Role {
+    ADMIN
+    CLIENTE
+  }
+
+  class Cliente <<Model>> {
+    - id: String
+    - nombre: String
+    - correo: String
+    - telefono: String
+    - tipoCliente: String
+    - presupuesto: double
+    - zonasInteres: String
+    - estadoBusqueda: String
+  }
+
+  class Asesor <<Model>> {
+    - id: String
+    - nombre: String
+    - contacto: String
+    - especialidadZona: String
+    - cantidadCierres: int
+  }
+
+  class Inmueble <<Model>> {
+    - codigo: String
+    - direccion: String
+    - ciudad: String
+    - barrioZona: String
+    - tipoInmueble: String
+    - precio: double
+    - disponible: boolean
+    - idAsesorResponsable: String
+  }
+
+  class Visita <<Model>> {
+    - id: int
+    - idCliente: String
+    - codigoInmueble: String
+    - idAsesor: String
+    - fecha: LocalDate
+    - hora: LocalTime
+    - estado: String
+  }
+
+  class Operacion <<Model>> {
+    - id: String
+    - codigoInmueble: String
+    - idCliente: String
+    - idAsesor: String
+    - tipoOperacion: String
+    - valorAcordado: double
+    - estadoProceso: String
+  }
+
+  class Contrato <<Model>> {
+    - id: String
+    - codigoInmueble: String
+    - idCliente: String
+    - idAsesor: String
+    - idOperacion: String
+    - fechaInicio: LocalDate
+    - fechaFin: LocalDate
+    - valor: double
+    + estaProximoAVencer(dias: int): boolean
+    + estaVencido(): boolean
+  }
+
+  class SolicitudAtencion <<Model>> {
+    - id: String
+    - idCliente: String
+    - codigoInmueble: String
+    - idAsesorAsignado: String
+    - tipoSolicitud: String
+    - estado: String
+    - prioridad: String
+    + estaPendiente(): boolean
+    + esAltaPrioridad(): boolean
+  }
+
+  class Interaccion <<Model>> {
+    - id: int
+    - idCliente: String
+    - codigoInmueble: String
+    - tipoInteraccion: String
+    - fecha: LocalDateTime
+  }
+
+  class Alerta <<Model>> {
+    - id: String
+    - tipo: String
+    - descripcion: String
+    - nivelAtencion: String
+    - estado: String
+  }
+
+  class EventoInusual <<Model>> {
+    - id: String
+    - tipo: String
+    - descripcion: String
+    - nivelAtencion: String
+    - entidadReferencia: String
+    - estado: String
+  }
+
+  class AuthUsuario <<Model>> {
+    - id: int
+    - username: String
+    - passwordHash: String
+    - rol: Role
+    - clienteId: String
+    - activo: boolean
+  }
+
+  class AuthToken <<Model>> {
+    - id: int
+    - token: String
+    - username: String
+    - rol: Role
+    - clienteId: String
+    - expiraEn: LocalDateTime
+    - revocado: boolean
+  }
+}
+
+package "Estructuras" as estructuras {
+  package "Listas" {
+    class "LinkedSimpleList<T>" as LinkedSimpleList <<Estructura>> {
+      - first: Node<T>
+      - size: int
+      + addLast(data: T): void
+      + getNodeValue(index: int): T
+    }
+
+    class "LinkedDoubleList<T>" as LinkedDoubleList <<Estructura>> {
+      - first: NodeDouble<T>
+      - last: NodeDouble<T>
+      - size: int
+    }
+
+    class "LinkedCircularSimpleList<T>" as LinkedCircularSimpleList <<Estructura>> {
+      - first: NodeCircularSimple<T>
+      - last: NodeCircularSimple<T>
+      - size: int
+    }
+
+    class "LinkedCircularDoubleList<T>" as LinkedCircularDoubleList <<Estructura>> {
+      - first: NodeCircularDouble<T>
+      - last: NodeCircularDouble<T>
+      - size: int
+    }
+
+    class "Node<T>" as NodeSimple <<Nodo>>
+    class "NodeDouble<T>" as NodeDouble <<Nodo>>
+    class "NodeCircularSimple<T>" as NodeCircularSimple <<Nodo>>
+    class "NodeCircularDouble<T>" as NodeCircularDouble <<Nodo>>
+  }
+
+  package "Colas y pila" {
+    class "Cola<T>" as Cola <<Estructura>> {
+      - inicio: Nodo<T>
+      - fin: Nodo<T>
+      + encolar(dato: T): void
+      + desencolar(): T
+    }
+
+    class "ColaPrioridad<T>" as ColaPrioridad <<Estructura>> {
+      - inicio: NodoPrioridad<T>
+      + encolar(dato: T, prioridad: int): void
+      + desencolar(): T
+    }
+
+    class "Pila<T>" as Pila <<Estructura>> {
+      - cima: NodoPila<T>
+      + apilar(dato: T): void
+      + desapilar(): T
+    }
+
+    class "Nodo<T>" as NodoCola <<Nodo>>
+    class "NodoPrioridad<T>" as NodoPrioridad <<Nodo>>
+    class "NodoPila<T>" as NodoPila <<Nodo>>
+  }
+
+  package "Arboles, hash y grafos" {
+    class "ArbolBinarioBusqueda<T>" as ArbolBinarioBusqueda <<Estructura>> {
+      - raiz: NodoArbol<T>
+      + insertar(dato: T): void
+      + llenarInOrdenAscendente(arreglo: T[]): void
+    }
+
+    class ArbolPrecioInmuebles <<Estructura>> {
+      - raiz: NodoArbolPrecio
+      + insertar(inmueble: Inmueble): void
+      + buscarPorRango(min: double, max: double): LinkedSimpleList<Inmueble>
+    }
+
+    class "TablaHash<K,V>" as TablaHash <<Estructura>> {
+      - tabla: NodoHash<K,V>[]
+      + poner(clave: K, valor: V): void
+      + obtener(clave: K): V
+    }
+
+    class "TablaHashPropia<K,V>" as TablaHashPropia <<Estructura>> {
+      - tabla: EntradaHash<K,V>[]
+      - colisiones: int
+      + insertar(clave: K, valor: V): void
+      + buscar(clave: K): V
+    }
+
+    class "GrafoNoDirigido<T>" as GrafoNoDirigido <<Estructura>> {
+      - vertices: Object[]
+      - matrizAdyacencia: double[][]
+      + agregarVertice(dato: T): boolean
+      + agregarArista(origen: T, destino: T, peso: double): void
+    }
+
+    class "NodoArbol<T>" as NodoArbol <<Nodo>>
+    class NodoArbolPrecio <<Nodo>>
+    class "NodoHash<K,V>" as NodoHash <<Nodo>>
+    class "EntradaHash<K,V>" as EntradaHash <<Nodo>>
+  }
+}
+
+' Orden visual de capas.
+config -[hidden]down-> security
+security -[hidden]down-> controller
+controller -[hidden]down-> service
+service -[hidden]down-> repository
+repository -[hidden]down-> model
+service -[hidden]right-> estructuras
+
+' Configuracion y seguridad.
+SecurityConfig ..> TokenAuthenticationFilter : registra filtro
+SecurityConfig ..> CorsConfig : CORS
+TokenAuthenticationFilter --> AuthService : valida token
+CustomUserDetailsService --> AuthUsuarioRepository : carga usuario
+AuthService --> AuthUsuarioRepository
+AuthService --> AuthTokenRepository
+AuthService --> ClienteRepository
+SesionUsuarioService --> AuthUsuarioRepository
+
+' Controller -> Service.
+AuthController --> AuthService
+ClienteController --> ClienteService
+AsesorController --> AsesorService
+InmuebleController --> InmuebleService
+VisitaController --> VisitaService
+OperacionController --> OperacionService
+ContratoController --> ContratoService
+SolicitudAtencionController --> SolicitudAtencionService
+FavoritoController --> FavoritoService
+FavoritoController --> InteraccionService
+FavoritoController --> SesionUsuarioService
+InteraccionController --> InteraccionService
+InteraccionController --> SesionUsuarioService
+AlertaController --> AlertaService
+EventoInusualController --> EventoInusualService
+ConsultaRangoPrecioController --> ConsultaRangoPrecioService
+OrdenamientoInmuebleController --> OrdenamientoInmuebleService
+BusquedaHashController --> BusquedaHashService
+RecomendacionController --> RecomendacionService
+RecomendacionController --> SesionUsuarioService
+ReporteController --> ReporteService
+GrafoRelacionesController --> GrafoRelacionesService
+HistorialInmuebleController --> HistorialInmuebleService
+CarruselInmuebleController --> CarruselInmuebleService
+RotacionAsesorController --> RotacionAsesorService
+MotorAlertasComercialesController --> MotorAlertasComercialesService
+ValidacionNegocioController --> ValidacionNegocioService
+
+' Service -> Repository.
+ClienteService --> ClienteRepository
+AsesorService --> AsesorRepository
+InmuebleService --> InmuebleRepository
+VisitaService --> VisitaRepository
+VisitaService --> InteraccionService
+OperacionService --> OperacionRepository
+OperacionService --> InmuebleRepository
+OperacionService --> ClienteRepository
+OperacionService --> AsesorRepository
+ContratoService --> ContratoRepository
+SolicitudAtencionService --> SolicitudAtencionRepository
+FavoritoService --> FavoritoRepository
+FavoritoService --> ClienteRepository
+FavoritoService --> InmuebleRepository
+FavoritoService --> InteraccionService
+InteraccionService --> InteraccionRepository
+AlertaService --> AlertaRepository
+AlertaService --> VisitaService
+AlertaService --> InmuebleService
+AlertaService --> OperacionService
+EventoInusualService --> EventoInusualRepository
+EventoInusualService --> InmuebleService
+EventoInusualService --> VisitaService
+EventoInusualService --> OperacionService
+EventoInusualService --> AlertaService
+ConsultaRangoPrecioService --> InmuebleRepository
+OrdenamientoInmuebleService --> InmuebleService
+OrdenamientoInmuebleService --> VisitaService
+BusquedaHashService --> ClienteRepository
+BusquedaHashService --> InmuebleRepository
+BusquedaHashService --> AsesorRepository
+RecomendacionService --> ClienteRepository
+RecomendacionService --> InmuebleService
+ReporteService --> InmuebleService
+ReporteService --> VisitaService
+ReporteService --> OperacionService
+GrafoRelacionesService --> InmuebleService
+GrafoRelacionesService --> VisitaService
+GrafoRelacionesService --> OperacionService
+HistorialInmuebleService --> InmuebleRepository
+CarruselInmuebleService --> InmuebleRepository
+RotacionAsesorService --> AsesorRepository
+MotorAlertasComercialesService --> ContratoRepository
+MotorAlertasComercialesService --> SolicitudAtencionRepository
+ValidacionNegocioService --> ClienteRepository
+ValidacionNegocioService --> InmuebleRepository
+ValidacionNegocioService --> AsesorRepository
+ValidacionNegocioService --> VisitaRepository
+ValidacionNegocioService --> OperacionRepository
+ValidacionNegocioService --> ContratoRepository
+ValidacionNegocioService --> SolicitudAtencionRepository
+
+' Repository -> Model.
+ClienteRepository ..> Cliente
+AsesorRepository ..> Asesor
+InmuebleRepository ..> Inmueble
+VisitaRepository ..> Visita
+OperacionRepository ..> Operacion
+ContratoRepository ..> Contrato
+SolicitudAtencionRepository ..> SolicitudAtencion
+FavoritoRepository ..> Cliente
+FavoritoRepository ..> Inmueble
+InteraccionRepository ..> Interaccion
+AlertaRepository ..> Alerta
+EventoInusualRepository ..> EventoInusual
+AuthUsuarioRepository ..> AuthUsuario
+AuthTokenRepository ..> AuthToken
+
+' Relaciones del dominio.
+Cliente "1" --> "0..*" Visita : agenda
+Cliente "1" --> "0..*" SolicitudAtencion : solicita
+Cliente "1" --> "0..*" Operacion : realiza
+Cliente "1" --> "0..*" Contrato : firma
+Cliente "1" --> "0..*" Interaccion : historial
+Cliente "0..*" -- "0..*" Inmueble : favoritos
+
+Asesor "1" --> "0..*" Inmueble : responsable
+Asesor "1" --> "0..*" Visita : atiende
+Asesor "1" --> "0..*" Operacion : gestiona
+Asesor "1" --> "0..*" Contrato : acompana
+Asesor "1" --> "0..*" SolicitudAtencion : asignado
+
+Inmueble "1" --> "0..*" Visita : visitado
+Inmueble "1" --> "0..*" SolicitudAtencion : consultado
+Inmueble "1" --> "0..*" Operacion : negociado
+Inmueble "1" --> "0..*" Contrato : contratado
+Inmueble "1" --> "0..*" Interaccion : registrado
+
+Operacion "1" --> "0..1" Contrato : genera
+AuthUsuario --> Role
+AuthToken --> Role
+AuthUsuario --> Cliente : clienteId
+AuthToken --> Cliente : clienteId
+
+' Uso de estructuras propias.
+ClienteRepository ..> LinkedSimpleList
+AsesorRepository ..> LinkedSimpleList
+InmuebleRepository ..> LinkedSimpleList
+VisitaRepository ..> LinkedSimpleList
+ContratoRepository ..> LinkedSimpleList
+SolicitudAtencionRepository ..> LinkedSimpleList
+InteraccionRepository ..> LinkedDoubleList
+
+SolicitudAtencionService *-- Cola : pendientes
+SolicitudAtencionService *-- ColaPrioridad : prioritarias
+AlertaService *-- Cola : pendientes
+AlertaService *-- ColaPrioridad : prioritarias
+HistorialInmuebleService *-- Pila : deshacer cambios
+CarruselInmuebleService *-- LinkedCircularDoubleList : carrusel
+RotacionAsesorService *-- LinkedCircularSimpleList : rotacion
+ConsultaRangoPrecioService ..> ArbolPrecioInmuebles : rango precio
+OrdenamientoInmuebleService ..> ArbolBinarioBusqueda : ordenar
+BusquedaHashService ..> TablaHashPropia : busqueda directa
+ReporteService ..> TablaHash : agrupaciones
+GrafoRelacionesService ..> GrafoNoDirigido : relaciones
+
+' Composiciones internas de estructuras.
+LinkedSimpleList *-- NodeSimple
+LinkedDoubleList *-- NodeDouble
+LinkedCircularSimpleList *-- NodeCircularSimple
+LinkedCircularDoubleList *-- NodeCircularDouble
+Cola *-- NodoCola
+ColaPrioridad *-- NodoPrioridad
+Pila *-- NodoPila
+ArbolBinarioBusqueda *-- NodoArbol
+ArbolPrecioInmuebles *-- NodoArbolPrecio
+ArbolPrecioInmuebles ..> Inmueble
+TablaHash *-- NodoHash
+TablaHashPropia *-- EntradaHash
+
+note right of service
+  La capa Service contiene la logica de negocio
+  y coordina repositorios, otros servicios y
+  estructuras de datos propias.
+end note
+
+note bottom of model
+  Las asociaciones del dominio se implementan con
+  idCliente, codigoInmueble, idAsesor e idOperacion.
+end note
+
+@enduml

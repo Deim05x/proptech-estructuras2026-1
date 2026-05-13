@@ -15,6 +15,7 @@ public class Inmueble implements Comparable<Inmueble> {
     private String estado;
     private boolean disponible;
     private String idAsesorResponsable;
+    private String imagenUrl;
 
     public Inmueble() {
     }
@@ -22,7 +23,7 @@ public class Inmueble implements Comparable<Inmueble> {
     public Inmueble(String codigo, String direccion, String ciudad, String barrioZona,
             String tipoInmueble, String finalidad, double precio, double area,
             int habitaciones, int banos, String estado, boolean disponible,
-            String idAsesorResponsable) {
+            String idAsesorResponsable, String imagenUrl) {
         this.codigo = codigo;
         this.direccion = direccion;
         this.ciudad = ciudad;
@@ -36,6 +37,7 @@ public class Inmueble implements Comparable<Inmueble> {
         this.estado = estado;
         this.disponible = disponible;
         this.idAsesorResponsable = idAsesorResponsable;
+        this.imagenUrl = imagenUrl;
     }
 
     public String getCodigo() {
@@ -142,6 +144,14 @@ public class Inmueble implements Comparable<Inmueble> {
         this.idAsesorResponsable = idAsesorResponsable;
     }
 
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
+    }
+
     @Override
     public String toString() {
         return "Inmueble{" +
@@ -158,6 +168,7 @@ public class Inmueble implements Comparable<Inmueble> {
                 ", estado='" + estado + '\'' +
                 ", disponible=" + disponible +
                 ", idAsesorResponsable='" + idAsesorResponsable + '\'' +
+                ", imagenUrl='" + imagenUrl + '\'' +
                 '}';
     }
 

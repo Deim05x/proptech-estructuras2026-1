@@ -43,7 +43,7 @@ public class OperacionController {
         }
 
         return ResponseEntity.badRequest()
-                .body("No se pudo registrar la operación. Verifica inmueble, cliente, asesor, valores y que el ID no esté repetido.");
+                .body("No se pudo registrar la operación. Verifica inmueble, cliente, asesor y valores.");
     }
 
     @PutMapping("/{id}")

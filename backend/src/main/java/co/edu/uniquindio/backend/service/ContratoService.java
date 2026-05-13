@@ -5,6 +5,10 @@ import co.edu.uniquindio.backend.model.Contrato;
 import co.edu.uniquindio.backend.repository.ContratoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Servicio para contratos, estados y vencimientos.
  *
@@ -17,6 +21,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ContratoService {
+
+    private static final DateTimeFormatter ID_CONTRATO_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
     private final ContratoRepository contratoRepository;
 
@@ -40,6 +47,7 @@ public class ContratoService {
     }
 
     public Contrato crear(Contrato contrato) {
+        prepararContratoNuevo(contrato);
         validarContrato(contrato);
 
         if (contrato.getEstado() == null || contrato.getEstado().isBlank()) {
@@ -84,7 +92,34 @@ public class ContratoService {
         return contratoRepository.actualizar(id, contrato);
     }
 
+    private void prepararContratoNuevo(Contrato contrato) {
+        if (contrato == null) {
+            return;
+        }
+
+        if (contrato.getId() == null || contrato.getId().isBlank()) {
+            contrato.setId(generarIdContrato());
+        }
+    }
+
+    private String generarIdContrato() {
+        String id;
+
+        do {
+            id = "CON-" +
+                    LocalDateTime.now().format(ID_CONTRATO_FORMATTER) +
+                    "-" +
+                    ThreadLocalRandom.current().nextInt(100, 1000);
+        } while (contratoRepository.existe(id));
+
+        return id;
+    }
+
     private void validarContrato(Contrato contrato) {
+        if (contrato == null) {
+            throw new RuntimeException("El contrato no puede ser nulo");
+        }
+
         if (contrato.getId() == null || contrato.getId().isBlank()) {
             throw new RuntimeException("El ID del contrato es obligatorio");
         }

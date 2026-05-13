@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import solicitudAtencionService from "../services/solicitudAtencionService";
 
 function SolicitudesPage() {
@@ -12,9 +12,9 @@ function SolicitudesPage() {
     idAsesor: "",
     respuesta: "",
   });
+  const [asesoresPorSolicitud, setAsesoresPorSolicitud] = useState({});
 
   const [formulario, setFormulario] = useState({
-    id: "",
     idCliente: "",
     codigoInmueble: "",
     tipoSolicitud: "ATENCION",
@@ -25,11 +25,7 @@ function SolicitudesPage() {
     respuesta: "",
   });
 
-  useEffect(() => {
-    cargarSolicitudes();
-  }, []);
-
-  const cargarSolicitudes = async () => {
+  const cargarSolicitudes = useCallback(async () => {
     try {
       setCargando(true);
 
@@ -49,7 +45,11 @@ function SolicitudesPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [filtroEstado]);
+
+  useEffect(() => {
+    cargarSolicitudes();
+  }, [cargarSolicitudes]);
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
@@ -69,9 +69,15 @@ function SolicitudesPage() {
     });
   };
 
+  const manejarAsesorSolicitud = (id, value) => {
+    setAsesoresPorSolicitud({
+      ...asesoresPorSolicitud,
+      [id]: value,
+    });
+  };
+
   const limpiarFormulario = () => {
     setFormulario({
-      id: "",
       idCliente: "",
       codigoInmueble: "",
       tipoSolicitud: "ATENCION",
@@ -162,6 +168,28 @@ function SolicitudesPage() {
     } catch (error) {
       console.error("Error al cambiar estado:", error);
       alert("No se pudo cambiar el estado");
+    }
+  };
+
+  const asignarAsesorSolicitud = async (id) => {
+    const idAsesor = (asesoresPorSolicitud[id] || "").trim();
+
+    if (!idAsesor) {
+      alert("Ingresa el ID del asesor para asignar la solicitud.");
+      return;
+    }
+
+    try {
+      await solicitudAtencionService.asignarAsesor(id, idAsesor);
+      alert("Asesor asignado correctamente");
+      setAsesoresPorSolicitud({
+        ...asesoresPorSolicitud,
+        [id]: "",
+      });
+      await cargarSolicitudes();
+    } catch (error) {
+      console.error("Error al asignar asesor:", error);
+      alert("No se pudo asignar el asesor");
     }
   };
 
@@ -312,21 +340,12 @@ function SolicitudesPage() {
         <div style={panelHeaderStyle}>
           <div>
             <p style={eyebrowStyle}>NUEVA SOLICITUD</p>
-            <h2 style={titleStyle}>Registrar solicitud manual</h2>
+            <h2 style={titleStyle}>Registrar solicitud</h2>
           </div>
         </div>
 
         <form onSubmit={crearSolicitud}>
           <div style={formGridStyle}>
-            <input
-              name="id"
-              placeholder="ID solicitud, ejemplo: SOL-001"
-              value={formulario.id}
-              onChange={manejarCambio}
-              required
-              style={inputStyle}
-            />
-
             <input
               name="idCliente"
               placeholder="ID cliente, ejemplo: CLI-001"
@@ -542,6 +561,22 @@ function SolicitudesPage() {
 
                     <td style={tdStyle}>
                       <div style={actionRowStyle}>
+                        <input
+                          value={asesoresPorSolicitud[solicitud.id] || ""}
+                          onChange={(e) =>
+                            manejarAsesorSolicitud(solicitud.id, e.target.value)
+                          }
+                          placeholder="ASE-001"
+                          style={miniInputStyle}
+                        />
+
+                        <button
+                          onClick={() => asignarAsesorSolicitud(solicitud.id)}
+                          style={miniSuccessButton}
+                        >
+                          Asignar
+                        </button>
+
                         <button
                           onClick={() => cambiarEstado(solicitud.id, "ATENDIDA")}
                           style={miniSuccessButton}
@@ -910,6 +945,17 @@ const actionRowStyle = {
   display: "flex",
   gap: "8px",
   flexWrap: "wrap",
+};
+
+const miniInputStyle = {
+  width: "92px",
+  padding: "8px 10px",
+  borderRadius: "12px",
+  border: "1px solid #37333e",
+  outline: "none",
+  background: "#15121b",
+  color: "#e8dfee",
+  fontWeight: "800",
 };
 
 const miniSuccessButton = {

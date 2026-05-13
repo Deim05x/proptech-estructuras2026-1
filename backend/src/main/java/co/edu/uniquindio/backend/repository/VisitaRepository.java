@@ -69,6 +69,12 @@ public class VisitaRepository {
         }, id);
     }
 
+    public int obtenerSiguienteId() {
+        String sql = "SELECT COALESCE(MAX(id), 0) + 1 FROM visita";
+        Integer siguienteId = jdbcTemplate.queryForObject(sql, Integer.class);
+        return siguienteId == null ? 1 : siguienteId;
+    }
+
     public boolean guardar(Visita visita) {
         String sql = """
                 INSERT INTO visita (

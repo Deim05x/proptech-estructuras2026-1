@@ -2,6 +2,7 @@ import { useState } from "react";
 import recomendacionService from "../services/recomendacionService";
 import authService from "../services/authService";
 import solicitudRapidaHelper from "../utils/solicitudRapidaHelper";
+import InmuebleCover from "../components/InmuebleCover";
 
 function RecomendacionesPage() {
   const rol = authService.getRol();
@@ -184,7 +185,7 @@ function RecomendacionesPage() {
 
               return (
                 <article key={inmueble.codigo} style={cardStyle}>
-                  <div style={imagePlaceholderStyle}>🏠</div>
+                  <InmuebleCover inmueble={inmueble} height={130} />
 
                   <div style={cardTopStyle}>
                     <div>
@@ -587,17 +588,6 @@ const primaryButton = {
   transition: "0.25s ease",
 };
 
-const secondaryButton = {
-  padding: "11px 16px",
-  border: "1px solid #6d5f7a",
-  borderRadius: "14px",
-  background: "#3f2a57",
-  color: "#d2bbff",
-  fontWeight: "900",
-  cursor: "pointer",
-  transition: "0.25s ease",
-};
-
 const modeBadgeStyle = {
   padding: "8px 12px",
   borderRadius: "999px",
@@ -629,20 +619,6 @@ const cardStyle = {
   padding: "18px",
   boxShadow: "0 18px 38px rgba(0,0,0,0.20)",
   transition: "0.28s ease",
-};
-
-const imagePlaceholderStyle = {
-  height: "130px",
-  borderRadius: "20px",
-  background: "linear-gradient(135deg, #3f2a57, #7c3aed)",
-  marginBottom: "16px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  fontSize: "3rem",
-  border: "1px solid #6d5f7a",
-  boxShadow: "0 0 22px rgba(124,58,237,0.18)",
 };
 
 const cardTopStyle = {

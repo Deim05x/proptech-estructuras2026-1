@@ -1,10 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import ordenamientoService from "../services/ordenamientoService";
+import favoritoService from "../services/favoritoService";
 import solicitudRapidaHelper from "../utils/solicitudRapidaHelper";
 import authService from "../services/authService";
+import InmuebleCover from "../components/InmuebleCover";
+
+const obtenerCodigoFavorito = (favorito) => {
+  if (typeof favorito === "string") return favorito;
+
+  return (
+    favorito?.codigoInmueble ||
+    favorito?.inmuebleCodigo ||
+    favorito?.codigo ||
+    favorito?.id ||
+    ""
+  );
+};
 
 function DescubrirInmueblesPage() {
   const [inmueblesOrdenados, setInmueblesOrdenados] = useState([]);
+  const [favoritosCodigos, setFavoritosCodigos] = useState([]);
+  const [favoritoEnProceso, setFavoritoEnProceso] = useState("");
   const [cargando, setCargando] = useState(false);
   const [criterio, setCriterio] = useState("precio");
   const [direccion, setDireccion] = useState("desc");
@@ -19,6 +35,26 @@ function DescubrirInmueblesPage() {
 
   const rol = authService.getRol();
   const esCliente = rol === "CLIENTE";
+  const clienteId = authService.getClienteId();
+
+  const cargarFavoritosCliente = useCallback(async () => {
+    if (!esCliente || !clienteId) {
+      setFavoritosCodigos([]);
+      return;
+    }
+
+    try {
+      const data = await favoritoService.listarPorCliente(clienteId);
+      const codigos = (data || [])
+        .map(obtenerCodigoFavorito)
+        .filter(Boolean)
+        .map((codigo) => codigo.toUpperCase());
+
+      setFavoritosCodigos(codigos);
+    } catch (error) {
+      console.error("Error al cargar favoritos del cliente:", error);
+    }
+  }, [clienteId, esCliente]);
 
   const crearSolicitudRapida = async (tipoSolicitud, inmueble) => {
     try {
@@ -39,7 +75,7 @@ function DescubrirInmueblesPage() {
     }
   };
 
-  const cargarInmuebles = async () => {
+  const cargarInmuebles = useCallback(async () => {
     try {
       setCargando(true);
 
@@ -55,11 +91,55 @@ function DescubrirInmueblesPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [criterio, direccion]);
 
   useEffect(() => {
     cargarInmuebles();
-  }, [criterio, direccion]);
+  }, [cargarInmuebles]);
+
+  useEffect(() => {
+    cargarFavoritosCliente();
+  }, [cargarFavoritosCliente]);
+
+  const agregarFavoritoDesdeCard = async (inmueble) => {
+    if (!clienteId) {
+      alert("No se encontro el cliente autenticado.");
+      return;
+    }
+
+    const codigo = inmueble?.codigo;
+
+    if (!codigo) {
+      alert("El inmueble no tiene codigo registrado.");
+      return;
+    }
+
+    if (favoritosCodigos.includes(codigo.toUpperCase())) {
+      alert("Este inmueble ya esta en tus favoritos.");
+      return;
+    }
+
+    try {
+      setFavoritoEnProceso(codigo);
+      await favoritoService.agregar(clienteId, codigo);
+      setFavoritosCodigos((codigosActuales) => [
+        ...codigosActuales,
+        codigo.toUpperCase(),
+      ]);
+      alert("Inmueble agregado a favoritos.");
+    } catch (error) {
+      console.error("Error al agregar favorito:", error);
+
+      const mensaje =
+        error?.response?.data ||
+        error?.message ||
+        "No se pudo agregar el inmueble a favoritos.";
+
+      alert(mensaje);
+    } finally {
+      setFavoritoEnProceso("");
+    }
+  };
 
   const manejarFiltro = (e) => {
     const { name, value } = e.target;
@@ -318,10 +398,15 @@ function DescubrirInmueblesPage() {
           <div style={cardsGridStyle}>
             {inmueblesFiltrados.map((item) => {
               const inmueble = item.inmueble;
+              const codigo = inmueble.codigo;
+              const yaEsFavorito = favoritosCodigos.includes(
+                (codigo || "").toUpperCase()
+              );
+              const guardandoFavorito = favoritoEnProceso === codigo;
 
               return (
                 <article key={inmueble.codigo} style={cardStyle}>
-                  <div style={imagePlaceholderStyle}>🏡</div>
+                  <InmuebleCover inmueble={inmueble} height={130} />
 
                   <div style={cardTopStyle}>
                     <div>
@@ -366,6 +451,24 @@ function DescubrirInmueblesPage() {
 
                   {esCliente && (
                     <div style={quickActionsStyle}>
+                      <button
+                        type="button"
+                        onClick={() => agregarFavoritoDesdeCard(inmueble)}
+                        disabled={yaEsFavorito || guardandoFavorito}
+                        style={{
+                          ...favoriteActionButton,
+                          ...(yaEsFavorito || guardandoFavorito
+                            ? disabledFavoriteButton
+                            : {}),
+                        }}
+                      >
+                        {guardandoFavorito
+                          ? "Guardando..."
+                          : yaEsFavorito
+                          ? "En favoritos"
+                          : "Guardar favorito"}
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => crearSolicitudRapida("VISITA", inmueble)}
@@ -688,20 +791,6 @@ const cardStyle = {
   transition: "0.28s ease",
 };
 
-const imagePlaceholderStyle = {
-  height: "130px",
-  borderRadius: "20px",
-  background: "linear-gradient(135deg, #3f2a57, #7c3aed)",
-  marginBottom: "16px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  fontSize: "3rem",
-  border: "1px solid #6d5f7a",
-  boxShadow: "0 0 22px rgba(124,58,237,0.18)",
-};
-
 const cardTopStyle = {
   display: "flex",
   justifyContent: "space-between",
@@ -774,6 +863,24 @@ const quickActionsStyle = {
   marginTop: "16px",
   paddingTop: "14px",
   borderTop: "1px solid #37333e",
+};
+
+const favoriteActionButton = {
+  padding: "9px 12px",
+  border: "1px solid #7c3aed",
+  borderRadius: "12px",
+  background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
+  color: "#ffffff",
+  fontWeight: "900",
+  cursor: "pointer",
+};
+
+const disabledFavoriteButton = {
+  opacity: 0.72,
+  cursor: "not-allowed",
+  background: "#3f2a57",
+  border: "1px solid #6d5f7a",
+  color: "#d2bbff",
 };
 
 const quickActionButton = {

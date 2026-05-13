@@ -20,7 +20,8 @@ public class InmuebleRepository {
     public LinkedSimpleList<Inmueble> obtenerTodos() {
         String sql = """
                 SELECT codigo, direccion, ciudad, barrio_zona, tipo_inmueble, finalidad,
-                       precio, area, habitaciones, banos, estado, disponible, asesor_id_responsable
+                       precio, area, habitaciones, banos, estado, disponible, asesor_id_responsable,
+                       imagen_url
                 FROM inmueble
                 ORDER BY codigo
                 """;
@@ -39,7 +40,8 @@ public class InmuebleRepository {
     public Inmueble buscarPorCodigo(String codigo) {
         String sql = """
                 SELECT codigo, direccion, ciudad, barrio_zona, tipo_inmueble, finalidad,
-                       precio, area, habitaciones, banos, estado, disponible, asesor_id_responsable
+                       precio, area, habitaciones, banos, estado, disponible, asesor_id_responsable,
+                       imagen_url
                 FROM inmueble
                 WHERE codigo = ?
                 """;
@@ -56,8 +58,9 @@ public class InmuebleRepository {
         String sql = """
                 INSERT INTO inmueble (
                     codigo, direccion, ciudad, barrio_zona, tipo_inmueble, finalidad,
-                    precio, area, habitaciones, banos, estado, disponible, asesor_id_responsable
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    precio, area, habitaciones, banos, estado, disponible, asesor_id_responsable,
+                    imagen_url
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         int filasAfectadas = jdbcTemplate.update(
@@ -74,7 +77,8 @@ public class InmuebleRepository {
                 inmueble.getBanos(),
                 inmueble.getEstado(),
                 inmueble.isDisponible(),
-                inmueble.getIdAsesorResponsable()
+                inmueble.getIdAsesorResponsable(),
+                inmueble.getImagenUrl()
         );
 
         return filasAfectadas > 0;
@@ -94,7 +98,8 @@ public class InmuebleRepository {
                     banos = ?,
                     estado = ?,
                     disponible = ?,
-                    asesor_id_responsable = ?
+                    asesor_id_responsable = ?,
+                    imagen_url = ?
                 WHERE codigo = ?
                 """;
 
@@ -112,6 +117,7 @@ public class InmuebleRepository {
                 inmueble.getEstado(),
                 inmueble.isDisponible(),
                 inmueble.getIdAsesorResponsable(),
+                inmueble.getImagenUrl(),
                 codigo
         );
 
@@ -138,7 +144,8 @@ public class InmuebleRepository {
                 rs.getInt("banos"),
                 rs.getString("estado"),
                 rs.getBoolean("disponible"),
-                rs.getString("asesor_id_responsable")
+                rs.getString("asesor_id_responsable"),
+                rs.getString("imagen_url")
         );
     }
 }

@@ -7,8 +7,15 @@ import co.edu.uniquindio.backend.repository.InmuebleRepository;
 import co.edu.uniquindio.backend.repository.OperacionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ThreadLocalRandom;
+
 @Service
 public class OperacionService {
+
+    private static final DateTimeFormatter ID_OPERACION_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
     private final OperacionRepository operacionRepository;
     private final InmuebleRepository inmuebleRepository;
@@ -35,7 +42,11 @@ public class OperacionService {
 
     public boolean registrarOperacion(Operacion operacion) {
         if (operacion == null) return false;
-        if (operacion.getId() == null || operacion.getId().isBlank()) return false;
+
+        if (operacion.getId() == null || operacion.getId().isBlank()) {
+            operacion.setId(generarIdOperacion());
+        }
+
         if (operacionRepository.buscarPorId(operacion.getId()) != null) return false;
 
         if (inmuebleRepository.buscarPorCodigo(operacion.getCodigoInmueble()) == null) return false;
@@ -65,5 +76,18 @@ public class OperacionService {
     public boolean eliminarOperacion(String id) {
         if (operacionRepository.buscarPorId(id) == null) return false;
         return operacionRepository.eliminar(id);
+    }
+
+    private String generarIdOperacion() {
+        String id;
+
+        do {
+            id = "OPE-" +
+                    LocalDateTime.now().format(ID_OPERACION_FORMATTER) +
+                    "-" +
+                    ThreadLocalRandom.current().nextInt(100, 1000);
+        } while (operacionRepository.buscarPorId(id) != null);
+
+        return id;
     }
 }

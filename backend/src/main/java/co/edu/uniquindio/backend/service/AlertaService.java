@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Servicio para generar y procesar alertas operativas.
@@ -25,6 +27,9 @@ import java.time.temporal.ChronoUnit;
  */
 @Service
 public class AlertaService {
+
+    private static final DateTimeFormatter ID_ALERTA_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
     private final AlertaRepository alertaRepository;
     private final VisitaService visitaService;
@@ -60,7 +65,7 @@ public class AlertaService {
         if (alerta == null) return false;
 
         if (alerta.getId() == null || alerta.getId().isBlank()) {
-            return false;
+            alerta.setId(generarIdAlerta());
         }
 
         if (alertaRepository.buscarPorId(alerta.getId()) != null) {
@@ -346,7 +351,14 @@ public class AlertaService {
             return false;
         }
 
-        return alertaRepository.actualizarEstado(id, estado);
+        boolean actualizada = alertaRepository.actualizarEstado(id, estado);
+
+        if (actualizada) {
+            recargarColaPendientes();
+            recargarColaPrioridad();
+        }
+
+        return actualizada;
     }
 
     private int calcularPrioridad(Alerta alerta) {
@@ -374,5 +386,18 @@ public class AlertaService {
     private String normalizar(String texto) {
         if (texto == null) return "";
         return texto.toLowerCase().trim();
+    }
+
+    private String generarIdAlerta() {
+        String id;
+
+        do {
+            id = "AL-" +
+                    LocalDateTime.now().format(ID_ALERTA_FORMATTER) +
+                    "-" +
+                    ThreadLocalRandom.current().nextInt(100, 1000);
+        } while (alertaRepository.buscarPorId(id) != null);
+
+        return id;
     }
 }

@@ -55,6 +55,8 @@ INSERT IGNORE INTO interaccion (id, cliente_id, inmueble_codigo, tipo_interaccio
 (1, 'CLI-001', 'INM-001', 'FAVORITO', CURRENT_TIMESTAMP),
 (2, 'CLI-002', 'INM-002', 'VISITA', CURRENT_TIMESTAMP);
 
+ALTER TABLE inmueble ADD COLUMN IF NOT EXISTS imagen_url VARCHAR(255);
+
 INSERT IGNORE INTO inmueble (
     codigo, direccion, ciudad, barrio_zona, tipo_inmueble, finalidad,
     precio, area, habitaciones, banos, estado, disponible, asesor_id_responsable
@@ -71,6 +73,175 @@ INSERT IGNORE INTO inmueble (
     'INM-005', 'Cra 6 #30-12', 'Armenia', 'Sur', 'Casa', 'Venta',
     165000000, 110, 4, 2, 'Disponible', true, 'ASE-002'
 );
+
+INSERT IGNORE INTO inmueble (
+    codigo, direccion, ciudad, barrio_zona, tipo_inmueble, finalidad,
+    precio, area, habitaciones, banos, estado, disponible, asesor_id_responsable
+) VALUES
+(
+    'INM-006', 'Cra 14 #18-25', 'Armenia', 'Centro', 'Apartamento', 'Venta',
+    245000000, 88, 3, 2, 'Disponible', true, 'ASE-001'
+),
+(
+    'INM-007', 'Calle 21 #12-40', 'Armenia', 'Centro', 'Casa', 'Venta',
+    295000000, 130, 4, 3, 'Disponible', true, 'ASE-CEN-002'
+),
+(
+    'INM-008', 'Cra 18 #16-08', 'Armenia', 'Centro', 'Local', 'Arriendo',
+    2600000, 58, 1, 1, 'Disponible', true, 'ASE-CEN-003'
+),
+(
+    'INM-009', 'Calle 15 #19-33', 'Armenia', 'Centro', 'Apartamento', 'Arriendo',
+    1450000, 72, 2, 2, 'Disponible', true, 'ASE-CEN-004'
+),
+(
+    'INM-010', 'Cra 11 #22-14', 'Armenia', 'Centro', 'Casa', 'Venta',
+    340000000, 150, 5, 3, 'Reservado', false, 'ASE-CEN-005'
+),
+(
+    'INM-011', 'Calle 18 #10-52', 'Armenia', 'Centro', 'Apartamento', 'Venta',
+    198000000, 76, 2, 2, 'Disponible', true, 'ASE-001'
+),
+(
+    'INM-012', 'Cra 13 #24-09', 'Armenia', 'Centro', 'Oficina', 'Arriendo',
+    2100000, 64, 1, 1, 'Disponible', true, 'ASE-CEN-002'
+),
+(
+    'INM-013', 'Calle 20 #17-60', 'Armenia', 'Centro', 'Apartamento', 'Venta',
+    275000000, 94, 3, 2, 'Disponible', true, 'ASE-CEN-003'
+),
+(
+    'INM-014', 'Cra 16 #13-44', 'Armenia', 'Centro', 'Local', 'Venta',
+    390000000, 82, 1, 2, 'Disponible', true, 'ASE-CEN-004'
+),
+(
+    'INM-015', 'Calle 23 #11-27', 'Armenia', 'Centro', 'Casa', 'Arriendo',
+    2300000, 118, 4, 2, 'Disponible', true, 'ASE-CEN-005'
+),
+(
+    'INM-016', 'Av Bolivar #12-80', 'Armenia', 'Norte', 'Apartamento', 'Venta',
+    360000000, 105, 3, 2, 'Disponible', true, 'ASE-002'
+),
+(
+    'INM-017', 'Cra 19 #35-16', 'Armenia', 'Norte', 'Casa', 'Venta',
+    420000000, 170, 4, 4, 'Disponible', true, 'ASE-NOR-002'
+),
+(
+    'INM-018', 'Calle 38 #18-22', 'Armenia', 'Norte', 'Apartamento', 'Arriendo',
+    2100000, 86, 3, 2, 'Disponible', true, 'ASE-NOR-003'
+),
+(
+    'INM-019', 'Av Centenario #28-45', 'Armenia', 'Norte', 'Casa', 'Arriendo',
+    2800000, 145, 4, 3, 'Disponible', true, 'ASE-NOR-004'
+),
+(
+    'INM-020', 'Cra 21 #40-30', 'Armenia', 'Norte', 'Apartamento', 'Venta',
+    315000000, 92, 3, 2, 'Reservado', false, 'ASE-NOR-005'
+),
+(
+    'INM-021', 'Calle 44 #17-11', 'Armenia', 'Norte', 'Local', 'Arriendo',
+    3600000, 74, 1, 1, 'Disponible', true, 'ASE-002'
+),
+(
+    'INM-022', 'Cra 23 #31-09', 'Armenia', 'Norte', 'Casa', 'Venta',
+    510000000, 210, 5, 4, 'Disponible', true, 'ASE-NOR-002'
+),
+(
+    'INM-023', 'Calle 36 #20-18', 'Armenia', 'Norte', 'Apartamento', 'Venta',
+    285000000, 89, 3, 2, 'Disponible', true, 'ASE-NOR-003'
+),
+(
+    'INM-024', 'Av Bolivar #45-72', 'Armenia', 'Norte', 'Oficina', 'Arriendo',
+    3200000, 96, 1, 2, 'Disponible', true, 'ASE-NOR-004'
+),
+(
+    'INM-025', 'Cra 25 #39-06', 'Armenia', 'Norte', 'Casa', 'Venta',
+    455000000, 185, 4, 3, 'Disponible', true, 'ASE-NOR-005'
+),
+(
+    'INM-026', 'Calle 10 #31-20', 'Armenia', 'Occidente', 'Casa', 'Venta',
+    190000000, 115, 3, 2, 'Disponible', true, 'ASE-OCC-001'
+),
+(
+    'INM-027', 'Cra 32 #12-55', 'Armenia', 'Occidente', 'Apartamento', 'Venta',
+    155000000, 68, 2, 1, 'Disponible', true, 'ASE-OCC-002'
+),
+(
+    'INM-028', 'Calle 14 #35-08', 'Armenia', 'Occidente', 'Local', 'Arriendo',
+    1800000, 52, 1, 1, 'Disponible', true, 'ASE-OCC-003'
+),
+(
+    'INM-029', 'Cra 34 #16-41', 'Armenia', 'Occidente', 'Casa', 'Arriendo',
+    1600000, 104, 3, 2, 'Disponible', true, 'ASE-OCC-004'
+),
+(
+    'INM-030', 'Calle 17 #37-19', 'Armenia', 'Occidente', 'Apartamento', 'Venta',
+    178000000, 74, 3, 2, 'Reservado', false, 'ASE-OCC-005'
+),
+(
+    'INM-031', 'Cra 29 #18-63', 'Armenia', 'Occidente', 'Casa', 'Venta',
+    235000000, 140, 4, 3, 'Disponible', true, 'ASE-OCC-001'
+),
+(
+    'INM-032', 'Calle 20 #33-47', 'Armenia', 'Occidente', 'Oficina', 'Arriendo',
+    1500000, 48, 1, 1, 'Disponible', true, 'ASE-OCC-002'
+),
+(
+    'INM-033', 'Cra 36 #21-10', 'Armenia', 'Occidente', 'Apartamento', 'Venta',
+    205000000, 80, 3, 2, 'Disponible', true, 'ASE-OCC-003'
+),
+(
+    'INM-034', 'Calle 24 #39-32', 'Armenia', 'Occidente', 'Casa', 'Arriendo',
+    1950000, 128, 4, 2, 'Disponible', true, 'ASE-OCC-004'
+),
+(
+    'INM-035', 'Cra 38 #26-18', 'Armenia', 'Occidente', 'Local', 'Venta',
+    260000000, 76, 1, 2, 'Disponible', true, 'ASE-OCC-005'
+),
+(
+    'INM-036', 'Calle 30 #7-22', 'Armenia', 'Sur', 'Casa', 'Venta',
+    175000000, 112, 3, 2, 'Disponible', true, 'ASE-003'
+),
+(
+    'INM-037', 'Cra 8 #33-45', 'Armenia', 'Sur', 'Apartamento', 'Venta',
+    145000000, 64, 2, 1, 'Disponible', true, 'ASE-SUR-002'
+),
+(
+    'INM-038', 'Calle 35 #9-16', 'Armenia', 'Sur', 'Casa', 'Arriendo',
+    1350000, 98, 3, 2, 'Disponible', true, 'ASE-SUR-003'
+),
+(
+    'INM-039', 'Cra 10 #37-28', 'Armenia', 'Sur', 'Local', 'Arriendo',
+    1700000, 55, 1, 1, 'Disponible', true, 'ASE-SUR-004'
+),
+(
+    'INM-040', 'Calle 39 #6-50', 'Armenia', 'Sur', 'Casa', 'Venta',
+    215000000, 135, 4, 3, 'Reservado', false, 'ASE-SUR-005'
+),
+(
+    'INM-041', 'Cra 12 #41-11', 'Armenia', 'Sur', 'Apartamento', 'Arriendo',
+    1200000, 60, 2, 1, 'Disponible', true, 'ASE-003'
+),
+(
+    'INM-042', 'Calle 42 #8-37', 'Armenia', 'Sur', 'Casa', 'Venta',
+    198000000, 126, 4, 2, 'Disponible', true, 'ASE-SUR-002'
+),
+(
+    'INM-043', 'Cra 14 #44-09', 'Armenia', 'Sur', 'Oficina', 'Arriendo',
+    1400000, 46, 1, 1, 'Disponible', true, 'ASE-SUR-003'
+),
+(
+    'INM-044', 'Calle 45 #11-26', 'Armenia', 'Sur', 'Apartamento', 'Venta',
+    168000000, 70, 3, 2, 'Disponible', true, 'ASE-SUR-004'
+),
+(
+    'INM-045', 'Cra 16 #47-58', 'Armenia', 'Sur', 'Casa', 'Arriendo',
+    1750000, 122, 4, 2, 'Disponible', true, 'ASE-SUR-005'
+);
+
+UPDATE inmueble
+SET imagen_url = CONCAT('/inmuebles/', LOWER(codigo), '.jpg')
+WHERE imagen_url IS NULL OR imagen_url = '';
 
 INSERT IGNORE INTO cliente (
     id, nombre, correo, telefono, tipo_cliente, presupuesto,
@@ -89,7 +260,58 @@ INSERT IGNORE INTO asesor (
     id, nombre, contacto, especialidad_zona, cantidad_cierres
 ) VALUES
 (
-    'ASE-003', 'Camilo Vargas', 'camilo@inmobiliaria.com', 'Occidente', 5
+    'ASE-003', 'Camila Torres', 'camila@inmobiliaria.com', 'Sur', 5
+),
+(
+    'ASE-CEN-002', 'Daniela Castro', 'daniela.castro@inmobiliaria.com', 'Centro', 9
+),
+(
+    'ASE-CEN-003', 'Santiago Rios', 'santiago.rios@inmobiliaria.com', 'Centro', 7
+),
+(
+    'ASE-CEN-004', 'Valentina Moreno', 'valentina.moreno@inmobiliaria.com', 'Centro', 11
+),
+(
+    'ASE-CEN-005', 'Andres Salazar', 'andres.salazar@inmobiliaria.com', 'Centro', 6
+),
+(
+    'ASE-NOR-002', 'Natalia Mejia', 'natalia.mejia@inmobiliaria.com', 'Norte', 10
+),
+(
+    'ASE-NOR-003', 'Felipe Cardenas', 'felipe.cardenas@inmobiliaria.com', 'Norte', 8
+),
+(
+    'ASE-NOR-004', 'Laura Medina', 'laura.medina@inmobiliaria.com', 'Norte', 13
+),
+(
+    'ASE-NOR-005', 'Jorge Pineda', 'jorge.pineda@inmobiliaria.com', 'Norte', 4
+),
+(
+    'ASE-SUR-002', 'Paula Gutierrez', 'paula.gutierrez@inmobiliaria.com', 'Sur', 7
+),
+(
+    'ASE-SUR-003', 'Miguel Herrera', 'miguel.herrera@inmobiliaria.com', 'Sur', 12
+),
+(
+    'ASE-SUR-004', 'Carolina Rojas', 'carolina.rojas@inmobiliaria.com', 'Sur', 6
+),
+(
+    'ASE-SUR-005', 'Esteban Vargas', 'esteban.vargas@inmobiliaria.com', 'Sur', 9
+),
+(
+    'ASE-OCC-001', 'Camilo Vargas', 'camilo.vargas@inmobiliaria.com', 'Occidente', 5
+),
+(
+    'ASE-OCC-002', 'Juliana Ospina', 'juliana.ospina@inmobiliaria.com', 'Occidente', 8
+),
+(
+    'ASE-OCC-003', 'Ricardo Marin', 'ricardo.marin@inmobiliaria.com', 'Occidente', 6
+),
+(
+    'ASE-OCC-004', 'Manuela Quintero', 'manuela.quintero@inmobiliaria.com', 'Occidente', 10
+),
+(
+    'ASE-OCC-005', 'Tomas Londono', 'tomas.londono@inmobiliaria.com', 'Occidente', 7
 );
 
 INSERT IGNORE INTO operaciones (
