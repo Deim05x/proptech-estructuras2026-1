@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ordenamientoService from "../services/ordenamientoService";
 import favoritoService from "../services/favoritoService";
 import solicitudRapidaHelper from "../utils/solicitudRapidaHelper";
@@ -18,6 +19,7 @@ const obtenerCodigoFavorito = (favorito) => {
 };
 
 function DescubrirInmueblesPage() {
+  const navigate = useNavigate();
   const [inmueblesOrdenados, setInmueblesOrdenados] = useState([]);
   const [favoritosCodigos, setFavoritosCodigos] = useState([]);
   const [favoritoEnProceso, setFavoritoEnProceso] = useState("");
@@ -33,9 +35,19 @@ function DescubrirInmueblesPage() {
     disponibilidad: "TODOS",
   });
 
+  const autenticado = authService.estaAutenticado();
   const rol = authService.getRol();
   const esCliente = rol === "CLIENTE";
+  const esInvitado = !autenticado;
   const clienteId = authService.getClienteId();
+
+  const irALogin = () => {
+    navigate("/login");
+  };
+
+  const irARegistro = () => {
+    navigate("/registro-cliente");
+  };
 
   const cargarFavoritosCliente = useCallback(async () => {
     if (!esCliente || !clienteId) {
@@ -229,15 +241,29 @@ function DescubrirInmueblesPage() {
           </h1>
 
           <p style={descriptionStyle}>
-            Explora inmuebles con filtros combinados y organiza los resultados
-            por precio, área o demanda. Desde cada inmueble puedes registrar una
-            solicitud de visita, compra, arriendo o información.
+            {esInvitado
+              ? "Explora inmuebles con filtros combinados y organiza los resultados por precio, área o demanda. Para guardar favoritos, solicitar visitas o pedir información, crea una cuenta de cliente."
+              : "Explora inmuebles con filtros combinados y organiza los resultados por precio, área o demanda. Desde cada inmueble puedes registrar una solicitud de visita, compra, arriendo o información."}
           </p>
         </div>
 
-        <div style={headerBadgeStyle}>
-          <span style={statusDotStyle}></span>
-          <span>{inmueblesFiltrados.length} resultados</span>
+        <div style={headerSideStyle}>
+          <div style={headerBadgeStyle}>
+            <span style={statusDotStyle}></span>
+            <span>{inmueblesFiltrados.length} resultados</span>
+          </div>
+
+          {esInvitado && (
+            <div style={headerActionsStyle}>
+              <button type="button" onClick={irALogin} style={secondaryButton}>
+                Iniciar sesión
+              </button>
+
+              <button type="button" onClick={irARegistro} style={primaryButton}>
+                Registrarme
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -266,10 +292,36 @@ function DescubrirInmueblesPage() {
         <SummaryCard
           icono="📩"
           titulo="Solicitudes"
-          valor={esCliente ? "Activas" : "Solo cliente"}
+          valor={
+            esCliente ? "Activas" : esInvitado ? "Con cuenta" : "Solo cliente"
+          }
           texto="Acciones rápidas"
         />
       </section>
+
+      {esInvitado && (
+        <section style={guestNoticeStyle}>
+          <div>
+            <p style={eyebrowStyle}>MODO INVITADO</p>
+            <h2 style={titleStyle}>Puedes ver inmuebles sin iniciar sesión</h2>
+            <p style={mutedTextStyle}>
+              El registro solo será necesario cuando quieras guardar favoritos,
+              enviar solicitudes, pedir visitas o entrar al panel completo de
+              cliente.
+            </p>
+          </div>
+
+          <div style={guestNoticeActionsStyle}>
+            <button type="button" onClick={irALogin} style={secondaryButton}>
+              Ya tengo cuenta
+            </button>
+
+            <button type="button" onClick={irARegistro} style={primaryButton}>
+              Crear cuenta cliente
+            </button>
+          </div>
+        </section>
+      )}
 
       <section style={panelStyle}>
         <div style={panelHeaderStyle}>
@@ -506,6 +558,38 @@ function DescubrirInmueblesPage() {
                       </button>
                     </div>
                   )}
+
+                  {esInvitado && (
+                    <div style={lockedActionsStyle}>
+                      <strong style={lockedTitleStyle}>
+                        Regístrate para continuar
+                      </strong>
+
+                      <p style={lockedTextStyle}>
+                        Con una cuenta de cliente podrás guardar este inmueble,
+                        solicitar visita, comprar, arrendar o pedir más
+                        información.
+                      </p>
+
+                      <div style={lockedButtonsStyle}>
+                        <button
+                          type="button"
+                          onClick={irARegistro}
+                          style={favoriteActionButton}
+                        >
+                          Crear cuenta
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={irALogin}
+                          style={quickActionButton}
+                        >
+                          Iniciar sesión
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </article>
               );
             })}
@@ -616,6 +700,20 @@ const descriptionStyle = {
   margin: 0,
 };
 
+const headerSideStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-end",
+  gap: "12px",
+};
+
+const headerActionsStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap",
+  justifyContent: "flex-end",
+};
+
 const headerBadgeStyle = {
   display: "flex",
   alignItems: "center",
@@ -691,6 +789,26 @@ const summaryTextStyle = {
   display: "block",
   color: "#8f849e",
   marginTop: "3px",
+};
+
+const guestNoticeStyle = {
+  background: "linear-gradient(135deg, #2c2833, #221e28)",
+  padding: "20px",
+  borderRadius: "24px",
+  marginBottom: "22px",
+  border: "1px solid #6d5f7a",
+  boxShadow: "0 20px 48px rgba(0,0,0,0.20)",
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "18px",
+  alignItems: "center",
+  flexWrap: "wrap",
+};
+
+const guestNoticeActionsStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap",
 };
 
 const panelStyle = {
@@ -863,6 +981,34 @@ const quickActionsStyle = {
   marginTop: "16px",
   paddingTop: "14px",
   borderTop: "1px solid #37333e",
+};
+
+const lockedActionsStyle = {
+  marginTop: "16px",
+  padding: "14px",
+  borderRadius: "16px",
+  background: "#15121b",
+  border: "1px solid #6d5f7a",
+};
+
+const lockedTitleStyle = {
+  display: "block",
+  color: "#ffffff",
+  fontSize: "0.9rem",
+  marginBottom: "7px",
+};
+
+const lockedTextStyle = {
+  color: "#9f92b2",
+  margin: "0 0 12px",
+  lineHeight: 1.45,
+  fontSize: "0.82rem",
+};
+
+const lockedButtonsStyle = {
+  display: "flex",
+  gap: "8px",
+  flexWrap: "wrap",
 };
 
 const favoriteActionButton = {

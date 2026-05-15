@@ -56,7 +56,7 @@ function MonitoreoPage() {
           <p style={descriptionStyle}>
             Revisa alertas, eventos inusuales y elementos que requieren atención
             administrativa. Este módulo centraliza la supervisión del sistema
-            PropTech.
+            HogarXpress.
           </p>
         </div>
 

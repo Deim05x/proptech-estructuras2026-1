@@ -259,11 +259,7 @@ element={
       />
       <Route
         path="/descubrir-inmuebles"
-        element={
-          <ProtectedRoute rolesPermitidos={["ADMIN", "CLIENTE"]}>
-            <DescubrirInmueblesPage />
-          </ProtectedRoute>
-        }
+        element={<DescubrirInmueblesPage />}
       />
 
       <Route

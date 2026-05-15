@@ -15,7 +15,7 @@ function InicioClientePage() {
           <p style={eyebrowStyle}>PORTAL CLIENTE</p>
 
           <h1 style={mainTitleStyle}>
-            Bienvenido a <span style={titleAccentStyle}>PropTech</span>
+            Bienvenido a <span style={titleAccentStyle}>HogarXpress</span>
           </h1>
 
           <p style={descriptionStyle}>

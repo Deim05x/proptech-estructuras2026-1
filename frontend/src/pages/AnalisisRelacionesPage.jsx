@@ -143,7 +143,7 @@ function AnalisisRelacionesPage() {
           <p style={descriptionStyle}>
             Consulta conexiones comerciales entre clientes, inmuebles, zonas y
             asesores para identificar oportunidades de seguimiento dentro del
-            sistema PropTech.
+            sistema HogarXpress.
           </p>
         </div>
 

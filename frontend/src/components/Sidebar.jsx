@@ -125,9 +125,9 @@ function Sidebar() {
         <div style={logoCircleStyle}>⌂</div>
 
         <div>
-          <h3 style={sidebarTitleStyle}>PropTech</h3>
+          <h3 style={sidebarTitleStyle}>HogarXpress</h3>
           <small style={sidebarSubtitleStyle}>
-            {rol === "ADMIN" ? "PropTech OS · Admin" : "Portal cliente"}
+            {rol === "ADMIN" ? "HogarXpress OS · Admin" : "Portal cliente"}
           </small>
         </div>
       </div>

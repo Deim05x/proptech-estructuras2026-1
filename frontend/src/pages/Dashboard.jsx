@@ -135,7 +135,7 @@ function Dashboard() {
           <p style={heroTextStyle}>
             Bienvenido, {username || "administrador"}. Este centro de mando
             resume inmuebles, visitas, operaciones, alertas, eventos inusuales,
-            reportes y análisis comercial del sistema PropTech.
+            reportes y análisis comercial del sistema HogarXpress.
           </p>
         </div>
 

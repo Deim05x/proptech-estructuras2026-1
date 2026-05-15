@@ -58,9 +58,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/inmuebles/**",
+                                "/api/ordenamientos/**")
+                        .permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
                                 "/api/carrusel-inmuebles/**",
                                 "/api/recomendaciones/**",
-                                "/api/ordenamientos/**",
                                 "/api/rangos-precio/**")
                         .authenticated()
                         .requestMatchers("/api/clientes/**").authenticated()

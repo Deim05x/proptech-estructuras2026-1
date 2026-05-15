@@ -47,7 +47,7 @@ function PersonasPage() {
 
           <p style={descriptionStyle}>
             Administra clientes, asesores y la rotación de atención comercial
-            desde un solo centro de control del sistema PropTech.
+            desde un solo centro de control del sistema HogarXpress.
           </p>
         </div>
 

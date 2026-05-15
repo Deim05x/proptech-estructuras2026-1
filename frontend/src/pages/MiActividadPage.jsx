@@ -46,7 +46,7 @@ function MiActividadPage() {
 
           <p style={descriptionStyle}>
             Consulta tus inmuebles favoritos, historial de interacción y visitas
-            agendadas dentro de la plataforma PropTech.
+            agendadas dentro de la plataforma HogarXpress.
           </p>
         </div>
 

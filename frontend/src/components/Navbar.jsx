@@ -56,7 +56,7 @@ function Navbar() {
 
         <div>
           <h2 style={titleStyle}>
-            Prop<span style={titleAccentStyle}>Tech</span>
+            Hogar<span style={titleAccentStyle}>Xpress</span>
           </h2>
 
           <small style={subtitleStyle}>

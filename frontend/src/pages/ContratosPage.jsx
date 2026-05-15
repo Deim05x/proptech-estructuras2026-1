@@ -253,7 +253,7 @@ function ContratosPage() {
           <p style={descriptionStyle}>
             Registra contratos de venta, arriendo o renovación, controla fechas,
             estados, valores y vencimientos próximos dentro del sistema
-            PropTech.
+            HogarXpress.
           </p>
         </div>
 

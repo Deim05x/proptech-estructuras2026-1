@@ -48,7 +48,7 @@ function AnaliticaPage() {
           <p style={descriptionStyle}>
             Consulta reportes administrativos, análisis comerciales e
             interpretación de relaciones entre clientes, inmuebles, asesores y
-            zonas para apoyar la toma de decisiones del sistema PropTech.
+            zonas para apoyar la toma de decisiones del sistema HogarXpress.
           </p>
         </div>
 
