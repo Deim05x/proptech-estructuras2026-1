@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
+import asesorService from "../services/asesorService";
 import inmuebleService from "../services/inmuebleService";
 import historialInmuebleService from "../services/historialInmuebleService";
 import InmuebleCover from "../components/InmuebleCover";
+import {
+  estadosInmueble,
+  finalidadesInmueble,
+  tiposInmueble,
+  zonasComerciales,
+} from "../utils/formOptions";
+import { generarSiguienteCodigo } from "../utils/idGenerator";
 
 function InmueblesPage() {
   const [inmuebles, setInmuebles] = useState([]);
+  const [asesores, setAsesores] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [editando, setEditando] = useState(false);
 
@@ -31,7 +40,21 @@ function InmueblesPage() {
   useEffect(() => {
     cargarInmuebles();
     cargarEstadoPila();
+    cargarAsesores();
   }, []);
+
+  useEffect(() => {
+    if (editando) return;
+
+    setFormulario((formularioActual) => ({
+      ...formularioActual,
+      codigo: generarSiguienteCodigo(
+        inmuebles,
+        "INM",
+        (inmueble) => inmueble.codigo
+      ),
+    }));
+  }, [inmuebles, editando]);
 
   const cargarInmuebles = async () => {
     try {
@@ -63,18 +86,88 @@ function InmueblesPage() {
     }
   };
 
+  const cargarAsesores = async () => {
+    try {
+      const data = await asesorService.listar();
+      setAsesores(data);
+    } catch (error) {
+      console.error("Error al cargar asesores:", error);
+      alert("No se pudieron cargar los asesores para asignar zonas");
+    }
+  };
+
+  const normalizarTexto = (valor) =>
+    String(valor || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  const asesorCubreZona = (asesor, zona) => {
+    const zonaSeleccionada = normalizarTexto(zona);
+    const zonaAsesor = normalizarTexto(asesor?.especialidadZona);
+
+    return zonaSeleccionada && zonaAsesor === zonaSeleccionada;
+  };
+
+  const obtenerAsesoresPorZona = (zona) =>
+    asesores.filter((asesor) => asesorCubreZona(asesor, zona));
+
+  useEffect(() => {
+    if (!formulario.barrioZona || formulario.idAsesorResponsable) return;
+
+    const primerAsesorDisponible = obtenerAsesoresPorZona(formulario.barrioZona)[0];
+
+    if (!primerAsesorDisponible) return;
+
+    setFormulario((formularioActual) => ({
+      ...formularioActual,
+      idAsesorResponsable: primerAsesorDisponible.id,
+    }));
+  }, [asesores, formulario.barrioZona, formulario.idAsesorResponsable]);
+
   const manejarCambio = (e) => {
     const { name, value, type, checked } = e.target;
+    const nuevoValor = type === "checkbox" ? checked : value;
+
+    if (name === "barrioZona") {
+      const asesoresZona = obtenerAsesoresPorZona(value);
+      const asesorActualEsValido = asesoresZona.some(
+        (asesor) => asesor.id === formulario.idAsesorResponsable
+      );
+
+      setFormulario({
+        ...formulario,
+        barrioZona: value,
+        idAsesorResponsable: asesorActualEsValido
+          ? formulario.idAsesorResponsable
+          : asesoresZona[0]?.id || "",
+      });
+      return;
+    }
+
+    if (name === "estado") {
+      setFormulario({
+        ...formulario,
+        estado: value,
+        disponible: value === "Disponible",
+      });
+      return;
+    }
 
     setFormulario({
       ...formulario,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: nuevoValor,
     });
   };
 
   const limpiarFormulario = () => {
     setFormulario({
-      codigo: "",
+      codigo: generarSiguienteCodigo(
+        inmuebles,
+        "INM",
+        (inmueble) => inmueble.codigo
+      ),
       direccion: "",
       ciudad: "",
       barrioZona: "",
@@ -96,6 +189,9 @@ function InmueblesPage() {
   const prepararInmuebleParaEnviar = () => {
     return {
       ...formulario,
+      codigo:
+        formulario.codigo ||
+        generarSiguienteCodigo(inmuebles, "INM", (item) => item.codigo),
       precio: Number(formulario.precio),
       area: Number(formulario.area),
       habitaciones: Number(formulario.habitaciones),
@@ -135,6 +231,14 @@ function InmueblesPage() {
   };
 
   const editarInmueble = (inmueble) => {
+    const asesorAsignado = asesores.find(
+      (asesor) => asesor.id === inmueble.idAsesorResponsable
+    );
+    const asesorAsignadoEsValido = asesorCubreZona(
+      asesorAsignado,
+      inmueble.barrioZona
+    );
+
     setFormulario({
       codigo: inmueble.codigo || "",
       direccion: inmueble.direccion || "",
@@ -148,7 +252,9 @@ function InmueblesPage() {
       banos: inmueble.banos || "",
       estado: inmueble.estado || "",
       disponible: inmueble.disponible ?? true,
-      idAsesorResponsable: inmueble.idAsesorResponsable || "",
+      idAsesorResponsable: asesorAsignadoEsValido
+        ? inmueble.idAsesorResponsable || ""
+        : "",
       imagenUrl: inmueble.imagenUrl || "",
     });
 
@@ -209,6 +315,8 @@ function InmueblesPage() {
       maximumFractionDigits: 0,
     });
   };
+
+  const asesoresFiltrados = obtenerAsesoresPorZona(formulario.barrioZona);
 
   return (
     <div style={pageStyle}>
@@ -340,14 +448,14 @@ function InmueblesPage() {
             <input
               type="text"
               name="codigo"
-              placeholder="Código, ejemplo: INM-001"
+              placeholder="Codigo generado automaticamente"
               value={formulario.codigo}
-              onChange={manejarCambio}
-              disabled={editando}
+              readOnly
+              disabled
               required
               style={{
                 ...inputStyle,
-                ...(editando ? disabledInputStyle : {}),
+                ...disabledInputStyle,
               }}
             />
 
@@ -371,35 +479,50 @@ function InmueblesPage() {
               style={inputStyle}
             />
 
-            <input
-              type="text"
+            <select
               name="barrioZona"
-              placeholder="Barrio o zona"
               value={formulario.barrioZona}
               onChange={manejarCambio}
               required
               style={inputStyle}
-            />
+            >
+              <option value="">Barrio o zona</option>
+              {zonasComerciales.map((zona) => (
+                <option key={zona} value={zona}>
+                  {zona}
+                </option>
+              ))}
+            </select>
 
-            <input
-              type="text"
+            <select
               name="tipoInmueble"
-              placeholder="Tipo: Casa, Apartamento..."
               value={formulario.tipoInmueble}
               onChange={manejarCambio}
               required
               style={inputStyle}
-            />
+            >
+              <option value="">Tipo de inmueble</option>
+              {tiposInmueble.map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {tipo}
+                </option>
+              ))}
+            </select>
 
-            <input
-              type="text"
+            <select
               name="finalidad"
-              placeholder="Finalidad: Venta, Arriendo..."
               value={formulario.finalidad}
               onChange={manejarCambio}
               required
               style={inputStyle}
-            />
+            >
+              <option value="">Finalidad</option>
+              {finalidadesInmueble.map((finalidad) => (
+                <option key={finalidad} value={finalidad}>
+                  {finalidad}
+                </option>
+              ))}
+            </select>
 
             <input
               type="number"
@@ -441,25 +564,47 @@ function InmueblesPage() {
               style={inputStyle}
             />
 
-            <input
-              type="text"
+            <select
               name="estado"
-              placeholder="Estado: Disponible, Reservado..."
               value={formulario.estado}
               onChange={manejarCambio}
               required
               style={inputStyle}
-            />
+            >
+              <option value="">Estado del inmueble</option>
+              {estadosInmueble.map((estado) => (
+                <option key={estado} value={estado}>
+                  {estado}
+                </option>
+              ))}
+            </select>
 
-            <input
-              type="text"
+            <select
               name="idAsesorResponsable"
-              placeholder="ID asesor responsable, ejemplo: ASE-001"
               value={formulario.idAsesorResponsable}
               onChange={manejarCambio}
               required
-              style={inputStyle}
-            />
+              disabled={!formulario.barrioZona || asesoresFiltrados.length === 0}
+              style={{
+                ...inputStyle,
+                ...(!formulario.barrioZona || asesoresFiltrados.length === 0
+                  ? disabledInputStyle
+                  : {}),
+              }}
+            >
+              <option value="">
+                {!formulario.barrioZona
+                  ? "Selecciona una zona primero"
+                  : asesoresFiltrados.length === 0
+                  ? "No hay asesores para esta zona"
+                  : "Asesor responsable"}
+              </option>
+              {asesoresFiltrados.map((asesor) => (
+                <option key={asesor.id} value={asesor.id}>
+                  {asesor.id} - {asesor.nombre}
+                </option>
+              ))}
+            </select>
 
             <input
               type="text"

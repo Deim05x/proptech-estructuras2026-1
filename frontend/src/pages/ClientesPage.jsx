@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import clienteService from "../services/ClienteService";
+import clienteService from "../services/clienteService";
+import {
+  estadosBusquedaCliente,
+  tiposCliente,
+  tiposInmueble,
+  zonasComerciales,
+} from "../utils/formOptions";
+import { generarSiguienteCodigo } from "../utils/idGenerator";
 
 function ClientesPage() {
   const [clientes, setClientes] = useState([]);
@@ -37,6 +44,15 @@ function ClientesPage() {
     cargarClientes();
   }, []);
 
+  useEffect(() => {
+    if (editando) return;
+
+    setFormulario((formularioActual) => ({
+      ...formularioActual,
+      id: generarSiguienteCodigo(clientes, "CLI", (cliente) => cliente.id),
+    }));
+  }, [clientes, editando]);
+
   const manejarCambio = (e) => {
     const { name, value } = e.target;
 
@@ -48,7 +64,7 @@ function ClientesPage() {
 
   const limpiarFormulario = () => {
     setFormulario({
-      id: "",
+      id: generarSiguienteCodigo(clientes, "CLI", (cliente) => cliente.id),
       nombre: "",
       correo: "",
       telefono: "",
@@ -68,6 +84,9 @@ function ClientesPage() {
 
     const cliente = {
       ...formulario,
+      id:
+        formulario.id ||
+        generarSiguienteCodigo(clientes, "CLI", (item) => item.id),
       presupuesto: Number(formulario.presupuesto),
       habitacionesMinimas: Number(formulario.habitacionesMinimas),
     };
@@ -210,14 +229,14 @@ function ClientesPage() {
             <input
               type="text"
               name="id"
-              placeholder="ID"
+              placeholder="ID generado automaticamente"
               value={formulario.id}
-              onChange={manejarCambio}
-              disabled={editando}
+              readOnly
+              disabled
               required
               style={{
                 ...inputStyle,
-                ...(editando ? disabledInputStyle : {}),
+                ...disabledInputStyle,
               }}
             />
 
@@ -251,15 +270,20 @@ function ClientesPage() {
               style={inputStyle}
             />
 
-            <input
-              type="text"
+            <select
               name="tipoCliente"
-              placeholder="Tipo cliente"
               value={formulario.tipoCliente}
               onChange={manejarCambio}
               required
               style={inputStyle}
-            />
+            >
+              <option value="">Tipo cliente</option>
+              {tiposCliente.map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {tipo}
+                </option>
+              ))}
+            </select>
 
             <input
               type="number"
@@ -271,23 +295,33 @@ function ClientesPage() {
               style={inputStyle}
             />
 
-            <input
-              type="text"
+            <select
               name="zonasInteres"
-              placeholder="Zonas de interés"
               value={formulario.zonasInteres}
               onChange={manejarCambio}
               style={inputStyle}
-            />
+            >
+              <option value="">Zona de interes</option>
+              {zonasComerciales.map((zona) => (
+                <option key={zona} value={zona}>
+                  {zona}
+                </option>
+              ))}
+            </select>
 
-            <input
-              type="text"
+            <select
               name="tipoInmuebleDeseado"
-              placeholder="Tipo inmueble deseado"
               value={formulario.tipoInmuebleDeseado}
               onChange={manejarCambio}
               style={inputStyle}
-            />
+            >
+              <option value="">Tipo inmueble deseado</option>
+              {tiposInmueble.map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {tipo}
+                </option>
+              ))}
+            </select>
 
             <input
               type="number"
@@ -299,15 +333,20 @@ function ClientesPage() {
               style={inputStyle}
             />
 
-            <input
-              type="text"
+            <select
               name="estadoBusqueda"
-              placeholder="Estado búsqueda"
               value={formulario.estadoBusqueda}
               onChange={manejarCambio}
               required
               style={inputStyle}
-            />
+            >
+              <option value="">Estado busqueda</option>
+              {estadosBusquedaCliente.map((estado) => (
+                <option key={estado} value={estado}>
+                  {estado}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div style={buttonRowStyle}>

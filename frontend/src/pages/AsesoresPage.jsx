@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import asesorService from "../services/asesorService";
+import { zonasComerciales } from "../utils/formOptions";
+import { generarSiguienteCodigo } from "../utils/idGenerator";
 
 function AsesoresPage() {
   const [asesores, setAsesores] = useState([]);
@@ -33,6 +35,15 @@ function AsesoresPage() {
     cargarAsesores();
   }, []);
 
+  useEffect(() => {
+    if (editando) return;
+
+    setFormulario((formularioActual) => ({
+      ...formularioActual,
+      id: generarSiguienteCodigo(asesores, "ASE", (asesor) => asesor.id),
+    }));
+  }, [asesores, editando]);
+
   const manejarCambio = (e) => {
     const { name, value } = e.target;
     setFormulario({
@@ -43,7 +54,7 @@ function AsesoresPage() {
 
   const limpiarFormulario = () => {
     setFormulario({
-      id: "",
+      id: generarSiguienteCodigo(asesores, "ASE", (asesor) => asesor.id),
       nombre: "",
       contacto: "",
       especialidadZona: "",
@@ -58,6 +69,9 @@ function AsesoresPage() {
 
     const asesor = {
       ...formulario,
+      id:
+        formulario.id ||
+        generarSiguienteCodigo(asesores, "ASE", (item) => item.id),
       cantidadCierres: Number(formulario.cantidadCierres),
     };
 
@@ -183,14 +197,14 @@ function AsesoresPage() {
             <input
               type="text"
               name="id"
-              placeholder="ID"
+              placeholder="ID generado automaticamente"
               value={formulario.id}
-              onChange={manejarCambio}
-              disabled={editando}
+              readOnly
+              disabled
               required
               style={{
                 ...inputStyle,
-                ...(editando ? disabledInputStyle : {}),
+                ...disabledInputStyle,
               }}
             />
 
@@ -214,15 +228,20 @@ function AsesoresPage() {
               style={inputStyle}
             />
 
-            <input
-              type="text"
+            <select
               name="especialidadZona"
-              placeholder="Especialidad de zona"
               value={formulario.especialidadZona}
               onChange={manejarCambio}
               required
               style={inputStyle}
-            />
+            >
+              <option value="">Especialidad de zona</option>
+              {zonasComerciales.map((zona) => (
+                <option key={zona} value={zona}>
+                  {zona}
+                </option>
+              ))}
+            </select>
 
             <input
               type="number"

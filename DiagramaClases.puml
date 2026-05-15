@@ -22,7 +22,7 @@ skinparam package {
   BorderColor #CBD5E1
 }
 
-title Diagrama de clases organizado - Backend PropTech
+title Diagrama de clases organizado - Backend HogarXpress
 
 package "Config" as config {
   class BackendApplication <<SpringBootApplication>> {
@@ -170,21 +170,28 @@ package "Service" as service {
     - clienteRepository: ClienteRepository
     + listarClientes(): Cliente[]
     + buscarPorId(): Cliente
-    + guardarCliente(): boolean
+    + agregarCliente(): boolean
+    + actualizarCliente(): boolean
+    + eliminarCliente(): boolean
   }
 
   class AsesorService <<Service>> {
     - asesorRepository: AsesorRepository
     + listarAsesores(): Asesor[]
     + buscarPorId(): Asesor
-    + guardarAsesor(): boolean
+    + agregarAsesor(): boolean
+    + actualizarAsesor(): boolean
+    + eliminarAsesor(): boolean
   }
 
   class InmuebleService <<Service>> {
     - inmuebleRepository: InmuebleRepository
     + listarInmuebles(): Inmueble[]
     + buscarPorCodigo(): Inmueble
-    + guardarInmueble(): boolean
+    + agregarInmueble(): boolean
+    + actualizarInmueble(): boolean
+    + eliminarInmueble(): boolean
+    - asignarImagenPorDefecto(): void
   }
 
   class VisitaService <<Service>> {
@@ -425,6 +432,8 @@ package "Model" as model {
     - tipoCliente: String
     - presupuesto: double
     - zonasInteres: String
+    - tipoInmuebleDeseado: String
+    - habitacionesMinimas: int
     - estadoBusqueda: String
   }
 
@@ -442,9 +451,15 @@ package "Model" as model {
     - ciudad: String
     - barrioZona: String
     - tipoInmueble: String
+    - finalidad: String
     - precio: double
+    - area: double
+    - habitaciones: int
+    - banos: int
+    - estado: String
     - disponible: boolean
     - idAsesorResponsable: String
+    - imagenUrl: String
   }
 
   class Visita <<Model>> {
@@ -819,9 +834,17 @@ note right of service
   estructuras de datos propias.
 end note
 
+note right of SecurityConfig
+  Login y registro de cliente son publicos.
+  El catalogo publico permite GET de inmuebles
+  y ordenamientos para el modo invitado.
+end note
+
 note bottom of model
   Las asociaciones del dominio se implementan con
   idCliente, codigoInmueble, idAsesor e idOperacion.
+  En el frontend administrativo se generan los codigos
+  CLI-###, ASE-### e INM-### antes de crear registros.
 end note
 
 @enduml

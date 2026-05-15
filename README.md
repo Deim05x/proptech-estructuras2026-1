@@ -1,6 +1,6 @@
-# PropTech Estructuras 2026-1
+# HogarXpress Estructuras 2026-1
 
-PropTech es una plataforma de gestion inmobiliaria con backend en Spring Boot y frontend en React. El proyecto combina persistencia relacional con MariaDB y estructuras de datos propias implementadas en Java para resolver procesos de catalogo, atencion comercial, monitoreo, analitica y seguimiento de clientes.
+HogarXpress es una plataforma de gestion inmobiliaria con backend en Spring Boot y frontend en React. El proyecto combina persistencia relacional con MariaDB y estructuras de datos propias implementadas en Java para resolver procesos de catalogo, atencion comercial, monitoreo, analitica y seguimiento de clientes.
 
 ## Vision General
 
@@ -9,11 +9,12 @@ El sistema esta organizado como una aplicacion web administrativa y de cliente:
 - El backend expone una API REST bajo `/api`.
 - El frontend consume esa API desde servicios centralizados en `frontend/src/services`.
 - La autenticacion usa tokens persistidos en base de datos.
+- El catalogo de inmuebles puede consultarse como invitado sin iniciar sesion.
 - Las reglas de negocio se implementan en servicios Java.
 - Las colecciones criticas del dominio usan estructuras propias antes de devolver arreglos JSON al frontend.
 
 ```text
-proptech-estructuras2026-1/
+HogarXpress/
 |-- backend/   API REST, persistencia, seguridad y estructuras propias
 `-- frontend/  interfaz React con rutas protegidas por rol
 ```
@@ -61,7 +62,7 @@ React page -> frontend service -> API REST -> controller -> service -> repositor
 
 ### Inmuebles
 
-Gestiona catalogo, disponibilidad, finalidad, precios, area y asesor responsable.
+Gestiona catalogo, disponibilidad, finalidad, precios, area y asesor responsable. En el frontend administrativo el codigo del inmueble se genera automaticamente con formato `INM-###`; tipo, finalidad, zona, estado y asesor responsable se seleccionan desde controles guiados. El asesor responsable se filtra segun la zona comercial seleccionada.
 
 Rutas principales:
 
@@ -81,6 +82,8 @@ Estructuras usadas:
 ### Personas
 
 Agrupa clientes, asesores y rotacion de asesores.
+
+En el frontend administrativo los identificadores de clientes y asesores se generan automaticamente con formato `CLI-###` y `ASE-###`. Los formularios usan listas guiadas para tipo de cliente, zona de interes, tipo de inmueble deseado, estado de busqueda y especialidad de zona.
 
 Rutas principales:
 
@@ -264,6 +267,8 @@ El frontend esta organizado por rutas protegidas y modulos agrupados:
 - `AppRouter`: declara rutas y protege vistas.
 - `services/api.js`: configura Axios con base URL `/api` y token Bearer.
 - `pages`: contiene vistas administrativas y de cliente.
+- `utils/formOptions.js`: centraliza opciones de formularios para zonas, tipos, finalidades y estados.
+- `utils/idGenerator.js`: genera el siguiente codigo visible para clientes, asesores e inmuebles.
 
 Modulos de administrador:
 
@@ -281,6 +286,12 @@ Modulos de cliente:
 - Mi actividad
 - Mis solicitudes
 
+Modo invitado:
+
+- La ruta `/descubrir-inmuebles` permite explorar el catalogo sin iniciar sesion.
+- Los invitados pueden ver y filtrar inmuebles.
+- Guardar favoritos, crear solicitudes, pedir visitas, comprar, arrendar o consultar actividad requiere cuenta de cliente.
+
 ## Seguridad
 
 La seguridad vive en `SecurityConfig` y `TokenAuthenticationFilter`.
@@ -288,7 +299,8 @@ La seguridad vive en `SecurityConfig` y `TokenAuthenticationFilter`.
 Reglas principales:
 
 - `/api/auth/login` y `/api/auth/register-cliente` son publicos.
-- Las rutas de consulta de catalogo requieren autenticacion.
+- `GET /api/inmuebles/**` y `GET /api/ordenamientos/**` son publicos para soportar el catalogo en modo invitado.
+- Carrusel, recomendaciones, rangos de precio, favoritos, historial y solicitudes requieren autenticacion.
 - Rutas administrativas como contratos, reportes, motor de alertas y validaciones requieren rol `ADMIN`.
 - Solicitudes quedan autenticadas para permitir flujos de cliente y administracion.
 - El token se guarda en `auth_token` y se valida en cada solicitud.

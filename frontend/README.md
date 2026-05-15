@@ -1,6 +1,6 @@
-# Frontend PropTech
+# Frontend HogarXpress
 
-Aplicacion cliente construida con React + Vite para consumir la API del backend PropTech.
+Aplicacion cliente construida con React + Vite para consumir la API del backend HogarXpress.
 
 ## Stack
 
@@ -29,6 +29,10 @@ La interfaz esta organizada por rutas protegidas y por rol:
 - `src/components/ProtectedRoute.jsx`: valida sesion y rol permitido.
 - `src/services/api.js`: configura Axios con `http://localhost:8080/api` y token Bearer.
 - `src/pages`: contiene las vistas funcionales.
+- `src/utils/formOptions.js`: centraliza opciones compartidas para formularios.
+- `src/utils/idGenerator.js`: calcula el siguiente codigo visible para registros administrativos.
+
+El login y el registro usan una experiencia visual unificada con fondo inmobiliario, tarjetas glass y animaciones suaves. Desde el login se puede entrar como invitado al catalogo publico.
 
 ## Modulos
 
@@ -47,6 +51,20 @@ Cliente:
 - Catalogo
 - Mi actividad
 - Mis solicitudes
+
+Invitado:
+
+- Descubrir inmuebles sin iniciar sesion.
+- Filtrar y ordenar el catalogo.
+- Iniciar sesion o registrarse cuando quiera guardar favoritos, solicitar visitas o enviar intenciones comerciales.
+
+## Formularios administrativos
+
+- Clientes: el ID se genera automaticamente con formato `CLI-###`.
+- Asesores: el ID se genera automaticamente con formato `ASE-###` y la especialidad se selecciona por zona.
+- Inmuebles: el codigo se genera automaticamente con formato `INM-###`.
+- Registro de inmuebles: tipo, finalidad, zona, estado y asesor responsable se seleccionan desde listas.
+- El selector de asesor responsable muestra solo asesores cuya `especialidadZona` coincide con la zona elegida.
 
 ## Relacion con Estructuras del Backend
 

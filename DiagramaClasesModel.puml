@@ -22,7 +22,7 @@ skinparam package {
   BorderColor #CBD5E1
 }
 
-title Diagrama de clases - Paquete Model
+title Diagrama de clases - Paquete Model HogarXpress
 
 package "Autenticacion" as autenticacion {
   enum Role {
@@ -93,6 +93,7 @@ package "Inventario" as inventario {
     - estado: String
     - disponible: boolean
     - idAsesorResponsable: String
+    - imagenUrl: String
     + compareTo(otro: Inmueble): int
   }
 }
@@ -241,6 +242,10 @@ note bottom
   Las relaciones entre clases del paquete model se guardan como llaves simples:
   idCliente, codigoInmueble, idAsesor, idOperacion, clienteId y entidadReferencia.
   Por eso el diagrama muestra asociaciones logicas del dominio, no atributos objeto.
+
+  En el frontend administrativo se generan automaticamente los identificadores
+  CLI-###, ASE-### e INM-### antes de enviar el registro. El backend conserva
+  estos identificadores como String y valida que no esten vacios ni repetidos.
 end note
 
 @enduml
