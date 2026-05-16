@@ -55,6 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register-cliente").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/ia/chat").permitAll()
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/inmuebles/**",

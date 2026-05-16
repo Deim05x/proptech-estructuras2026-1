@@ -23,15 +23,18 @@ public class AuthService {
     private final AuthTokenRepository authTokenRepository;
     private final ClienteRepository clienteRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CorreoBienvenidaService correoBienvenidaService;
 
     public AuthService(AuthUsuarioRepository authUsuarioRepository,
             AuthTokenRepository authTokenRepository,
             ClienteRepository clienteRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            CorreoBienvenidaService correoBienvenidaService) {
         this.authUsuarioRepository = authUsuarioRepository;
         this.authTokenRepository = authTokenRepository;
         this.clienteRepository = clienteRepository;
         this.passwordEncoder = passwordEncoder;
+        this.correoBienvenidaService = correoBienvenidaService;
     }
 
     public void sembrarAdminSiNoExiste() {
@@ -111,7 +114,13 @@ public class AuthService {
                 nuevoClienteId,
                 true);
 
-        return authUsuarioRepository.guardar(usuario);
+        boolean usuarioCreado = authUsuarioRepository.guardar(usuario);
+
+        if (usuarioCreado) {
+            correoBienvenidaService.enviarBienvenida(cliente, request.getUsername());
+        }
+
+        return usuarioCreado;
     }
 
     public LoginResponse login(LoginRequest request) {

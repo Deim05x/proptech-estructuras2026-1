@@ -148,6 +148,10 @@ package "Controller" as controller {
   class ValidacionNegocioController <<RestController>> {
     - validacionNegocioService: ValidacionNegocioService
   }
+
+  class AsistenteVirtualController <<RestController>> {
+    - asistenteVirtualService: AsistenteVirtualService
+  }
 }
 
 package "Service" as service {
@@ -155,6 +159,7 @@ package "Service" as service {
     - authUsuarioRepository: AuthUsuarioRepository
     - authTokenRepository: AuthTokenRepository
     - clienteRepository: ClienteRepository
+    - correoBienvenidaService: CorreoBienvenidaService
     + registrarCliente(): boolean
     + login(): LoginResponse
     + validarToken(): AuthToken
@@ -338,6 +343,17 @@ package "Service" as service {
     - contratoRepository: ContratoRepository
     - solicitudAtencionRepository: SolicitudAtencionRepository
     + validarReglasDeNegocio(): Object
+  }
+
+  class AsistenteVirtualService <<Service>> {
+    - inmuebleService: InmuebleService
+    - restClient: RestClient
+    + responder(): AsistenteVirtualResponse
+  }
+
+  class CorreoBienvenidaService <<Service>> {
+    - mailSender: JavaMailSender
+    + enviarBienvenida(): void
   }
 }
 
@@ -552,6 +568,25 @@ package "Model" as model {
   }
 }
 
+package "DTO" as dto {
+  class AsistenteVirtualRequest <<DTO>> {
+    - mensaje: String
+    - historial: List<ChatMessageDTO>
+  }
+
+  class AsistenteVirtualResponse <<DTO>> {
+    - respuesta: String
+    - generadoConIa: boolean
+    - requiereRegistro: boolean
+    - codigosSugeridos: List<String>
+  }
+
+  class ChatMessageDTO <<DTO>> {
+    - role: String
+    - content: String
+  }
+}
+
 package "Estructuras" as estructuras {
   package "Listas" {
     class "LinkedSimpleList<T>" as LinkedSimpleList <<Estructura>> {
@@ -696,6 +731,7 @@ CarruselInmuebleController --> CarruselInmuebleService
 RotacionAsesorController --> RotacionAsesorService
 MotorAlertasComercialesController --> MotorAlertasComercialesService
 ValidacionNegocioController --> ValidacionNegocioService
+AsistenteVirtualController --> AsistenteVirtualService
 
 ' Service -> Repository.
 ClienteService --> ClienteRepository
@@ -749,6 +785,12 @@ ValidacionNegocioService --> VisitaRepository
 ValidacionNegocioService --> OperacionRepository
 ValidacionNegocioService --> ContratoRepository
 ValidacionNegocioService --> SolicitudAtencionRepository
+AuthService --> CorreoBienvenidaService
+AsistenteVirtualService --> InmuebleService
+AsistenteVirtualService ..> AsistenteVirtualRequest
+AsistenteVirtualService ..> AsistenteVirtualResponse
+AsistenteVirtualService ..> ChatMessageDTO
+CorreoBienvenidaService ..> Cliente
 
 ' Repository -> Model.
 ClienteRepository ..> Cliente
@@ -838,6 +880,13 @@ note right of SecurityConfig
   Login y registro de cliente son publicos.
   El catalogo publico permite GET de inmuebles
   y ordenamientos para el modo invitado.
+  El endpoint POST /api/ia/chat tambien es publico.
+end note
+
+note right of AsistenteVirtualService
+  Usa el catalogo disponible como contexto.
+  Si hay API key configurada, consulta el proveedor IA.
+  Si no, responde con logica local de respaldo.
 end note
 
 note bottom of model

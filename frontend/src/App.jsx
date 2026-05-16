@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import AsistenteVirtualChat from "./components/AsistenteVirtualChat";
 import AppRouter from "./router/AppRouter";
 import authService from "./services/authService";
 
@@ -14,7 +15,12 @@ function App() {
   const autenticado = authService.estaAutenticado();
 
   if (esPaginaAutenticacion) {
-    return <AppRouter />;
+    return (
+      <>
+        <AppRouter />
+        <AsistenteVirtualChat />
+      </>
+    );
   }
 
   return (
@@ -37,6 +43,7 @@ function App() {
           <AppRouter />
         </main>
       </div>
+      <AsistenteVirtualChat />
     </div>
   );
 }

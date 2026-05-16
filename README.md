@@ -10,6 +10,8 @@ El sistema esta organizado como una aplicacion web administrativa y de cliente:
 - El frontend consume esa API desde servicios centralizados en `frontend/src/services`.
 - La autenticacion usa tokens persistidos en base de datos.
 - El catalogo de inmuebles puede consultarse como invitado sin iniciar sesion.
+- El asesor virtual usa IA para orientar busquedas y responder preguntas sobre el catalogo.
+- El registro de cliente puede enviar un correo real de bienvenida por SMTP.
 - Las reglas de negocio se implementan en servicios Java.
 - Las colecciones criticas del dominio usan estructuras propias antes de devolver arreglos JSON al frontend.
 
@@ -28,6 +30,7 @@ Backend:
 - Spring Web MVC
 - Spring Security
 - Spring JDBC
+- Spring Mail
 - MariaDB
 - Gradle Wrapper
 
@@ -56,6 +59,14 @@ Flujo base:
 React page -> frontend service -> API REST -> controller -> service -> repository -> MariaDB
                                               |
                                               `-> estructura propia segun caso de uso
+```
+
+Flujo de IA:
+
+```text
+Widget asesor virtual -> POST /api/ia/chat -> AsistenteVirtualService
+                                           |-> catalogo de inmuebles disponibles
+                                           `-> proveedor IA si esta configurado
 ```
 
 ## Modulos Funcionales
@@ -219,6 +230,26 @@ Estructuras usadas:
 - `LinkedDoubleList<Interaccion>` para historial.
 - `Pila` para navegacion inversa de historial de inmuebles.
 
+### Asistente Virtual IA y Correo
+
+El sistema incluye un asesor virtual visible desde el frontend. Puede responder como invitado o como usuario autenticado, usa el catalogo real como contexto y recomienda inmuebles disponibles sin inventar datos. Si no hay API key configurada, responde con una logica local de respaldo para mantener el proyecto operativo.
+
+Rutas principales:
+
+- `POST /api/ia/chat`
+- `POST /api/auth/register-cliente`
+
+Servicios principales:
+
+- `AsistenteVirtualService`: construye el contexto inmobiliario, invoca el proveedor IA cuando esta activo y genera respuestas de respaldo.
+- `CorreoBienvenidaService`: envia correo HTML de bienvenida cuando el registro de cliente termina correctamente y SMTP esta configurado.
+
+DTOs principales:
+
+- `AsistenteVirtualRequest`
+- `AsistenteVirtualResponse`
+- `ChatMessageDTO`
+
 ## Uso de Estructuras Propias
 
 Las estructuras propias se encuentran en:
@@ -266,6 +297,8 @@ El frontend esta organizado por rutas protegidas y modulos agrupados:
 - `Sidebar`: muestra accesos segun rol.
 - `AppRouter`: declara rutas y protege vistas.
 - `services/api.js`: configura Axios con base URL `/api` y token Bearer.
+- `services/asistenteVirtualService.js`: consume el endpoint del asesor virtual.
+- `components/AsistenteVirtualChat.jsx`: muestra el chat flotante global.
 - `pages`: contiene vistas administrativas y de cliente.
 - `utils/formOptions.js`: centraliza opciones de formularios para zonas, tipos, finalidades y estados.
 - `utils/idGenerator.js`: genera el siguiente codigo visible para clientes, asesores e inmuebles.
@@ -290,6 +323,7 @@ Modo invitado:
 
 - La ruta `/descubrir-inmuebles` permite explorar el catalogo sin iniciar sesion.
 - Los invitados pueden ver y filtrar inmuebles.
+- Los invitados pueden usar el asesor virtual para preguntar por inmuebles, zonas y presupuesto.
 - Guardar favoritos, crear solicitudes, pedir visitas, comprar, arrendar o consultar actividad requiere cuenta de cliente.
 
 ## Seguridad
@@ -299,6 +333,7 @@ La seguridad vive en `SecurityConfig` y `TokenAuthenticationFilter`.
 Reglas principales:
 
 - `/api/auth/login` y `/api/auth/register-cliente` son publicos.
+- `POST /api/ia/chat` es publico para que invitados puedan conversar con el asesor virtual.
 - `GET /api/inmuebles/**` y `GET /api/ordenamientos/**` son publicos para soportar el catalogo en modo invitado.
 - Carrusel, recomendaciones, rangos de precio, favoritos, historial y solicitudes requieren autenticacion.
 - Rutas administrativas como contratos, reportes, motor de alertas y validaciones requieren rol `ADMIN`.
@@ -310,6 +345,66 @@ Usuarios semilla:
 - `admin` / `Admin123*`
 - `cliente1` / `Cliente123*`
 - `cliente2` / `Cliente123*`
+
+## Configuracion de IA y Correo
+
+La IA y el correo estan listos para servicios reales, pero se activan por variables de entorno para no guardar claves en el repositorio.
+
+La forma recomendada en Windows es editar el archivo local:
+
+```text
+backend/.env.local
+```
+
+Ese archivo esta ignorado por Git. Puedes tomar como guia `backend/.env.example`. Despues inicia el backend con:
+
+```powershell
+cd backend
+.\run-local.ps1
+```
+
+IA:
+
+```powershell
+$env:AI_ENABLED="true"
+$env:OPENAI_API_KEY="tu_api_key"
+$env:AI_MODEL="gpt-4.1-mini"
+```
+
+Correo SMTP:
+
+```powershell
+$env:MAIL_ENABLED="true"
+$env:MAIL_HOST="smtp.gmail.com"
+$env:MAIL_PORT="587"
+$env:MAIL_USERNAME="tu_correo@gmail.com"
+$env:MAIL_PASSWORD="tu_app_password"
+$env:MAIL_FROM="tu_correo@gmail.com"
+```
+
+Si `AI_ENABLED` esta apagado o falta la API key, el asesor virtual usa respuesta local. Si `MAIL_ENABLED` esta apagado o faltan datos SMTP, el registro funciona normal pero no envia correo.
+
+Para probar solo el correo, sin registrar un cliente:
+
+```powershell
+cd backend
+.\test-mail.ps1
+```
+
+El script envia un correo de prueba al `MAIL_USERNAME` configurado. Tambien puedes indicar otro destinatario:
+
+```powershell
+.\test-mail.ps1 -To cliente@correo.com
+```
+
+Para probar solo la API de OpenAI:
+
+```powershell
+cd backend
+.\test-openai.ps1
+```
+
+Si OpenAI responde `429 Too Many Requests`, la clave puede estar correcta, pero falta saldo/facturacion, se alcanzo un limite del proyecto o el modelo configurado no tiene disponibilidad para esa cuenta.
 
 ## Persistencia
 

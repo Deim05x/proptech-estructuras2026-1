@@ -246,6 +246,9 @@ note bottom
   En el frontend administrativo se generan automaticamente los identificadores
   CLI-###, ASE-### e INM-### antes de enviar el registro. El backend conserva
   estos identificadores como String y valida que no esten vacios ni repetidos.
+
+  El asesor virtual IA y el correo de bienvenida se implementan con servicios
+  y DTOs; no agregan entidades persistentes al paquete model.
 end note
 
 @enduml
