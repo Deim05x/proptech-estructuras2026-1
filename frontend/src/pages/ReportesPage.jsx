@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import reporteService from "../services/reporteService";
 
 function ReportesPage() {
@@ -7,16 +7,16 @@ function ReportesPage() {
   const [tipoReporte, setTipoReporte] = useState("zonas");
   const [cargando, setCargando] = useState(false);
 
-  const cargarResumen = async () => {
+  const cargarResumen = useCallback(async () => {
     try {
       const data = await reporteService.resumen();
       setResumen(data);
     } catch (error) {
       console.error("Error al cargar resumen:", error);
     }
-  };
+  }, []);
 
-  const cargarReporte = async (tipo = tipoReporte) => {
+  const cargarReporte = useCallback(async (tipo) => {
     try {
       setCargando(true);
 
@@ -43,12 +43,12 @@ function ReportesPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     cargarResumen();
     cargarReporte("zonas");
-  }, []);
+  }, [cargarResumen, cargarReporte]);
 
   const cambiarTipoReporte = (e) => {
     const nuevoTipo = e.target.value;

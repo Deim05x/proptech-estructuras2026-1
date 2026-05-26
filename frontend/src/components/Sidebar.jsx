@@ -38,6 +38,12 @@ const groupedAdminLinks = [
     icon: "📈",
     descripcion: "Reportes y búsqueda",
   },
+  {
+    label: "Simulación de Demanda",
+    path: "/simulacion-demanda",
+    icon: "🔮",
+    descripcion: "Proyecciones por sector",
+  },
 ];
 
 const groupedClienteLinks = [

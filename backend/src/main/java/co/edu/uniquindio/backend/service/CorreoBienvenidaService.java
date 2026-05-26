@@ -21,6 +21,7 @@ public class CorreoBienvenidaService {
     private final boolean correoActivo;
     private final String mailHost;
     private final String mailUsername;
+    private final String mailPassword;
     private final String remitente;
     private final String nombreRemitente;
 
@@ -29,19 +30,21 @@ public class CorreoBienvenidaService {
             @Value("${hogarxpress.mail.enabled:false}") boolean correoActivo,
             @Value("${spring.mail.host:}") String mailHost,
             @Value("${spring.mail.username:}") String mailUsername,
+            @Value("${spring.mail.password:}") String mailPassword,
             @Value("${hogarxpress.mail.from:}") String remitente,
             @Value("${hogarxpress.mail.from-name:HogarXpress}") String nombreRemitente) {
         this.mailSender = mailSenderProvider.getIfAvailable();
         this.correoActivo = correoActivo;
         this.mailHost = mailHost;
         this.mailUsername = mailUsername;
+        this.mailPassword = mailPassword;
         this.remitente = remitente;
         this.nombreRemitente = nombreRemitente;
     }
 
-    public void enviarBienvenida(Cliente cliente, String username) {
+    public boolean enviarBienvenida(Cliente cliente, String username) {
         if (!estaConfigurado(cliente)) {
-            return;
+            return false;
         }
 
         try {
@@ -54,22 +57,35 @@ public class CorreoBienvenidaService {
             helper.setText(crearTextoPlano(cliente, username), crearHtml(cliente, username));
 
             mailSender.send(mensaje);
+            LOGGER.info("Correo de bienvenida enviado a {}", cliente.getCorreo());
+            return true;
         } catch (MailException | MessagingException ex) {
             LOGGER.warn("No se pudo enviar el correo de bienvenida a {}", cliente.getCorreo(), ex);
+            return false;
         }
     }
 
     private boolean estaConfigurado(Cliente cliente) {
         if (!correoActivo) {
+            LOGGER.info("Correo de bienvenida omitido porque MAIL_ENABLED=false.");
             return false;
         }
 
-        if (mailSender == null || estaVacio(mailHost) || estaVacio(mailUsername) || estaVacio(remitente)) {
+        if (mailSender == null
+                || estaVacio(mailHost)
+                || estaVacio(mailUsername)
+                || estaVacio(mailPassword)
+                || estaVacio(remitente)) {
             LOGGER.warn("Correo de bienvenida activo, pero faltan variables SMTP.");
             return false;
         }
 
-        return cliente != null && !estaVacio(cliente.getCorreo());
+        if (cliente == null || estaVacio(cliente.getCorreo())) {
+            LOGGER.warn("Correo de bienvenida omitido porque el cliente no tiene correo.");
+            return false;
+        }
+
+        return true;
     }
 
     private String crearTextoPlano(Cliente cliente, String username) {

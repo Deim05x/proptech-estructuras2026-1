@@ -83,7 +83,8 @@ public class SecurityConfig {
                                 "/api/historial-inmuebles/**",
                                 "/api/eventos-inusuales/**",
                                 "/api/motor-alertas",
-                                "/api/motor-alertas/**")
+                                "/api/motor-alertas/**",
+                                "/api/simulacion-demanda/**")
                         .hasRole("ADMIN")
                         .anyRequest().authenticated());
 

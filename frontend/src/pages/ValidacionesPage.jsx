@@ -227,19 +227,25 @@ function ValidacionesPage() {
           </div>
 
           <div style={buttonRowStyle}>
-            <button type="submit" style={primaryButton}>
-              Ejecutar validación
+            <button type="submit" style={primaryButton} disabled={cargando}>
+              {cargando ? "Ejecutando..." : "Ejecutar validación"}
             </button>
 
             <button
               type="button"
               onClick={validarConsistenciaGeneral}
               style={secondaryButton}
+              disabled={cargando}
             >
               Consistencia general
             </button>
 
-            <button type="button" onClick={limpiar} style={secondaryButton}>
+            <button
+              type="button"
+              onClick={limpiar}
+              style={secondaryButton}
+              disabled={cargando}
+            >
               Limpiar
             </button>
           </div>

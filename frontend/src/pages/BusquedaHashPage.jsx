@@ -158,11 +158,16 @@ function BusquedaHashPage() {
           </div>
 
           <div style={buttonRowStyle}>
-            <button type="submit" style={primaryButton}>
-              Buscar
+            <button type="submit" style={primaryButton} disabled={cargando}>
+              {cargando ? "Buscando..." : "Buscar"}
             </button>
 
-            <button type="button" onClick={limpiar} style={secondaryButton}>
+            <button
+              type="button"
+              onClick={limpiar}
+              style={secondaryButton}
+              disabled={cargando}
+            >
               Limpiar
             </button>
           </div>

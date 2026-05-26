@@ -10,11 +10,14 @@ import co.edu.uniquindio.backend.model.SolicitudAtencion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import tools.jackson.databind.JsonNode;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -40,9 +43,11 @@ public class AsistenteVirtualService {
     private final SolicitudAtencionService solicitudAtencionService;
     private final RestClient restClient;
     private final boolean iaActiva;
+    private final String proveedor;
     private final String apiUrl;
     private final String apiKey;
     private final String modelo;
+    private final String conocimientoBase;
 
     public AsistenteVirtualService(
             InmuebleService inmuebleService,
@@ -50,18 +55,22 @@ public class AsistenteVirtualService {
             AsesorService asesorService,
             SolicitudAtencionService solicitudAtencionService,
             @Value("${hogarxpress.ai.enabled:false}") boolean iaActiva,
-            @Value("${hogarxpress.ai.api-url:https://api.openai.com/v1/responses}") String apiUrl,
+            @Value("${hogarxpress.ai.provider:openai}") String proveedor,
+            @Value("${hogarxpress.ai.api-url:}") String apiUrl,
             @Value("${hogarxpress.ai.api-key:}") String apiKey,
-            @Value("${hogarxpress.ai.model:gpt-4.1-mini}") String modelo) {
+            @Value("${hogarxpress.ai.model:}") String modelo,
+            @Value("classpath:asesor-ia-conocimiento.md") Resource conocimientoResource) {
         this.inmuebleService = inmuebleService;
         this.clienteService = clienteService;
         this.asesorService = asesorService;
         this.solicitudAtencionService = solicitudAtencionService;
         this.restClient = RestClient.builder().build();
         this.iaActiva = iaActiva;
+        this.proveedor = proveedor;
         this.apiUrl = apiUrl;
         this.apiKey = apiKey;
         this.modelo = modelo;
+        this.conocimientoBase = cargarConocimientoBase(conocimientoResource);
     }
 
     public AsistenteVirtualResponse responder(
@@ -105,15 +114,28 @@ public class AsistenteVirtualService {
             Inmueble[] inmuebles,
             String clienteId,
             String rol) {
+        if ("gemini".equalsIgnoreCase(valor(proveedor, ""))) {
+            return llamarGemini(request, mensaje, inmuebles, clienteId, rol);
+        }
+
+        return llamarOpenAi(request, mensaje, inmuebles, clienteId, rol);
+    }
+
+    private String llamarOpenAi(
+            AsistenteVirtualRequest request,
+            String mensaje,
+            Inmueble[] inmuebles,
+            String clienteId,
+            String rol) {
         Map<String, Object> body = Map.of(
-                "model", modelo,
+                "model", obtenerModeloOpenAi(),
                 "instructions", instruccionesSistema(),
                 "input", construirEntradaUsuario(request, mensaje, inmuebles, clienteId, rol),
                 "max_output_tokens", 450);
 
         JsonNode response = restClient
                 .post()
-                .uri(apiUrl)
+                .uri(obtenerUrlOpenAi())
                 .header("Authorization", "Bearer " + apiKey)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(body)
@@ -123,11 +145,41 @@ public class AsistenteVirtualService {
         return extraerTextoRespuesta(response);
     }
 
+    private String llamarGemini(
+            AsistenteVirtualRequest request,
+            String mensaje,
+            Inmueble[] inmuebles,
+            String clienteId,
+            String rol) {
+        Map<String, Object> body = Map.of(
+                "systemInstruction", Map.of(
+                        "parts", List.of(Map.of("text", instruccionesSistema()))),
+                "contents", List.of(Map.of(
+                        "role", "user",
+                        "parts", List.of(Map.of(
+                                "text", construirEntradaUsuario(request, mensaje, inmuebles, clienteId, rol))))),
+                "generationConfig", Map.of(
+                        "maxOutputTokens", 450,
+                        "temperature", 0.4));
+
+        JsonNode response = restClient
+                .post()
+                .uri(obtenerUrlGemini())
+                .header("x-goog-api-key", apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body)
+                .retrieve()
+                .body(JsonNode.class);
+
+        return extraerTextoGemini(response);
+    }
+
     private String instruccionesSistema() {
         return """
                 Eres el asesor virtual de HogarXpress, una plataforma inmobiliaria.
                 Responde en espanol claro, amable y breve.
                 Puedes responder preguntas del portal ADMIN, CLIENTE e INVITADO usando la guia operativa y el catalogo entregados por el sistema.
+                Prioriza la base de conocimiento entregada por el sistema cuando responda preguntas sobre HogarXpress.
                 Usa solo el contexto disponible; no inventes inmuebles, precios, disponibilidad, credenciales ni datos personales.
                 Si recomiendas propiedades, menciona codigo, tipo, zona, precio y motivo.
                 Si el usuario pide guardar favoritos, agendar visitas, comprar, arrendar o enviar solicitudes, explica que debe iniciar sesion o registrarse como cliente.
@@ -148,6 +200,10 @@ public class AsistenteVirtualService {
         entrada.append("Cliente autenticado: ").append(valor(clienteId, "sin cliente")).append('\n');
         entrada.append("Guia operativa HogarXpress:\n");
         entrada.append(construirGuiaOperativa());
+        if (!estaVacio(conocimientoBase)) {
+            entrada.append("\nBase de conocimiento HogarXpress:\n");
+            entrada.append(conocimientoBase).append('\n');
+        }
         entrada.append("\nResumen del sistema:\n");
         entrada.append(construirResumenSistema(inmuebles, rol));
         entrada.append("Catalogo disponible:\n");
@@ -252,6 +308,34 @@ public class AsistenteVirtualService {
         }
 
         return "";
+    }
+
+    private String extraerTextoGemini(JsonNode response) {
+        if (response == null || response.isMissingNode() || response.isNull()) {
+            return "";
+        }
+
+        StringBuilder texto = new StringBuilder();
+        JsonNode candidates = response.path("candidates");
+
+        if (candidates.isArray()) {
+            for (JsonNode candidate : candidates) {
+                JsonNode parts = candidate.path("content").path("parts");
+
+                if (!parts.isArray()) {
+                    continue;
+                }
+
+                for (JsonNode part : parts) {
+                    String value = part.path("text").asText("");
+                    if (!value.isBlank()) {
+                        texto.append(value).append('\n');
+                    }
+                }
+            }
+        }
+
+        return texto.toString().trim();
     }
 
     private AsistenteVirtualResponse responderLocalmente(
@@ -407,7 +491,7 @@ public class AsistenteVirtualService {
     }
 
     private String respuestaConfiguracionLocal() {
-        return "La IA real depende de AI_ENABLED=true y OPENAI_API_KEY en backend/.env.local. El correo depende de MAIL_ENABLED=true y una contraseña de aplicacion SMTP valida. Si el chat muestra respuestas sin etiqueta 'Respuesta IA', esta usando la respuesta local de respaldo; reinicia el backend con .\\run-local.ps1 despues de cambiar variables.";
+        return "La IA real depende de AI_ENABLED=true, AI_PROVIDER y una API key valida en backend/.env.local. Para Gemini usa AI_PROVIDER=gemini y GEMINI_API_KEY; para OpenAI usa AI_PROVIDER=openai y OPENAI_API_KEY. El conocimiento editable del asesor esta en backend/src/main/resources/asesor-ia-conocimiento.md. Si el chat muestra respuestas sin etiqueta 'Respuesta IA', esta usando la respuesta local de respaldo; reinicia el backend con .\\run-local.ps1 despues de cambiar variables.";
     }
 
     private String respuestaGeneralLocal(String rol) {
@@ -592,10 +676,41 @@ public class AsistenteVirtualService {
                 "que haces");
     }
 
+    private String obtenerUrlOpenAi() {
+        if (!estaVacio(apiUrl)) {
+            return apiUrl;
+        }
+
+        return "https://api.openai.com/v1/responses";
+    }
+
+    private String obtenerUrlGemini() {
+        if (!estaVacio(apiUrl)) {
+            return apiUrl;
+        }
+
+        return "https://generativelanguage.googleapis.com/v1beta/models/"
+                + obtenerModeloGemini()
+                + ":generateContent";
+    }
+
+    private String obtenerModeloOpenAi() {
+        return estaVacio(modelo) ? "gpt-4.1-mini" : modelo.trim();
+    }
+
+    private String obtenerModeloGemini() {
+        if (estaVacio(modelo) || modelo.toLowerCase(Locale.ROOT).startsWith("gpt-")) {
+            return "gemini-2.5-flash";
+        }
+
+        return modelo.trim();
+    }
+
     private boolean esPreguntaDeConfiguracion(String consulta) {
         return contieneAlguno(
                 consulta,
                 "openai",
+                "gemini",
                 "api key",
                 "apikey",
                 "ia real",
@@ -714,6 +829,19 @@ public class AsistenteVirtualService {
 
     private String limpiar(String valor) {
         return valor(valor, "").trim();
+    }
+
+    private String cargarConocimientoBase(Resource resource) {
+        if (resource == null || !resource.exists()) {
+            return "";
+        }
+
+        try {
+            return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+        } catch (IOException ex) {
+            LOGGER.warn("No se pudo cargar la base de conocimiento del asesor IA.", ex);
+            return "";
+        }
     }
 
     private String limitar(String valor, int maximo) {

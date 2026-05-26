@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import asesorService from "../services/asesorService";
 import inmuebleService from "../services/inmuebleService";
 import historialInmuebleService from "../services/historialInmuebleService";
@@ -96,22 +96,17 @@ function InmueblesPage() {
     }
   };
 
-  const normalizarTexto = (valor) =>
-    String(valor || "")
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
+  const obtenerAsesoresPorZona = useCallback(
+    (zona) => {
+      const zonaSeleccionada = normalizarTexto(zona);
 
-  const asesorCubreZona = (asesor, zona) => {
-    const zonaSeleccionada = normalizarTexto(zona);
-    const zonaAsesor = normalizarTexto(asesor?.especialidadZona);
-
-    return zonaSeleccionada && zonaAsesor === zonaSeleccionada;
-  };
-
-  const obtenerAsesoresPorZona = (zona) =>
-    asesores.filter((asesor) => asesorCubreZona(asesor, zona));
+      return asesores.filter((asesor) => {
+        const zonaAsesor = normalizarTexto(asesor?.especialidadZona);
+        return zonaSeleccionada && zonaAsesor === zonaSeleccionada;
+      });
+    },
+    [asesores]
+  );
 
   useEffect(() => {
     if (!formulario.barrioZona || formulario.idAsesorResponsable) return;
@@ -124,7 +119,12 @@ function InmueblesPage() {
       ...formularioActual,
       idAsesorResponsable: primerAsesorDisponible.id,
     }));
-  }, [asesores, formulario.barrioZona, formulario.idAsesorResponsable]);
+  }, [
+    asesores,
+    formulario.barrioZona,
+    formulario.idAsesorResponsable,
+    obtenerAsesoresPorZona,
+  ]);
 
   const manejarCambio = (e) => {
     const { name, value, type, checked } = e.target;
@@ -231,12 +231,10 @@ function InmueblesPage() {
   };
 
   const editarInmueble = (inmueble) => {
-    const asesorAsignado = asesores.find(
-      (asesor) => asesor.id === inmueble.idAsesorResponsable
-    );
-    const asesorAsignadoEsValido = asesorCubreZona(
-      asesorAsignado,
+    const asesorAsignadoEsValido = obtenerAsesoresPorZona(
       inmueble.barrioZona
+    ).some(
+      (asesor) => asesor.id === inmueble.idAsesorResponsable
     );
 
     setFormulario({
@@ -1160,5 +1158,12 @@ const loadingOrbStyle = {
   animation: "loadingFloat 1.8s ease-in-out infinite",
   margin: "0 auto 12px",
 };
+
+const normalizarTexto = (valor) =>
+  String(valor || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
 export default InmueblesPage;

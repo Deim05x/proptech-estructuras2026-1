@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import visitaService from "../services/visitaService";
 import authService from "../services/authService";
 
@@ -8,11 +8,7 @@ function MisVisitasPage() {
 
   const clienteId = authService.getClienteId();
 
-  useEffect(() => {
-    cargarMisVisitas();
-  }, []);
-
-  const cargarMisVisitas = async () => {
+  const cargarMisVisitas = useCallback(async () => {
     try {
       setCargando(true);
 
@@ -32,7 +28,11 @@ function MisVisitasPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [clienteId]);
+
+  useEffect(() => {
+    cargarMisVisitas();
+  }, [cargarMisVisitas]);
 
   const contarPorEstado = (estado) => {
     return visitas.filter(

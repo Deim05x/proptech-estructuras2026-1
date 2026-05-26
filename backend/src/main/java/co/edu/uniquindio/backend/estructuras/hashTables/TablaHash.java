@@ -35,6 +35,10 @@ public class TablaHash<K, V> {
         return tamaño;
     }
 
+    public int tamaño() {
+        return tamaño;
+    }
+
     public boolean estaVacia() {
         return tamaño == 0;
     }
@@ -137,7 +141,32 @@ public class TablaHash<K, V> {
         }
     }
 
+    public K obtenerClave(int indice) {
+        if (indice < 0 || indice >= tamaño) {
+            return null;
+        }
+
+        int contador = 0;
+        for (NodoHash<K, V> nodoHash : tabla) {
+            NodoHash<K, V> actual = nodoHash;
+
+            while (actual != null) {
+                if (contador == indice) {
+                    return actual.getClave();
+                }
+                contador++;
+                actual = actual.getSiguiente();
+            }
+        }
+
+        return null;
+    }
+
     private int calcularIndice(K clave) {
         return (clave.hashCode() & 0x7fffffff) % tabla.length;
+    }
+
+    public void insertar(K clave, V valor) {
+        poner(clave, valor);
     }
 }

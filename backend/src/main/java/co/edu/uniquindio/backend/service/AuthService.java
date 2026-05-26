@@ -10,6 +10,8 @@ import co.edu.uniquindio.backend.model.Role;
 import co.edu.uniquindio.backend.repository.AuthTokenRepository;
 import co.edu.uniquindio.backend.repository.AuthUsuarioRepository;
 import co.edu.uniquindio.backend.repository.ClienteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ import java.util.UUID;
 
 @Service
 public class AuthService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthService.class);
 
     private final AuthUsuarioRepository authUsuarioRepository;
     private final AuthTokenRepository authTokenRepository;
@@ -117,7 +121,11 @@ public class AuthService {
         boolean usuarioCreado = authUsuarioRepository.guardar(usuario);
 
         if (usuarioCreado) {
-            correoBienvenidaService.enviarBienvenida(cliente, request.getUsername());
+            boolean correoEnviado = correoBienvenidaService.enviarBienvenida(cliente, request.getUsername());
+            if (!correoEnviado) {
+                LOGGER.warn("Cliente {} fue registrado, pero no se pudo enviar el correo de bienvenida.",
+                        nuevoClienteId);
+            }
         }
 
         return usuarioCreado;

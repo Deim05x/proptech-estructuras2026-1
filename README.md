@@ -250,6 +250,41 @@ DTOs principales:
 - `AsistenteVirtualResponse`
 - `ChatMessageDTO`
 
+### Simulación de Crecimiento de Demanda (RA7)
+
+Módulo avanzado que simula y proyecta el crecimiento de demanda por sector/zona utilizando análisis predictivo basado en datos históricos.
+
+Rutas principales:
+
+- `GET /api/simulacion-demanda/zonas` - Simular demanda para todas las zonas
+- `GET /api/simulacion-demanda/zona/{zona}` - Proyección específica por zona
+- `GET /api/simulacion-demanda/resumen` - Resumen general del mercado
+
+Servicios principales:
+
+- `SimulacionDemandaService`: calcula proyecciones, tasas de crecimiento y recomendaciones estratégicas basadas en:
+  - Demanda histórica (visitas por zona)
+  - Operaciones realizadas (cierre de ventas/arriendos)
+  - Disponibilidad de inmuebles
+  - Análisis de precios promedio
+
+Algoritmo de predicción:
+
+- Regresión lineal simple para proyectar tendencias
+- Cálculo de tasa de crecimiento: (operaciones / demanda histórica) × 100
+- Proyección de 3 meses usando la tasa de crecimiento
+- Clasificación de tendencias: CRECIMIENTO ACELERADO, MODERADO, ESTABLE, DESCENSO
+
+DTOs principales:
+
+- `ProyeccionDemandaDTO` - Análisis detallado por zona
+- `ResumenSimulacionDemandaDTO` - Agregación global del mercado
+
+Estructuras usadas:
+
+- `TablaHash` para agrupar y contar inmuebles por zona
+- Lógica de análisis sin estructuras adicionales para mantener eficiencia
+
 ## Uso de Estructuras Propias
 
 Las estructuras propias se encuentran en:

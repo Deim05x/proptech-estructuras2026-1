@@ -1,42 +1,46 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
-import LoginPage from "../pages/LoginPage";
-import Dashboard from "../pages/Dashboard";
-import InmueblesPage from "../pages/InmueblesPage";
-import ClientesPage from "../pages/ClientesPage";
-import AsesoresPage from "../pages/AsesoresPage";
-import VisitasPage from "../pages/VisitasPage";
-import AlertasPage from "../pages/AlertasPage";
-import OperacionesPage from "../pages/OperacionesPage";
-import FavoritosPage from "../pages/FavoritosPage";
-import HistorialPage from "../pages/HistorialPage";
-import CarruselInmueblesPage from "../pages/CarruselInmueblesPage";
-import RotacionAsesoresPage from "../pages/RotacionAsesoresPage";
-import InicioClientePage from "../pages/InicioClientePage";
-import MisVisitasPage from "../pages/MisVisitasPage";
-import RecomendacionesPage from "../pages/RecomendacionesPage";
-import ReportesPage from "../pages/ReportesPage";
-import DescubrirInmueblesPage from "../pages/DescubrirInmueblesPage";
-import MiActividadPage from "../pages/MiActividadPage";
-import AsesoresModuloPage from "../pages/AsesoresModuloPage";
-import AnalisisRelacionesPage from "../pages/AnalisisRelacionesPage";
-import EventosInusualesPage from "../pages/EventosInusualesPage";
-import RegistroClientePage from "../pages/RegistroClientePage";
-import GestionInmobiliariaPage from "../pages/GestionInmobiliariaPage.jsx";
-import PersonasPage from "../pages/PersonasPage";
-import MonitoreoPage from "../pages/MonitoreoPage";
-import AnaliticaPage from "../pages/AnaliticaPage";
-import ComercialPage from "../pages/ComercialPage";
-import CatalogoClientePage from "../pages/CatalogoClientePage";
-import ContratosPage from "../pages/ContratosPage";
-import SolicitudesPage from "../pages/SolicitudesPage";
-import MisSolicitudesPage from "../pages/MisSolicitudesPage";
-import RangoPrecioPage from "../pages/RangoPrecioPage";
-import BusquedaHashPage from "../pages/BusquedaHashPage";
-import MotorAlertasPage from "../pages/MotorAlertasPage";
-import ValidacionesPage from "../pages/ValidacionesPage";
+
+const LoginPage = lazy(() => import("../pages/LoginPage"));
+const Dashboard = lazy(() => import("../pages/Dashboard"));
+const InmueblesPage = lazy(() => import("../pages/InmueblesPage"));
+const ClientesPage = lazy(() => import("../pages/ClientesPage"));
+const VisitasPage = lazy(() => import("../pages/VisitasPage"));
+const AlertasPage = lazy(() => import("../pages/AlertasPage"));
+const OperacionesPage = lazy(() => import("../pages/OperacionesPage"));
+const FavoritosPage = lazy(() => import("../pages/FavoritosPage"));
+const HistorialPage = lazy(() => import("../pages/HistorialPage"));
+const CarruselInmueblesPage = lazy(() => import("../pages/CarruselInmueblesPage"));
+const RotacionAsesoresPage = lazy(() => import("../pages/RotacionAsesoresPage"));
+const InicioClientePage = lazy(() => import("../pages/InicioClientePage"));
+const MisVisitasPage = lazy(() => import("../pages/MisVisitasPage"));
+const RecomendacionesPage = lazy(() => import("../pages/RecomendacionesPage"));
+const ReportesPage = lazy(() => import("../pages/ReportesPage"));
+const DescubrirInmueblesPage = lazy(() => import("../pages/DescubrirInmueblesPage"));
+const MiActividadPage = lazy(() => import("../pages/MiActividadPage"));
+const AsesoresModuloPage = lazy(() => import("../pages/AsesoresModuloPage"));
+const AnalisisRelacionesPage = lazy(() => import("../pages/AnalisisRelacionesPage"));
+const EventosInusualesPage = lazy(() => import("../pages/EventosInusualesPage"));
+const RegistroClientePage = lazy(() => import("../pages/RegistroClientePage"));
+const GestionInmobiliariaPage = lazy(() => import("../pages/GestionInmobiliariaPage.jsx"));
+const PersonasPage = lazy(() => import("../pages/PersonasPage"));
+const MonitoreoPage = lazy(() => import("../pages/MonitoreoPage"));
+const AnaliticaPage = lazy(() => import("../pages/AnaliticaPage"));
+const ComercialPage = lazy(() => import("../pages/ComercialPage"));
+const CatalogoClientePage = lazy(() => import("../pages/CatalogoClientePage"));
+const ContratosPage = lazy(() => import("../pages/ContratosPage"));
+const SolicitudesPage = lazy(() => import("../pages/SolicitudesPage"));
+const MisSolicitudesPage = lazy(() => import("../pages/MisSolicitudesPage"));
+const RangoPrecioPage = lazy(() => import("../pages/RangoPrecioPage"));
+const BusquedaHashPage = lazy(() => import("../pages/BusquedaHashPage"));
+const MotorAlertasPage = lazy(() => import("../pages/MotorAlertasPage"));
+const ValidacionesPage = lazy(() => import("../pages/ValidacionesPage"));
+const SimulacionDemandaPage = lazy(() => import("../pages/SimulacionDemandaPage"));
+
 function AppRouter() {
   return (
+    <Suspense fallback={<div style={loadingPageStyle}>Cargando...</div>}>
     <Routes>
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<LoginPage />} />
@@ -322,7 +326,17 @@ element={
           </ProtectedRoute>
         }
       />
-    </Routes> 
+
+      <Route
+        path="/simulacion-demanda"
+        element={
+          <ProtectedRoute rolesPermitidos={["ADMIN"]}>
+            <SimulacionDemandaPage />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+    </Suspense>
 
     
 
@@ -330,5 +344,12 @@ element={
 
   );
 }
+
+const loadingPageStyle = {
+  minHeight: "160px",
+  display: "grid",
+  placeItems: "center",
+  color: "#e8dfee",
+};
 
 export default AppRouter;

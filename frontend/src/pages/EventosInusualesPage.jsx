@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import eventoInusualService from "../services/eventoInusualService";
 
 function EventosInusualesPage() {
@@ -15,11 +15,7 @@ function EventosInusualesPage() {
     entidadReferencia: "",
   });
 
-  useEffect(() => {
-    cargarEventos();
-  }, [estadoFiltro]);
-
-  const cargarEventos = async () => {
+  const cargarEventos = useCallback(async () => {
     try {
       setCargando(true);
 
@@ -38,7 +34,11 @@ function EventosInusualesPage() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [estadoFiltro]);
+
+  useEffect(() => {
+    cargarEventos();
+  }, [cargarEventos]);
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
